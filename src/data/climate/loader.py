@@ -2,7 +2,7 @@ import pandas as pd
 from typing import List, Optional
 
 
-class LoadResults:
+class ResultsLoader:
     def __init__(self, filenames: List[str]):
         self.filenames = filenames
 
