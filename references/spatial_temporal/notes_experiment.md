@@ -23,8 +23,9 @@ So in this experiment I will be looking at how the spatial-temporal features can
 #### Fixed Parameters
 
 * Density Estimator - RBIG Algorithm
+* IT Scoring Methods - IT measures, ML Scores, Sensitivity Measures
 * ML Algorithm - Gaussian Process
-* Scoring Methods - IT measures, ML Scores, Sensitivity Measures
+* ML Scoring Metrics - R2, MSE, MAE, RMSE
 
 
 #### Steps
