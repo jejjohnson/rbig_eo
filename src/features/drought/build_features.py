@@ -2,6 +2,8 @@ import sys, os
 
 sys.path.insert(0, "/home/emmanuel/code/py_esdc")
 
+from functools import reduce
+
 from esdc.shape import ShapeFileExtract, rasterize
 from esdc.preprocessing import calculate_monthly_mean
 from esdc.transform import DensityCubes
@@ -120,3 +122,14 @@ def get_common_elements(
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     idx = X1.index.intersection(X2.index)
     return X1.loc[idx], X2.loc[idx]
+
+
+def get_common_elements_many(dfs: List[pd.DataFrame]) -> List[pd.DataFrame]:
+
+    # get common element index
+    idx = pd.concat(dfs, axis=1, join="inner").index
+
+    # get subset elements that are common
+    dfs = [df.loc[idx] for df in dfs]
+
+    return dfs
