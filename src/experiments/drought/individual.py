@@ -38,14 +38,14 @@ def main(args):
     drought_cube, _ = remove_climatology(drought_cube)
 
     # drought_years
-    drought_years = [
-        ("2010", False),
-        ("2011", False),
-        ("2012", True),
-        ("2013", False),
-        ("2014", True),
-        ("2015", True),
-    ]
+    drought_years = {
+        "2010": False,
+        "2011": False,
+        "2012": True,
+        "2013": False,
+        "2014": True,
+        "2015": True,
+    }
 
     time_steps = range(1, 12)
     spatial = 1
@@ -81,8 +81,9 @@ def main(args):
                     # get H and TC
                     results_df_single = results_df_single.append(
                         {
+                            "year": iyear,
+                            "drought": drought_years[str(iyear)],
                             "samples": X_norm.shape[0],
-                            "dimensions": X_norm.shape[1],
                             "temporal": itime_step,
                             "variable": iname,
                             "tc": tc,
@@ -92,7 +93,7 @@ def main(args):
                         ignore_index=True,
                     )
 
-                    results_df_single.to_csv(DATA_PATH + args.save_name)
+                    results_df_single.to_csv(DATA_PATH + args.save)
                     postfix = dict(
                         Year=f"{iyear}", Dims=f"{itime_step}", Variable=f"{iname}"
                     )
@@ -128,9 +129,6 @@ if __name__ == "__main__":
 
     # logistics
     parser.add_argument(
-        "--save_name",
-        default="exp_trial_v1.csv",
-        type=str,
-        help="Save Name for data results.",
+        "--save", default="exp_ind_v0.csv", type=str, help="Save Name for data results."
     )
     main(parser.parse_args())

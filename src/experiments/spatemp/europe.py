@@ -149,7 +149,7 @@ def main(args):
                         postfix = dict(
                             Region=iregion,
                             Variable=iname,
-                            SpaTemp=f"{ispatial}-{itemporal}",
+                            Spa_Temp=f"{ispatial}_{itemporal}",
                             Trial=itrial,
                             H=f"{h:.3f}",
                             TC=f"{tc:.3f}",
@@ -166,7 +166,10 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--train", default=10_000, type=int, help="Number of training points for GP"
+        "--train",
+        default=10_000,
+        type=int,
+        help="Number of training points for GP and IT estimator",
     )
     parser.add_argument(
         "--test", default=100_000, type=int, help="Number of testing points for GP"

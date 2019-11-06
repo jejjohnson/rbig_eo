@@ -2,6 +2,14 @@ import pandas as pd
 from typing import List, Optional
 
 
+class DataLoader:
+    def __init__(self, data="amip"):
+        self.data = data
+
+    def load_amip_data(self):
+        pass
+
+
 class ResultsLoader:
     def __init__(self, filenames: List[str]):
         self.filenames = filenames

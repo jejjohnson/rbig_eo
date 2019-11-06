@@ -16,6 +16,7 @@ import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from src.models.train_models import run_rbig_models
 from tqdm import tqdm
+from scipy import stats
 
 DATA_PATH = "/home/emmanuel/projects/2020_rbig_rs/data/drought/results/"
 
@@ -38,14 +39,14 @@ def main(args):
     drought_cube, _ = remove_climatology(drought_cube)
 
     # drought_years
-    drought_years = [
-        ("2010", False),
-        ("2011", False),
-        ("2012", True),
-        ("2013", False),
-        ("2014", True),
-        ("2015", True),
-    ]
+    drought_years = {
+        "2010": False,
+        "2011": False,
+        "2012": True,
+        "2013": False,
+        "2014": True,
+        "2015": True,
+    }
     # MI elements
     common_vars = [
         ("VOD", "NDVI"),
@@ -79,31 +80,53 @@ def main(args):
                 variables = {"VOD": vod_df, "NDVI": ndvi_df, "SM": sm_df, "LST": lst_df}
 
                 # do calculations for H, TC
-                for iname, idata in variables.items():
+                for (ivar, jvar) in common_vars:
+
+                    # Pearson coeffcient
+                    pears = stats.pearsonr(
+                        variables[ivar].values.ravel(), variables[jvar].values.ravel()
+                    )[0]
+
+                    # Spearman Coefficient
+                    spears = stats.spearmanr(
+                        variables[ivar].values.ravel(), variables[jvar].values.ravel()
+                    )[0]
 
                     # normalize data
-                    X_norm = StandardScaler().fit_transform(idata)
+                    X_norm = StandardScaler().fit_transform(variables[ivar])
+                    Y_norm = StandardScaler().fit_transform(variables[jvar])
 
                     # entropy, total correlation
-                    tc, h, t_ = run_rbig_models(X_norm, measure="t", random_state=123)
+                    mi, t_ = run_rbig_models(
+                        X_norm, Y_norm, measure="mi", random_state=123
+                    )
 
                     # get H and TC
                     results_df_single = results_df_single.append(
                         {
+                            "year": iyear,
+                            "drought": drought_years[str(iyear)],
                             "samples": X_norm.shape[0],
-                            "dimensions": X_norm.shape[1],
                             "temporal": itime_step,
-                            "variable": iname,
-                            "tc": tc,
-                            "h": h,
+                            "variable1": ivar,
+                            "variable2": jvar,
+                            "mi": mi,
+                            "pearson": pears,
+                            "spearman": spears,
                             "time": t_,
                         },
                         ignore_index=True,
                     )
 
-                    results_df_single.to_csv(DATA_PATH + args.save_name)
+                    results_df_single.to_csv(DATA_PATH + args.save)
 
-                    postfix = dict(Dims=f"{itime_step}", Variable=f"{iname}")
+                    postfix = dict(
+                        Dims=f"{itime_step}",
+                        Variable1=f"{ivar}",
+                        Variable2=f"{jvar}",
+                        MI=f"{mi:.3f}",
+                        time=f"{t_:.2f}",
+                    )
                     years_bar.set_postfix(postfix)
 
 
@@ -136,7 +159,7 @@ if __name__ == "__main__":
 
     # logistics
     parser.add_argument(
-        "--save_name",
+        "--save",
         default="group_trial_v1.csv",
         type=str,
         help="Save Name for data results.",
