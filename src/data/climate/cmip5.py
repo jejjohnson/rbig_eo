@@ -1,6 +1,11 @@
 import cdsapi
+import xarray as xr
+from typing import Union
+from src.data.climate.amip import DataLoader
 
 DATA_DIR = "/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/"
+
+xr_types = Union[xr.Dataset, xr.DataArray]
 
 
 def get_data():
@@ -19,6 +24,15 @@ def get_data():
         },
         f"{DATA_DIR}CMIP5.nc",
     )
+
+
+def get_cmip5_model(cmip_model: str, variable: str) -> xr_types:
+
+    loader = DataLoader()
+
+    ds = loader.load_amip_data(cmip_model)[variable]
+    ds.attrs["model_id"] = cmip_model
+    return ds
 
 
 def main():

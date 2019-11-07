@@ -3,11 +3,29 @@ import cdsapi
 import xarray as xr
 from typing import Union
 from zipfile import ZipFile, BadZipFile
+from src.data.climate.era5 import get_era5_data
+from src.data.climate.ncep import get_ncep_data
 
 import tarfile
 
 DATA_DIR = "/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/amip/"
 c = cdsapi.Client()
+
+from typing import Type, Union
+
+xr_types = Union[xr.Dataset, xr.DataArray]
+
+
+def get_base_model(base_model: str, variable: str) -> xr_types:
+
+    if base_model == "era5":
+        ds = get_era5_data()[variable]
+    elif base_model == "ncep":
+        ds = get_ncep_data()[variable]
+    else:
+        raise ValueError("Unrecognized base model:", base_model)
+    ds.attrs["model_id"] = base_model
+    return ds
 
 
 class DataDownloader:
@@ -128,7 +146,7 @@ class DataLoader:
         ]:
             return xr.open_mfdataset(f"{DATA_DIR}{data}/*.nc", combine="by_coords")
         else:
-            raise ValueError("Unrecognized dataset: {data}")
+            raise ValueError(f"Unrecognized dataset:", data)
 
 
 # inmcm4 (INM, Russia)
