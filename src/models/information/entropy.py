@@ -5,10 +5,15 @@ from sklearn.neighbors import NearestNeighbors
 from typing import Optional
 from sklearn.base import BaseEstimator
 from sklearn.utils import gen_batches
-from .ensemble import Ensemble
+from .ensemble import Batch
 from sklearn.utils import check_random_state, check_array
 from typing import Optional, Union
 import statsmodels.api as sm
+
+import sys
+
+sys.path.insert(0, "/home/emmanuel/code/rbig")
+from rbig import RBIG
 
 
 class Univariate:
@@ -177,7 +182,7 @@ class Multivariate:
         return norm_dist.entropy()
 
 
-class KNNEstimator(BaseEstimator, Ensemble):
+class KNNEstimator(BaseEstimator, Batch):
     """Performs the KNN search to
     
     Parameters
@@ -243,7 +248,7 @@ class KNNEstimator(BaseEstimator, Ensemble):
         """
 
         if self.ensemble:
-            self.H_x = self._fit_ensemble(X, self.batch_size)
+            self.H_x = self._fit_batches(X, self.batch_size)
         else:
             self.H_x = self._fit(X)
 
@@ -278,6 +283,71 @@ class KNNEstimator(BaseEstimator, Ensemble):
             + psi(n_samples)
             - psi(self.n_neighbors)
         )
+
+    def score(self, X: np.ndarray, y: Optional[np.ndarray] = None):
+
+        return self.H_x
+
+
+class RBIGEstimator(BaseEstimator, Batch):
+    def __init__(
+        self,
+        n_layers: int = 10_000,
+        rotation_type: str = "PCA",
+        zero_tolerance: int = 60,
+        pdf_extension: int = 10,
+        pdf_resolution: Optional[int] = None,
+        tolerance: Optional[int] = None,
+        random_state: Optional[int] = None,
+        verbose: Optional[int] = None,
+        batch_size: Optional[int] = None,
+    ):
+
+        self.n_layers = n_layers
+        self.rotation_type = rotation_type
+        self.random_state = random_state
+        self.zero_tolerance = zero_tolerance
+        self.tolerance = tolerance
+        self.pdf_extension = pdf_extension
+        self.pdf_resolution = pdf_resolution
+        self.verbose = verbose
+        self.batch_size = batch_size
+
+    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> BaseEstimator:
+        """
+        
+        Parameters
+        ----------
+        X : np.ndarray, (n_samples, n_features)
+            Data to be estimated.
+        """
+        X = check_array(X, ensure_2d=True)
+
+        if self.batch_size is not None:
+            self.H_x = self._fit_batches(X, None, self.batch_size)
+        else:
+            self.H_x = self._fit(X)
+
+        return self
+
+    def _fit(self, X: np.ndarray) -> float:
+
+        # 1. Calculate the K-nearest neighbors
+        rbig_model = RBIG(
+            n_layers=self.n_layers,
+            rotation_type=self.rotation_type,
+            random_state=self.random_state,
+            zero_tolerance=self.zero_tolerance,
+            tolerance=self.tolerance,
+            pdf_extension=self.pdf_extension,
+            pdf_resolution=self.pdf_resolution,
+            verbose=self.verbose,
+        )
+
+        rbig_model.fit(X)
+
+        # estimation
+        return rbig_model.entropy(correction=True) * np.log(2)
 
     def score(self, X: np.ndarray, y: Optional[np.ndarray] = None):
 
