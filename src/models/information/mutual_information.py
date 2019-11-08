@@ -1,9 +1,14 @@
 from .entropy import KNNEstimator
 from sklearn.base import BaseEstimator
-from .ensemble import Ensemble
+from .ensemble import Batch
 from typing import Optional
 import numpy as np
 from sklearn.utils import check_array
+
+import sys
+
+sys.path.insert(0, "/home/emmanuel/code/rbig")
+from rbig import RBIG, RBIGMI
 
 
 class MutualInformation(BaseEstimator):
@@ -143,4 +148,104 @@ class TotalCorrelation(BaseEstimator):
     def score(self, X: np.ndarray, y: Optional[np.ndarray] = None):
 
         return self.MI
+
+
+class RBIGEstimator(BaseEstimator, Batch):
+    def __init__(
+        self,
+        n_layers: int = 10_000,
+        rotation_type: str = "PCA",
+        zero_tolerance: int = 60,
+        pdf_extension: int = 10,
+        pdf_resolution: Optional[int] = None,
+        tolerance: Optional[int] = None,
+        random_state: Optional[int] = None,
+        verbose: Optional[int] = None,
+        batch_size: Optional[int] = None,
+        shuffle: bool = True,
+    ):
+        # Initialize super class
+        Batch.__init__(self, batch_size=batch_size, random_state=random_state)
+
+        self.n_layers = n_layers
+        self.rotation_type = rotation_type
+        self.zero_tolerance = zero_tolerance
+        self.tolerance = tolerance
+        self.pdf_extension = pdf_extension
+        self.pdf_resolution = pdf_resolution
+        self.verbose = verbose
+        self.shuffle = shuffle
+
+    def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> BaseEstimator:
+        """
+        
+        Parameters
+        ----------
+        X : np.ndarray, (n_samples, n_features)
+            Data to be estimated.
+        """
+
+        # Case I - Mutual Information
+        if self.batch_size is not None:
+            self.mi_ = self._fit_batches(X, y)
+        else:
+            self.mi_ = self._fit(X, y)
+
+        return self
+
+    def _fit(self, X: np.ndarray, Y: Optional[np.ndarray] = None) -> float:
+
+        X = check_array(X, ensure_2d=True)
+
+        # Case I - Mutual Information
+        if Y is None:
+            return self._fit_total_correlation(X)
+        # Case II - Total Correlation
+        else:
+
+            Y = check_array(Y, ensure_2d=True)
+            return self._fit_mutual_info(X, Y)
+
+    def _fit_mutual_info(self, X: np.ndarray, Y: np.ndarray) -> float:
+
+        # initialize rbig model
+        rbig_mi_model = RBIGMI(
+            n_layers=self.n_layers,
+            rotation_type=self.rotation_type,
+            random_state=self.random_state,
+            zero_tolerance=self.zero_tolerance,
+            tolerance=self.tolerance,
+            pdf_extension=self.pdf_extension,
+            pdf_resolution=self.pdf_resolution,
+            verbose=self.verbose,
+        )
+
+        # fit RBIG model to data
+        rbig_mi_model.fit(X, Y)
+
+        # return mutual info
+        return rbig_mi_model.mutual_information() * np.log(2)
+
+    def _fit_total_correlation(self, X: np.ndarray) -> float:
+
+        # 1. Calculate the K-nearest neighbors
+        rbig_model = RBIG(
+            n_layers=self.n_layers,
+            rotation_type=self.rotation_type,
+            random_state=self.random_state,
+            zero_tolerance=self.zero_tolerance,
+            tolerance=self.tolerance,
+            pdf_extension=self.pdf_extension,
+            pdf_resolution=self.pdf_resolution,
+            verbose=self.verbose,
+        )
+
+        rbig_model.fit(X)
+
+        # estimation
+        return rbig_model.mutual_information * np.log(2)
+
+    def score(self, X: np.ndarray, y: Optional[np.ndarray] = None):
+
+        return self.mi_
 

@@ -39,10 +39,10 @@ class Batch:
     
     Attributes
     ----------
-    batch_scores : np.ndarray
+    raw_scores : np.ndarray
         the raw batchsize scores
 
-    score : float
+    batch_score : float
         the final score after the summary stat (e.g. mean)
     """
 
@@ -80,7 +80,7 @@ class Batch:
 
         Returns
         -------
-        score : float
+        batch_score : float
             the score after the summary
         """
         it_measure = list()
@@ -100,16 +100,16 @@ class Batch:
                 it_measure.append(self._fit(X[idx]))
 
         # save raw scores
-        self.batch_scores = np.ndarray(it_measure)
+        self.raw_scores = it_measure
 
         # return summary score
         if self.summary == "mean":
-            self.score = np.mean(it_measure)
+            self.batch_score = np.mean(it_measure)
 
         elif self.summary == "median":
-            self.score = np.median(it_measure)
+            self.batch_score = np.median(it_measure)
 
         else:
             raise ValueError("Unrecognized summarizer: {}".format(self.summary))
 
-        return self.score
+        return self.batch_score

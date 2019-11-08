@@ -303,15 +303,16 @@ class RBIGEstimator(BaseEstimator, Batch):
         batch_size: Optional[int] = None,
     ):
 
+        # initialize super class
+        Batch.__init__(self, batch_size=batch_size, random_state=random_state)
+        
         self.n_layers = n_layers
         self.rotation_type = rotation_type
-        self.random_state = random_state
         self.zero_tolerance = zero_tolerance
         self.tolerance = tolerance
         self.pdf_extension = pdf_extension
         self.pdf_resolution = pdf_resolution
         self.verbose = verbose
-        self.batch_size = batch_size
 
     def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> BaseEstimator:
         """
@@ -324,7 +325,7 @@ class RBIGEstimator(BaseEstimator, Batch):
         X = check_array(X, ensure_2d=True)
 
         if self.batch_size is not None:
-            self.H_x = self._fit_batches(X, None, self.batch_size)
+            self.H_x = self._fit_batches(X, None)
         else:
             self.H_x = self._fit(X)
 
