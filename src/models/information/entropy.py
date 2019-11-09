@@ -5,7 +5,7 @@ from sklearn.neighbors import NearestNeighbors
 from typing import Optional
 from sklearn.base import BaseEstimator
 from sklearn.utils import gen_batches
-from .ensemble import Batch
+from .ensemble import Batch, BootStrap
 from sklearn.utils import check_random_state, check_array
 from typing import Optional, Union
 import statsmodels.api as sm
@@ -289,13 +289,15 @@ class KNNEstimator(BaseEstimator, Batch):
         return self.H_x
 
 
-class RBIGEstimator(BaseEstimator, Batch):
+class RBIGEstimator(BaseEstimator, Batch, BootStrap):
     def __init__(
         self,
         n_layers: int = 10_000,
         rotation_type: str = "PCA",
         zero_tolerance: int = 60,
         pdf_extension: int = 10,
+        bootstrap: bool = False,
+        n_iterations: int = 100,
         pdf_resolution: Optional[int] = None,
         tolerance: Optional[int] = None,
         random_state: Optional[int] = None,
@@ -305,7 +307,7 @@ class RBIGEstimator(BaseEstimator, Batch):
 
         # initialize super class
         Batch.__init__(self, batch_size=batch_size, random_state=random_state)
-        
+        BootStrap.__init__(self, n_iterations=n_iterations)
         self.n_layers = n_layers
         self.rotation_type = rotation_type
         self.zero_tolerance = zero_tolerance
@@ -313,6 +315,7 @@ class RBIGEstimator(BaseEstimator, Batch):
         self.pdf_extension = pdf_extension
         self.pdf_resolution = pdf_resolution
         self.verbose = verbose
+        self.bootstrap = bootstrap
 
     def fit(self, X: np.ndarray, y: Optional[np.ndarray] = None) -> BaseEstimator:
         """
@@ -324,8 +327,15 @@ class RBIGEstimator(BaseEstimator, Batch):
         """
         X = check_array(X, ensure_2d=True)
 
-        if self.batch_size is not None:
+        # Case I - Run Bootstrap
+        if self.bootstrap:
+            self.H_x = self.run_bootstrap(X, y, self.batch_size)
+
+        # Case II - Estimate in Batches
+        elif self.batch_size is not None:
             self.H_x = self._fit_batches(X, None)
+
+        # Case III - Do standard estimation
         else:
             self.H_x = self._fit(X)
 

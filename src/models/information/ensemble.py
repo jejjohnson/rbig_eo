@@ -1,8 +1,8 @@
 import numpy as np
 from sklearn.base import BaseEstimator
-from sklearn.utils import gen_batches
+from sklearn.utils import gen_batches, resample
 from sklearn.model_selection import train_test_split
-from typing import Optional
+from typing import Optional, Tuple
 from sklearn.utils import shuffle
 
 
@@ -113,3 +113,46 @@ class Batch:
             raise ValueError("Unrecognized summarizer: {}".format(self.summary))
 
         return self.batch_score
+
+
+class BootStrap:
+    def __init__(self, n_iterations=100):
+        self.n_iterations = n_iterations
+
+    def _fit(self, X: np.ndarray) -> BaseEstimator:
+        pass
+
+    def run_bootstrap(
+        self,
+        X: np.ndarray,
+        y: Optional[np.ndarray] = None,
+        sample_size: Optional[int] = 1_000,
+    ) -> None:
+
+        raw_scores = list()
+        if sample_size is not None:
+            n_samples = min(X.shape[0], sample_size)
+        else:
+            n_samples = X.shape[0]
+        for i in range(self.n_iterations):
+            if y is None:
+                X_sample = resample(X, n_samples=sample_size)
+                raw_scores.append(self._fit(X_sample))
+            else:
+                X_sample, Y_sample = resample(X, y, n_samples=sample_size)
+                raw_scores.append(self._fit(X_sample, Y_sample))
+        self.raw_scores = raw_scores
+
+        return np.mean(raw_scores)
+
+    def ci(self, p: float) -> Tuple[float, float]:
+        """
+        Return 2-sided symmetric confidence interval specified
+        by p.
+        """
+        u_pval = (1 + p) / 2.0
+        l_pval = 1 - u_pval
+        l_indx = int(np.floor(self.n_iterations * l_pval))
+        u_indx = int(np.floor(self.n_iterations * u_pval))
+        return self.raw_scores[l_indx], self.raw_scores[u_indx]
+
