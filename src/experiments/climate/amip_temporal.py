@@ -47,7 +47,7 @@ class CMIPArgs:
     # =============
     # Fixed Params
     # =============
-    spatial_windows = list(range(1, 10 + 1))
+    spatial_windows = [2, 3, 4, 5]
 
     # ============
     # Free Params
@@ -55,7 +55,7 @@ class CMIPArgs:
     variables = ["psl"]
 
     cmip_models = [
-        "inmcm4",
+
         "access1_0",
         "bcc_csm1_1",
         "bcc_csm1_1_m",
@@ -68,6 +68,7 @@ class CMIPArgs:
         "mpi_esm_lr",
         "mpi_esm_mr",
         "noresm1_m",
+        "inmcm4",
     ]
 
     base_models = ["ncep", "era5"]
@@ -131,29 +132,23 @@ def process_loop_individual(
     cmip_df = resample(cmip_df, n_samples=subsample, random_state=trial)
 
     # 7.1 - Entropy
-    h_base, h_time_base = run_rbig_models(
-        base_df, measure="h", verbose=None, batch_size=batch_size
+    tc_base, h_base, h_time_base = run_rbig_models(
+        base_df, measure="h", verbose=None, 
     )
-    h_cmip, h_time_cmip = run_rbig_models(
-        cmip_df, measure="h", verbose=None, batch_size=batch_size
+    tc_cmip, h_cmip, h_time_cmip = run_rbig_models(
+        cmip_df, measure="h", verbose=None,
     )
-    # 7.1 - Total Correlation
-    tc_base, tc_time_base = run_rbig_models(
-        base_df, measure="t", verbose=None, batch_size=batch_size
-    )
-    tc_cmip, tc_time_cmip = run_rbig_models(
-        cmip_df, measure="t", verbose=None, batch_size=batch_size
-    )
+
 
     results = {
         "base_time_stamp": base_time_stamp,
         "cmip_time_stamp": cmip_time_stamp,
         "h_base": h_base,
-        "tc_base": tc_base,
         "h_cmip": h_cmip,
+        "tc_base": tc_base,
         "tc_cmip": tc_cmip,
-        "t_base": h_time_base + tc_time_base,
-        "t_cmip": h_time_cmip + tc_time_cmip,
+        "t_base": h_time_base,
+        "t_cmip": h_time_cmip,
     }
     return results
 
@@ -260,9 +255,9 @@ def experiment_individual(args):
                                         "base_time": ires["base_time_stamp"],
                                         "cmip_time": ires["cmip_time_stamp"],
                                         "h_base": ires["h_base"],
-                                        "tc_base": ires["tc_base"],
                                         "h_cmip": ires["h_cmip"],
                                         "tc_cmip": ires["tc_cmip"],
+                                        "tc_base": ires["tc_base"],
                                         "t_base": ires["t_base"],
                                         "t_cmip": ires["t_cmip"],
                                         "subsample": args.subsample,

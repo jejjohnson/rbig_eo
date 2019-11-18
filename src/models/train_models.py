@@ -22,9 +22,10 @@ def run_rbig_models(
     pdf_resolution = None
     tolerance = None
 
-    if measure.lower() == "t":
+    if measure.lower() == "t" or measure.lower() == "h":
+
         # RBIG MODEL 0
-        rbig_tc_model = RBIGMI(
+        rbig_model = RBIG(
             n_layers=n_layers,
             rotation_type=rotation_type,
             random_state=random_state,
@@ -32,55 +33,25 @@ def run_rbig_models(
             tolerance=tolerance,
             pdf_extension=pdf_extension,
             pdf_resolution=pdf_resolution,
-            verbose=None,
-            batch_size=batch_size,
+            verbose=verbose,
         )
 
         # fit model to the data
         t0 = time.time()
-        rbig_tc_model.fit(X1)
+        rbig_model.fit(X1)
         t1 = time.time() - t0
 
-        if verbose:
-            print(
-                f"Trained RBIG TC ({X1.shape[0]:,} points, {X1.shape[1]:,} dimensions): {t1:.3f} secs"
-            )
-
-        tc = rbig_tc_model.score(X1)
-        if verbose:
-            print(f"TC: {tc:.3f}")
-
-        return tc, t1
-
-    elif measure.lower() == "h":
-        # RBIG MODEL 0
-        rbig_h_model = RBIGENT(
-            n_layers=n_layers,
-            rotation_type=rotation_type,
-            random_state=random_state,
-            zero_tolerance=zero_tolerance,
-            tolerance=tolerance,
-            pdf_extension=pdf_extension,
-            pdf_resolution=pdf_resolution,
-            verbose=None,
-            batch_size=batch_size,
+        print(
+            f"Trained RBIG ({X1.shape[0]:,} points, {X1.shape[1]:,} dimensions): {t1:.3f} secs"
         )
 
-        # fit model to the data
-        t0 = time.time()
-        rbig_h_model.fit(X1, X2)
-        t1 = time.time() - t0
+        tc = rbig_model.mutual_information * np.log(2)
+        h = rbig_model.entropy(correction=True) * np.log(2)
 
-        if verbose:
-            print(
-                f"Trained RBIG ({X1.shape[0]:,} points, {X1.shape[1]:,} dimensions): {t1:.3f} secs"
-            )
+        print(f"TC: {tc:.3f}")
+        print(f"H: {h:.3f}")
 
-        h = rbig_h_model.score(X1)
-        if verbose:
-            print(f"H: {h:.3f}")
-
-        return h, t1
+        return tc, h, t1
 
     elif measure.lower() == "mi":
         # RBIG MODEL 0
@@ -92,8 +63,7 @@ def run_rbig_models(
             tolerance=tolerance,
             pdf_extension=pdf_extension,
             pdf_resolution=pdf_resolution,
-            verbose=None,
-            batch_size=batch_size,
+            verbose=verbose,
         )
 
         # fit model to the data
@@ -101,16 +71,44 @@ def run_rbig_models(
         rbig_mi_model.fit(X1, X2)
         t1 = time.time() - t0
 
-        if verbose:
-            print(
-                f"Trained RBIG1 MI ({X1.shape[0]:,} points, {X1.shape[1]:,} dimensions): {t1:.3f} secs"
-            )
+        print(
+            f"Trained RBIG1 MI ({X1.shape[0]:,} points, {X1.shape[1]:,} dimensions): {t1:.3f} secs"
+        )
 
-        mi = rbig_mi_model.score(X1)
-        if verbose:
-            print(f"MI: {mi:.3f}")
+        mi = rbig_mi_model.mutual_information() * np.log(2)
+
+        print(f"MI: {mi:.3f}")
 
         return mi, t1
 
+    elif measure.lower() == "kld":
+
+        rbig_kld_model = RBIGKLD(
+            n_layers=n_layers,
+            rotation_type=rotation_type,
+            random_state=random_state,
+            zero_tolerance=zero_tolerance,
+            tolerance=tolerance,
+            pdf_extension=pdf_extension,
+            pdf_resolution=pdf_resolution,
+            verbose=verbose,
+        )
+
+        # fit model to the data
+        t0 = time.time()
+        rbig_kld_model.fit(X1, X2)
+        t1 = time.time() - t0
+
+        print(
+            f"Trained RBIG KLD ({X1.shape[0]:,}, {X2.shape[0]:,} points): {t1:.3f} secs"
+        )
+
+        kld = rbig_kld_model.kld * np.log(2)
+
+        print(f"KLD: {kld:.3f}")
+
+        return kld, t1
+
     else:
         raise ValueError(f"Unrecognized measure: {measure}.")
+
