@@ -40,6 +40,7 @@ xr_types = Union[xr.Dataset, xr.DataArray]
 class DataArgs:
     # Path Arguments
     data_path = "/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/amip/"
+    interim_path = '/home/emmanuel/projects/2020_rbig_rs/data/climate/interim/amip/'
     results_path = "/home/emmanuel/projects/2020_rbig_rs/data/climate/results/amip/"
 
 
@@ -47,7 +48,7 @@ class CMIPArgs:
     # =============
     # Fixed Params
     # =============
-    spatial_windows = [2, 3, 4, 5]
+    spatial_windows = [1, 2, 3, 4, 5]
 
     # ============
     # Free Params
@@ -58,15 +59,15 @@ class CMIPArgs:
 
         "access1_0",
         "bcc_csm1_1",
-        "bcc_csm1_1_m",
+        # "bcc_csm1_1_m",
         "bnu_esm",
         "giss_e2_r",
         "cnrm_cm5",
         "ipsl_cm5a_lr",
-        "ipsl_cm5a_mr",
-        "ipsl_cm5b_lr",
+        # "ipsl_cm5a_mr",
+        # "ipsl_cm5b_lr",
         "mpi_esm_lr",
-        "mpi_esm_mr",
+        # "mpi_esm_mr",
         "noresm1_m",
         "inmcm4",
     ]
@@ -74,17 +75,19 @@ class CMIPArgs:
     base_models = ["ncep", "era5"]
 
 
-def get_features_loop(base: str, cmip: str, variable: str) -> Dict:
+def get_features_loop(base: str, cmip: str, variable: str, regrid_name: str) -> Dict:
     """Performs one experimental loop for calculating the IT measures
     for the models"""
     # 1.1) get base model
+    # print(base)
     base_dat = get_base_model(base, variable)
 
     # 1.2) get cmip5 model
     cmip_dat = get_cmip5_model(cmip, variable)
 
     # 2) regrid data
-    base_dat, cmip_dat = regrid_2_lower_res(base_dat, cmip_dat)
+    # print(base_dat, cmip_dat)
+    base_dat, cmip_dat = regrid_2_lower_res(base_dat, cmip_dat, filename=regrid_name + '.nc')
 
     # 3) find overlapping times
     base_dat, cmip_dat = get_time_overlap(base_dat, cmip_dat)
@@ -207,159 +210,175 @@ def experiment_individual(args):
     # initialize results
     results_df = pd.DataFrame()
 
+    # cmip_model
+    base_model = CMIPArgs.base_models[args.base]
+    cmip_model = CMIPArgs.cmip_models[args.cmip]
+    interim_name = (
+        DataArgs.interim_path 
+        + "local/individual/"
+        + f"{base_model}_{cmip_model}_"
+        + args.save
+    )
+    results_name = (
+        DataArgs.results_path 
+        + "local/individual/"
+        + f"{base_model}_{cmip_model}_"
+        + args.save
+    )
+
     # set up progress bar
     n_iterations = len(CMIPArgs.cmip_models)
-    with tqdm(list(range(n_iterations))) as pbar:
+    with tqdm(CMIPArgs.spatial_windows) as pbar:
 
         # Loop through cmip models
-        for i in pbar:
-            icmip = CMIPArgs.cmip_models[i]
+        for ispatial in pbar:
 
-            # Loop through base models
-            for ibase in CMIPArgs.base_models:
 
-                # Loop through variables
-                for ivariable in CMIPArgs.variables:
+            # Loop through variables
+            for ivariable in CMIPArgs.variables:
 
-                    # Loop through spatial windows
-                    for ispatial in CMIPArgs.spatial_windows:
+                    
 
+                # Get results
+                base_dat, cmip_dat = get_features_loop(
+                    base_model, cmip_model, ivariable, regrid_name=interim_name
+                )
+
+                # generate dataset per year
+                for ibase_dat, icmip_dat in generate_temporal_data(
+                    base_dat, cmip_dat
+                ):
                         for itrial in range(args.trials):
-                            # Get results
-                            base_dat, cmip_dat = get_features_loop(
-                                ibase, icmip, ivariable
+                            # generate temporal data
+                            ires = process_loop_individual(
+                                ibase_dat,
+                                icmip_dat,
+                                ispatial,
+                                args.subsample,
+                                itrial,
                             )
 
-                            # generate dataset per year
-                            for ibase_dat, icmip_dat in generate_temporal_data(
-                                base_dat, cmip_dat
-                            ):
+                            # append results to running dataframe
+                            results_df = results_df.append(
+                                {
+                                    "trial": itrial,
+                                    "base": base_model,
+                                    "cmip": cmip_model,
+                                    "variable": ivariable,
+                                    "spatial": ispatial,
+                                    "base_time": ires["base_time_stamp"],
+                                    "cmip_time": ires["cmip_time_stamp"],
+                                    "h_base": ires["h_base"],
+                                    "h_cmip": ires["h_cmip"],
+                                    "tc_cmip": ires["tc_cmip"],
+                                    "tc_base": ires["tc_base"],
+                                    "t_base": ires["t_base"],
+                                    "t_cmip": ires["t_cmip"],
+                                    "subsample": args.subsample,
+                                },
+                                ignore_index=True,
+                            )
 
-                                # generate temporal data
-                                ires = process_loop_individual(
-                                    ibase_dat,
-                                    icmip_dat,
-                                    ispatial,
-                                    args.subsample,
-                                    itrial,
-                                )
-
-                                # append results to running dataframe
-                                results_df = results_df.append(
-                                    {
-                                        "trial": itrial,
-                                        "base": ibase,
-                                        "cmip": icmip,
-                                        "variable": ivariable,
-                                        "spatial": ispatial,
-                                        "base_time": ires["base_time_stamp"],
-                                        "cmip_time": ires["cmip_time_stamp"],
-                                        "h_base": ires["h_base"],
-                                        "h_cmip": ires["h_cmip"],
-                                        "tc_cmip": ires["tc_cmip"],
-                                        "tc_base": ires["tc_base"],
-                                        "t_base": ires["t_base"],
-                                        "t_cmip": ires["t_cmip"],
-                                        "subsample": args.subsample,
-                                    },
-                                    ignore_index=True,
-                                )
-
-                                # save results
-                                results_df.to_csv(
-                                    DataArgs.results_path
-                                    + "spatial_individual_"
-                                    + args.save
-                                    + ".csv"
-                                )
-                                # Update Progress bar
-                                postfix = dict(
-                                    Base=f"{ibase}",
-                                    CMIP=f"{icmip}",
-                                    Variable=f"{ivariable}",
-                                    Window=f"{ispatial}",
-                                    Year=ires["base_time_stamp"],
-                                )
-                                pbar.set_postfix(postfix)
-
+                            # save results
+                            results_df.to_csv(interim_name + '.csv')
+                            # Update Progress bar
+                            postfix = dict(
+                                Base=f"{base_model}",
+                                CMIP=f"{cmip_model}",
+                                Variable=f"{ivariable}",
+                                Window=f"{ispatial}",
+                                Year=ires["base_time_stamp"],
+                            )
+                            pbar.set_postfix(postfix)
+    results_df.to_csv(results_name + '.csv')
 
 def experiment_compare(args):
     # initialize results
     results_df = pd.DataFrame()
 
+    # cmip_model
+    base_model = CMIPArgs.base_models[args.base]
+    cmip_model = CMIPArgs.cmip_models[args.cmip]
+
+    interim_name = (
+        DataArgs.interim_path 
+        + "local/individual/"
+        + f"{base_model}_{cmip_model}_"
+        + args.save
+    )
+    results_name = (
+        DataArgs.results_path 
+        + "local/individual/"
+        + f"{base_model}_{cmip_model}_"
+        + args.save
+    )
     # set up progress bar
     n_iterations = len(CMIPArgs.cmip_models)
-    with tqdm(list(range(n_iterations))) as pbar:
+    with tqdm(CMIPArgs.spatial_windows) as pbar:
 
         # Loop through cmip models
-        for i in pbar:
-            icmip = CMIPArgs.cmip_models[i]
-
-            # Loop through base models
-            for ibase in CMIPArgs.base_models:
-
-                # Loop through variables
-                for ivariable in CMIPArgs.variables:
-
-                    # Loop through spatial windows
-                    for ispatial in CMIPArgs.spatial_windows:
-                        # Get results
-                        base_dat, cmip_dat = get_features_loop(ibase, icmip, ivariable)
-
-                        # generate dataset per year
-                        for ibase_dat, icmip_dat in generate_temporal_data(
-                            base_dat, cmip_dat
-                        ):
-                            for itrial in range(args.trials):
-
-                                # generate temporal data
-                                ires = process_loop_compare(
-                                    ibase_dat,
-                                    icmip_dat,
-                                    ispatial,
-                                    args.subsample,
-                                    itrial,
-                                )
-
-                                # append results to running dataframe
-                                results_df = results_df.append(
-                                    {
-                                        "trial": itrial,
-                                        "base": ibase,
-                                        "cmip": icmip,
-                                        "variable": ivariable,
-                                        "spatial": ispatial,
-                                        "base_time": ires["base_time_stamp"],
-                                        "cmip_time": ires["cmip_time_stamp"],
-                                        "mi": ires["mi"],
-                                        "time_mi": ires["time_mi"],
-                                        "pearson": ires["pearson"],
-                                        "spearman": ires["spearman"],
-                                        "kendelltau": ires["kendelltau"],
-                                        "subsample": args.subsample,
-                                    },
-                                    ignore_index=True,
-                                )
-
-                                # save results
-                                results_df.to_csv(
-                                    DataArgs.results_path
-                                    + "spatial_compare_"
-                                    + args.save
-                                    + ".csv"
-                                )
-                                # Update Progress bar
-                                postfix = dict(
-                                    Trial=f"{itrial}",
-                                    Base=f"{ibase}",
-                                    CMIP=f"{icmip}",
-                                    Variable=f"{ivariable}",
-                                    Window=f"{ispatial}",
-                                    Year=ires["base_time_stamp"],
-                                )
-                                pbar.set_postfix(postfix)
+        for ispatial in pbar:
 
 
+            # Loop through variables
+            for ivariable in CMIPArgs.variables:
+
+                # Get results
+                base_dat, cmip_dat = get_features_loop(
+                    base_model, cmip_model, ivariable, interim_name 
+                )
+
+                # generate dataset per year
+                for ibase_dat, icmip_dat in generate_temporal_data(
+                    base_dat, cmip_dat
+                ):
+                    for itrial in range(args.trials):
+
+                        # generate temporal data
+                        ires = process_loop_compare(
+                            ibase_dat,
+                            icmip_dat,
+                            ispatial,
+                            args.subsample,
+                            itrial,
+                        )
+
+                        # append results to running dataframe
+                        results_df = results_df.append(
+                            {
+                                "trial": itrial,
+                                "base": base_model,
+                                "cmip": cmip_model,
+                                "variable": ivariable,
+                                "spatial": ispatial,
+                                "base_time": ires["base_time_stamp"],
+                                "cmip_time": ires["cmip_time_stamp"],
+                                "mi": ires["mi"],
+                                "time_mi": ires["time_mi"],
+                                "pearson": ires["pearson"],
+                                "spearman": ires["spearman"],
+                                "kendelltau": ires["kendelltau"],
+                                "subsample": args.subsample,
+                            },
+                            ignore_index=True,
+                        )
+
+                        # save results
+
+                        results_df.to_csv(interim_name + ".csv")
+
+                        # Update Progress bar
+                        postfix = dict(
+                            Trial=f"{itrial}",
+                            Base=f"{base_model}",
+                            CMIP=f"{cmip_model}",
+                            Variable=f"{ivariable}",
+                            Window=f"{ispatial}",
+                            Year=ires["base_time_stamp"],
+                        )
+                        pbar.set_postfix(postfix)
+
+    results_df.to_csv(results_name + ".csv")
 def main(args):
 
     if args.exp == "individual":
@@ -376,13 +395,19 @@ if __name__ == "__main__":
         description="Arguments for climate model global experiment"
     )
 
+    # ======================
+    # Experiment Parameters
+    # ======================
     parser.add_argument(
         "--exp",
         default="individual",
         type=str,
         help="Individual IT measures or comparative IT measures.",
     )
-
+    parser.add_argument(
+        "--base", default=0, type=int, help="Base model to be compared (ncep, era5)"
+    )
+    parser.add_argument("--cmip", default=0, type=int, help="CMIP model to be compared (inmcm4)")
     # ===================
     # IT Measures Params
     # ===================

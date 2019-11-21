@@ -43,18 +43,18 @@ def check_time_coords(
     return ds
 
 
-def regrid_2_lower_res(ds1: xr_dat, ds2: xr_dat) -> Tuple[xr_dat, xr_dat]:
+def regrid_2_lower_res(ds1: xr_dat, ds2: xr_dat, filename: Optional[str]=None) -> Tuple[xr_dat, xr_dat]:
 
     ds1_coords = len(ds1.lat) + len(ds1.lon)
     ds2_coords = len(ds2.lat) + len(ds2.lon)
 
     if ds1_coords >= ds2_coords:
         model_id = ds1.attrs["model_id"]
-        ds1 = regrid_data(ds2, ds1)
+        ds1 = regrid_data(ds2, ds1, filename=filename)
         ds1.attrs["model_id"] = model_id
     else:
         model_id = ds2.attrs["model_id"]
-        ds2 = regrid_data(ds1, ds2)
+        ds2 = regrid_data(ds1, ds2, filename=filename)
         ds2.attrs["model_id"] = model_id
 
     return ds1, ds2
@@ -65,6 +65,7 @@ def regrid_data(
     ds: Union[xr.Dataset, xr.DataArray],
     method: Optional[str] = "nearest_s2d",
     clean: bool = True,
+    filename: Optional[str]=None
 ) -> xr.Dataset:
     """A light wrapper over the xEMSF package used to regrid datasets. Will
     regrid the new dataset under the reference dataset.
@@ -107,7 +108,7 @@ def regrid_data(
         {"lat": (["lat"], reference_ds.lat), "lon": (["lon"], reference_ds.lon)}
     )
     # create regridder object
-    regridder = xe.Regridder(ds, ds_out, method, reuse_weights=True)
+    regridder = xe.Regridder(ds, ds_out, method, reuse_weights=False, filename=filename)
 
     # case of dataarray
     if isinstance(ds, xr.core.dataarray.DataArray):

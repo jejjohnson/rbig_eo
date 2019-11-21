@@ -74,8 +74,8 @@ class CMIPArgs:
 
 
 def experiment_loop_comparative(
-    base: str,
-    cmip: str,
+    base_dat: str,
+    cmip_dat: str,
     variable: str,
     spatial_window: int,
     subsample: Optional[int] = None,
@@ -84,10 +84,10 @@ def experiment_loop_comparative(
     """Performs one experimental loop for calculating the IT measures
     for the models"""
     # 1.1) get base model
-    base_dat = get_base_model(base, variable)
+    base_dat = get_base_model(base_dat, variable)
 
     # 1.2) get cmip5 model
-    cmip_dat = get_cmip5_model(cmip, variable)
+    cmip_dat = get_cmip5_model(cmip_dat, variable)
 
     # 2) regrid data
     base_dat, cmip_dat = regrid_2_lower_res(base_dat, cmip_dat)
@@ -161,18 +161,12 @@ def experiment_loop_individual(
     cmip_df = resample(cmip_df, n_samples=subsample, random_state=trial)
 
     # 7.1 - Entropy
-    h_base, h_time_base = run_rbig_models(
-        base_df, measure="h", verbose=None, batch_size=batch_size
-    )
-    h_cmip, h_time_cmip = run_rbig_models(
-        cmip_df, measure="h", verbose=None, batch_size=batch_size
+    tc_base, h_base, h_time_base = run_rbig_models(
+        base_df, measure="h", verbose=None, 
     )
     # 7.1 - Total Correlation
-    tc_base, tc_time_base = run_rbig_models(
-        base_df, measure="t", verbose=None, batch_size=batch_size
-    )
-    tc_cmip, tc_time_cmip = run_rbig_models(
-        cmip_df, measure="t", verbose=None, batch_size=batch_size
+    tc_cmip, h_cmip, h_time_cmip = run_rbig_models(
+        cmip_df, measure="h", verbose=None,
     )
 
     results = {
@@ -180,8 +174,8 @@ def experiment_loop_individual(
         "tc_base": tc_base,
         "h_cmip": h_cmip,
         "tc_cmip": tc_cmip,
-        "t_base": h_time_base + tc_time_base,
-        "t_cmip": h_time_cmip + tc_time_cmip,
+        "t_base": h_time_base ,
+        "t_cmip": h_time_cmip ,
     }
     return results
 
@@ -191,136 +185,137 @@ def experiment_individual(args):
     # initialize results
     results_df = pd.DataFrame()
 
+    # cmip_model
+    base_model = CMIPArgs.base_models[args.base]
+    cmip_model = CMIPArgs.cmip_models[args.cmip]
+
     # set up progress bar
     n_iterations = len(CMIPArgs.cmip_models)
-    with tqdm(list(range(n_iterations))) as pbar:
+    with tqdm(CMIPArgs.spatial_windows) as pbar:
 
         # Loop through cmip models
-        for i in pbar:
-            icmip = CMIPArgs.cmip_models[i]
+        for ispatial in pbar:
 
-            # Loop through base models
-            for ibase in CMIPArgs.base_models:
 
-                # Loop through variables
-                for ivariable in CMIPArgs.variables:
+            # Loop through variables
+            for ivariable in CMIPArgs.variables:
 
-                    # Loop through spatial windows
-                    for ispatial in CMIPArgs.spatial_windows:
+                    for itrial in range(args.trials):
+                        ires = experiment_loop_individual(
+                            base_model,
+                            cmip_model,
+                            ivariable,
+                            ispatial,
+                            args.subsample,
+                            itrial,
+                        )
 
-                        # Get results
-                        for itrial in range(args.trials):
-                            ires = experiment_loop_individual(
-                                ibase,
-                                icmip,
-                                ivariable,
-                                ispatial,
-                                args.subsample,
-                                itrial,
-                            )
+                        # append results to running dataframe
+                        results_df = results_df.append(
+                            {
+                                "trial": itrial,
+                                "base": base_model,
+                                "cmip": cmip_model,
+                                "variable": ivariable,
+                                "spatial": ispatial,
+                                "h_base": ires["h_base"],
+                                "tc_base": ires["tc_base"],
+                                "h_cmip": ires["h_cmip"],
+                                "tc_cmip": ires["tc_cmip"],
+                                "t_base": ires["t_base"],
+                                "t_cmip": ires["t_cmip"],
+                                "subsample": args.subsample,
+                            },
+                            ignore_index=True,
+                        )
 
-                            # append results to running dataframe
-                            results_df = results_df.append(
-                                {
-                                    "trial": itrial,
-                                    "base": ibase,
-                                    "cmip": icmip,
-                                    "variable": ivariable,
-                                    "spatial": ispatial,
-                                    "h_base": ires["h_base"],
-                                    "tc_base": ires["tc_base"],
-                                    "h_cmip": ires["h_cmip"],
-                                    "tc_cmip": ires["tc_cmip"],
-                                    "t_base": ires["t_base"],
-                                    "t_cmip": ires["t_cmip"],
-                                    "subsample": args.subsample,
-                                },
-                                ignore_index=True,
-                            )
-
-                            # save results
-                            results_df.to_csv(
-                                DataArgs.results_path
-                                + "global_individual_"
-                                + args.save
-                                + ".csv"
-                            )
-                            # Update Progress bar
-                            postfix = dict(
-                                Base=f"{ibase}",
-                                CMIP=f"{icmip}",
-                                Variable=f"{ivariable}",
-                                Window=f"{ispatial}",
-                            )
-                            pbar.set_postfix(postfix)
+                        # save results
+                        save_name =  (
+                            DataArgs.results_path 
+                            + "global/individual/"
+                            + f"{base_model}_{cmip_model}_ind_"
+                            + args.save
+                            + ".csv")
+                        results_df.to_csv(
+                            DataArgs.results_path
+                            + args.save
+                            + ".csv"
+                        )
+                        results_df.to_csv(save_name)
+                        # Update Progress bar
+                        postfix = dict(
+                            Base=f"{base_model}",
+                            CMIP=f"{cmip_model}",
+                            Variable=f"{ivariable}",
+                            Window=f"{ispatial}",
+                        )
+                        pbar.set_postfix(postfix)
 
 
 def experiment_compare(args):
     # initialize results
     results_df = pd.DataFrame()
 
+    # cmip_model
+    base_model = CMIPArgs.base_models[args.base]
+    cmip_model = CMIPArgs.cmip_models[args.cmip]
+
     # set up progress bar
     n_iterations = len(CMIPArgs.cmip_models)
-    with tqdm(list(range(n_iterations))) as pbar:
+    with tqdm(CMIPArgs.spatial_windows) as pbar:
 
         # Loop through cmip models
-        for i in pbar:
-            icmip = CMIPArgs.cmip_models[i]
+        for ispatial in pbar:
 
-            # Loop through base models
-            for ibase in CMIPArgs.base_models:
 
-                # Loop through variables
-                for ivariable in CMIPArgs.variables:
+            # Loop through variables
+            for ivariable in CMIPArgs.variables:
 
-                    # Loop through spatial windows
-                    for ispatial in CMIPArgs.spatial_windows:
+                    for itrial in range(args.trials):
+                        # Get results
+                        ires = experiment_loop_comparative(
+                            base_model,
+                            cmip_model,
+                            ivariable,
+                            ispatial,
+                            args.subsample,
+                            itrial,
+                        )
 
-                        for itrial in range(args.trials):
-                            # Get results
-                            ires = experiment_loop_comparative(
-                                ibase,
-                                icmip,
-                                ivariable,
-                                ispatial,
-                                args.subsample,
-                                itrial,
-                            )
+                        # append results to running dataframe
+                        results_df = results_df.append(
+                            {
+                                "trial": itrial,
+                                "base": base_model,
+                                "cmip": cmip_model,
+                                "variable": ivariable,
+                                "spatial": ispatial,
+                                "mi": ires["mi"],
+                                "time_mi": ires["time_mi"],
+                                "pearson": ires["pearson"],
+                                "spearman": ires["spearman"],
+                                "kendelltau": ires["kendelltau"],
+                                "subsample": args.subsample,
+                            },
+                            ignore_index=True,
+                        )
 
-                            # append results to running dataframe
-                            results_df = results_df.append(
-                                {
-                                    "trial": itrial,
-                                    "base": ibase,
-                                    "cmip": icmip,
-                                    "variable": ivariable,
-                                    "spatial": ispatial,
-                                    "mi": ires["mi"],
-                                    "time_mi": ires["time_mi"],
-                                    "pearson": ires["pearson"],
-                                    "spearman": ires["spearman"],
-                                    "kendelltau": ires["kendelltau"],
-                                    "subsample": args.subsample,
-                                },
-                                ignore_index=True,
-                            )
 
-                            # save results
-                            results_df.to_csv(
-                                DataArgs.results_path
-                                + "global_compare_"
-                                + args.save
-                                + ".csv"
-                            )
-                            # Update Progress bar
-                            postfix = dict(
-                                Trial=f"{itrial}",
-                                Base=f"{ibase}",
-                                CMIP=f"{icmip}",
-                                Variable=f"{ivariable}",
-                                Window=f"{ispatial}",
-                            )
-                            pbar.set_postfix(postfix)
+                        # save results
+                        save_name = (DataArgs.results_path + "global/"
+                            + f"{base_model}_{cmip_model}_com_"
+                            + args.save
+                            + ".csv")
+                        results_df.to_csv(save_name)
+                        # Update Progress bar
+                        postfix = dict(
+                            Trial=f"{itrial}",
+                            Base=f"{base_model}",
+                            CMIP=f"{cmip_model}",
+                            Variable=f"{ivariable}",
+                            Window=f"{ispatial}",
+                        )
+                        pbar.set_postfix(postfix)
 
 
 def main(args):
@@ -340,14 +335,19 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Arguments for climate model global experiment"
     )
-
+    # ======================
+    # Experiment Parameters
+    # ======================
     parser.add_argument(
         "--exp",
         default="individual",
         type=str,
         help="Individual IT measures or comparative IT measures.",
     )
-
+    parser.add_argument(
+        "--base", default=0, type=int, help="Base model to be compared (ncep, era5)"
+    )
+    parser.add_argument("--cmip", default=0, type=int, help="CMIP model to be compared (inmcm4)")
     # ===================
     # IT Measures Params
     # ===================
