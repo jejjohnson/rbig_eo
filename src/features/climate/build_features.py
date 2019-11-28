@@ -2,6 +2,7 @@ import sys
 
 sys.path.insert(0, f"/home/emmanuel/code/py_esdc")
 from esdc.transform import DensityCubes
+from src.data.climate.amip import DataLoader
 from typing import Union, Tuple, Optional
 import numpy as np
 import pandas as pd
@@ -43,7 +44,9 @@ def check_time_coords(
     return ds
 
 
-def regrid_2_lower_res(ds1: xr_dat, ds2: xr_dat, filename: Optional[str]=None) -> Tuple[xr_dat, xr_dat]:
+def regrid_2_lower_res(
+    ds1: xr_dat, ds2: xr_dat, filename: Optional[str] = None
+) -> Tuple[xr_dat, xr_dat]:
 
     ds1_coords = len(ds1.lat) + len(ds1.lon)
     ds2_coords = len(ds2.lat) + len(ds2.lon)
@@ -65,7 +68,7 @@ def regrid_data(
     ds: Union[xr.Dataset, xr.DataArray],
     method: Optional[str] = "nearest_s2d",
     clean: bool = True,
-    filename: Optional[str]=None
+    filename: Optional[str] = None,
 ) -> xr.Dataset:
     """A light wrapper over the xEMSF package used to regrid datasets. Will
     regrid the new dataset under the reference dataset.
@@ -135,6 +138,19 @@ def regrid_data(
     if clean:
         regridder.clean_weight_file()
     return ds
+
+
+def get_reference_dataset(ds: Optional[str] = "ipsl_cm5a_lr") -> xr_dat:
+    """Regrids dataset to lowest res dataset available.
+    
+    In out case, we use 96 x 96 res dataset"""
+    # open reference dataset
+    if ds is None:
+        ds = "ipsl_cm5a_lr"
+
+    loader = DataLoader()
+    reference_ds = loader.load_amip_data(ds)
+    return reference_ds
 
 
 def get_spatial_cubes(da: xr.DataArray, spatial_window: int) -> pd.DataFrame:

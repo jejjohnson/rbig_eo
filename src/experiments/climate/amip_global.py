@@ -14,6 +14,8 @@ from src.features.climate.build_features import (
     regrid_2_lower_res,
     get_spatial_cubes,
     normalize_data,
+    get_reference_dataset,
+    regrid_data,
 )
 
 from typing import Type, Union, Optional, Tuple, Dict
@@ -32,7 +34,9 @@ from sklearn import preprocessing
 from sklearn.model_selection import train_test_split
 from scipy import stats
 from sklearn.utils import resample
+import warnings
 
+warnings.simplefilter("ignore")
 
 xr_types = Union[xr.Dataset, xr.DataArray]
 
@@ -40,6 +44,7 @@ xr_types = Union[xr.Dataset, xr.DataArray]
 class DataArgs:
     # Path Arguments
     data_path = "/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/amip/"
+    interim_path = "/home/emmanuel/projects/2020_rbig_rs/data/climate/interim/amip/"
     results_path = "/home/emmanuel/projects/2020_rbig_rs/data/climate/results/amip/"
 
 
@@ -55,19 +60,19 @@ class CMIPArgs:
     variables = ["psl"]
 
     cmip_models = [
-        "inmcm4",
         "access1_0",
         "bcc_csm1_1",
-        "bcc_csm1_1_m",
+        # "bcc_csm1_1_m",
         "bnu_esm",
         "giss_e2_r",
         "cnrm_cm5",
         "ipsl_cm5a_lr",
-        "ipsl_cm5a_mr",
-        "ipsl_cm5b_lr",
+        # "ipsl_cm5a_mr",
+        # "ipsl_cm5b_lr",
         "mpi_esm_lr",
-        "mpi_esm_mr",
+        # "mpi_esm_mr",
         "noresm1_m",
+        "inmcm4",
     ]
 
     base_models = ["ncep", "era5"]
@@ -80,6 +85,7 @@ def experiment_loop_comparative(
     spatial_window: int,
     subsample: Optional[int] = None,
     trial: int = 1,
+    regrid_filename: Optional[str] = None,
 ) -> Dict:
     """Performs one experimental loop for calculating the IT measures
     for the models"""
@@ -89,8 +95,10 @@ def experiment_loop_comparative(
     # 1.2) get cmip5 model
     cmip_dat = get_cmip5_model(cmip_dat, variable)
 
-    # 2) regrid data
-    base_dat, cmip_dat = regrid_2_lower_res(base_dat, cmip_dat)
+    # 2) regrid data w. reference grid and
+    reference_ds = get_reference_dataset("ipsl_cm5a_lr")
+    base_dat = regrid_data(reference_ds, base_dat, filename=regrid_filename + ".nc")
+    cmip_dat = regrid_data(reference_ds, cmip_dat, filename=regrid_filename + ".nc")
 
     # 3) find overlapping times
     base_dat, cmip_dat = get_time_overlap(base_dat, cmip_dat)
@@ -133,6 +141,7 @@ def experiment_loop_individual(
     subsample: Optional[int] = None,
     trial: int = 1,
     batch_size: Optional[int] = None,
+    regrid_filename: Optional[str] = None,
 ) -> Dict:
     """Performs one experimental loop for calculating the IT measures
     for the models"""
@@ -142,8 +151,10 @@ def experiment_loop_individual(
     # 1.2) get cmip5 model
     cmip_dat = get_cmip5_model(cmip, variable)
 
-    # 2) regrid data
-    base_dat, cmip_dat = regrid_2_lower_res(base_dat, cmip_dat)
+    # 2) regrid data w. reference grid and
+    reference_ds = get_reference_dataset("ipsl_cm5a_lr")
+    base_dat = regrid_data(reference_ds, base_dat, filename=regrid_filename + ".nc")
+    cmip_dat = regrid_data(reference_ds, cmip_dat, filename=regrid_filename + ".nc")
 
     # 3) find overlapping times
     base_dat, cmip_dat = get_time_overlap(base_dat, cmip_dat)
@@ -161,21 +172,17 @@ def experiment_loop_individual(
     cmip_df = resample(cmip_df, n_samples=subsample, random_state=trial)
 
     # 7.1 - Entropy
-    tc_base, h_base, h_time_base = run_rbig_models(
-        base_df, measure="h", verbose=None, 
-    )
+    tc_base, h_base, h_time_base = run_rbig_models(base_df, measure="h", verbose=None)
     # 7.1 - Total Correlation
-    tc_cmip, h_cmip, h_time_cmip = run_rbig_models(
-        cmip_df, measure="h", verbose=None,
-    )
+    tc_cmip, h_cmip, h_time_cmip = run_rbig_models(cmip_df, measure="h", verbose=None)
 
     results = {
         "h_base": h_base,
         "tc_base": tc_base,
         "h_cmip": h_cmip,
         "tc_cmip": tc_cmip,
-        "t_base": h_time_base ,
-        "t_cmip": h_time_cmip ,
+        "t_base": h_time_base,
+        "t_cmip": h_time_cmip,
     }
     return results
 
@@ -188,6 +195,20 @@ def experiment_individual(args):
     # cmip_model
     base_model = CMIPArgs.base_models[args.base]
     cmip_model = CMIPArgs.cmip_models[args.cmip]
+    interim_name = (
+        DataArgs.interim_path
+        + "global/individual/"
+        + f"{base_model}_{cmip_model}_"
+        + str(f"tr{args.trials}_" if args.trials > 1 else "")
+        + args.save
+    )
+    results_name = (
+        DataArgs.results_path
+        + "global/individual/"
+        + f"{base_model}_{cmip_model}_"
+        + str(f"tr{args.trials}_" if args.trials > 1 else "")
+        + args.save
+    )
 
     # set up progress bar
     n_iterations = len(CMIPArgs.cmip_models)
@@ -196,60 +217,49 @@ def experiment_individual(args):
         # Loop through cmip models
         for ispatial in pbar:
 
-
             # Loop through variables
             for ivariable in CMIPArgs.variables:
 
-                    for itrial in range(args.trials):
-                        ires = experiment_loop_individual(
-                            base_model,
-                            cmip_model,
-                            ivariable,
-                            ispatial,
-                            args.subsample,
-                            itrial,
-                        )
+                for itrial in range(args.trials):
+                    ires = experiment_loop_individual(
+                        base_model,
+                        cmip_model,
+                        ivariable,
+                        ispatial,
+                        args.subsample,
+                        itrial,
+                        regrid_filename=interim_name,
+                    )
 
-                        # append results to running dataframe
-                        results_df = results_df.append(
-                            {
-                                "trial": itrial,
-                                "base": base_model,
-                                "cmip": cmip_model,
-                                "variable": ivariable,
-                                "spatial": ispatial,
-                                "h_base": ires["h_base"],
-                                "tc_base": ires["tc_base"],
-                                "h_cmip": ires["h_cmip"],
-                                "tc_cmip": ires["tc_cmip"],
-                                "t_base": ires["t_base"],
-                                "t_cmip": ires["t_cmip"],
-                                "subsample": args.subsample,
-                            },
-                            ignore_index=True,
-                        )
+                    # append results to running dataframe
+                    results_df = results_df.append(
+                        {
+                            "trial": itrial,
+                            "base": base_model,
+                            "cmip": cmip_model,
+                            "variable": ivariable,
+                            "spatial": ispatial,
+                            "h_base": ires["h_base"],
+                            "tc_base": ires["tc_base"],
+                            "h_cmip": ires["h_cmip"],
+                            "tc_cmip": ires["tc_cmip"],
+                            "t_base": ires["t_base"],
+                            "t_cmip": ires["t_cmip"],
+                            "subsample": args.subsample,
+                        },
+                        ignore_index=True,
+                    )
 
-                        # save results
-                        save_name =  (
-                            DataArgs.results_path 
-                            + "global/individual/"
-                            + f"{base_model}_{cmip_model}_ind_"
-                            + args.save
-                            + ".csv")
-                        results_df.to_csv(
-                            DataArgs.results_path
-                            + args.save
-                            + ".csv"
-                        )
-                        results_df.to_csv(save_name)
-                        # Update Progress bar
-                        postfix = dict(
-                            Base=f"{base_model}",
-                            CMIP=f"{cmip_model}",
-                            Variable=f"{ivariable}",
-                            Window=f"{ispatial}",
-                        )
-                        pbar.set_postfix(postfix)
+                    results_df.to_csv(interim_name + ".csv")
+                    # Update Progress bar
+                    postfix = dict(
+                        Base=f"{base_model}",
+                        CMIP=f"{cmip_model}",
+                        Variable=f"{ivariable}",
+                        Window=f"{ispatial}",
+                    )
+                    pbar.set_postfix(postfix)
+    results_df.to_csv(results_name + ".csv")
 
 
 def experiment_compare(args):
@@ -259,6 +269,20 @@ def experiment_compare(args):
     # cmip_model
     base_model = CMIPArgs.base_models[args.base]
     cmip_model = CMIPArgs.cmip_models[args.cmip]
+    interim_name = (
+        DataArgs.interim_path
+        + "global/compare/"
+        + f"{base_model}_{cmip_model}_"
+        + str(f"tr{args.trials}_" if args.trials > 1 else "")
+        + args.save
+    )
+    results_name = (
+        DataArgs.results_path
+        + "global/compare/"
+        + f"{base_model}_{cmip_model}_"
+        + str(f"tr{args.trials}_" if args.trials > 1 else "")
+        + args.save
+    )
 
     # set up progress bar
     n_iterations = len(CMIPArgs.cmip_models)
@@ -267,55 +291,51 @@ def experiment_compare(args):
         # Loop through cmip models
         for ispatial in pbar:
 
-
             # Loop through variables
             for ivariable in CMIPArgs.variables:
 
-                    for itrial in range(args.trials):
-                        # Get results
-                        ires = experiment_loop_comparative(
-                            base_model,
-                            cmip_model,
-                            ivariable,
-                            ispatial,
-                            args.subsample,
-                            itrial,
-                        )
+                for itrial in range(args.trials):
+                    # Get results
+                    ires = experiment_loop_comparative(
+                        base_model,
+                        cmip_model,
+                        ivariable,
+                        ispatial,
+                        args.subsample,
+                        itrial,
+                        regrid_filename=interim_name,
+                    )
 
-                        # append results to running dataframe
-                        results_df = results_df.append(
-                            {
-                                "trial": itrial,
-                                "base": base_model,
-                                "cmip": cmip_model,
-                                "variable": ivariable,
-                                "spatial": ispatial,
-                                "mi": ires["mi"],
-                                "time_mi": ires["time_mi"],
-                                "pearson": ires["pearson"],
-                                "spearman": ires["spearman"],
-                                "kendelltau": ires["kendelltau"],
-                                "subsample": args.subsample,
-                            },
-                            ignore_index=True,
-                        )
+                    # append results to running dataframe
+                    results_df = results_df.append(
+                        {
+                            "trial": itrial,
+                            "base": base_model,
+                            "cmip": cmip_model,
+                            "variable": ivariable,
+                            "spatial": ispatial,
+                            "mi": ires["mi"],
+                            "time_mi": ires["time_mi"],
+                            "pearson": ires["pearson"],
+                            "spearman": ires["spearman"],
+                            "kendelltau": ires["kendelltau"],
+                            "subsample": args.subsample,
+                        },
+                        ignore_index=True,
+                    )
 
-
-                        # save results
-                        save_name = (DataArgs.results_path + "global/"
-                            + f"{base_model}_{cmip_model}_com_"
-                            + args.save
-                            + ".csv")
-                        results_df.to_csv(save_name)
-                        # Update Progress bar
-                        postfix = dict(
-                            Trial=f"{itrial}",
-                            Base=f"{base_model}",
-                            CMIP=f"{cmip_model}",
-                            Variable=f"{ivariable}",
-                            Window=f"{ispatial}",
-                        )
-                        pbar.set_postfix(postfix)
+                    # save results
+                    results_df.to_csv(interim_name + ".csv")
+                    # Update Progress bar
+                    postfix = dict(
+                        Trial=f"{itrial}",
+                        Base=f"{base_model}",
+                        CMIP=f"{cmip_model}",
+                        Variable=f"{ivariable}",
+                        Window=f"{ispatial}",
+                    )
+                    pbar.set_postfix(postfix)
+    results_df.to_csv(results_name + ".csv")
 
 
 def main(args):
@@ -347,7 +367,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "--base", default=0, type=int, help="Base model to be compared (ncep, era5)"
     )
-    parser.add_argument("--cmip", default=0, type=int, help="CMIP model to be compared (inmcm4)")
+    parser.add_argument(
+        "--cmip", default=0, type=int, help="CMIP model to be compared (inmcm4)"
+    )
     # ===================
     # IT Measures Params
     # ===================
