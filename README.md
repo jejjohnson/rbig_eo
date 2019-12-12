@@ -2,7 +2,7 @@
 
 This repo has the experiments and reproducible code for all of my experiments using RBIG for analyzing Earth science data. I am primarily focused on using RBIG to measure the information content for datasets with spatial-temporal features. I look at IT measures such as Entropy, Mutual Information and Total Correlation. The strength of RBIG lies in it's ability to handle multivariate and high dimensional datasets.
 
-I will be periodically updating this repo as I finish more experiments.
+I will be periodically updating this repo as I finish more experiments. I will also make the code even more reproducible as I learn some of the best practices. For now, I would advise you to look at the notebooks.
 
 
 ---
