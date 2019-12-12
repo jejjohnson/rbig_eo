@@ -1,36 +1,25 @@
 import cdsapi
 import xarray as xr
 from typing import Union
-from src.data.climate.amip import DataLoader
+from src.data.climate.amip import DataLoader as DLAMIP
+from src.data.climate.rcp import DataLoader as DLRCP
+
 
 DATA_DIR = "/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/"
 
 xr_types = Union[xr.Dataset, xr.DataArray]
 
 
-def get_data():
+def get_cmip5_model(cmip_model: str, variable: str, model: str = "amip") -> xr_types:
 
-    c = cdsapi.Client()
-
-    c.retrieve(
-        "projections-cmip5-monthly-single-levels",
-        {
-            "experiment": "rcp_8_5",
-            "variable": "mean_sea_level_pressure",
-            "model": "giss_e2_r",
-            "ensemble_member": "r1i1p1",
-            "period": "200601-202512",
-            "format": "netcdf",
-        },
-        f"{DATA_DIR}CMIP5.nc",
-    )
-
-
-def get_cmip5_model(cmip_model: str, variable: str) -> xr_types:
-
-    loader = DataLoader()
-
-    ds = loader.load_amip_data(cmip_model)[variable]
+    if model == "amip":
+        loader = DLAMIP()
+        ds = loader.load_amip_data(cmip_model)[variable]
+    elif model == "rcp":
+        loader = DLRCP()
+        ds = loader.load_rcp_data(cmip_model)[variable]
+    else:
+        raise ValueError("Unrecognized model:", model)
     ds.attrs["model_id"] = cmip_model
     return ds
 

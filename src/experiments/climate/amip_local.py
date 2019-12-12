@@ -14,6 +14,8 @@ from src.features.climate.build_features import (
     regrid_2_lower_res,
     get_spatial_cubes,
     normalize_data,
+    get_reference_dataset,
+    regrid_data,
 )
 
 from typing import Type, Union, Optional, Tuple, Dict
@@ -59,19 +61,13 @@ class CMIPArgs:
     variables = ["psl"]
 
     cmip_models = [
-        "access1_0",
-        "bcc_csm1_1",
-        # "bcc_csm1_1_m",
-        "bnu_esm",
-        "giss_e2_r",
-        "cnrm_cm5",
-        "ipsl_cm5a_lr",
-        # "ipsl_cm5a_mr",
-        # "ipsl_cm5b_lr",
-        "mpi_esm_lr",
-        # "mpi_esm_mr",
-        "noresm1_m",
         "inmcm4",
+        "access1_0",
+        "access1_3",
+        "ipsl_cm5a_mr",
+        "mpi_esm_lr",
+        "mpi_esm_mr",
+        "noresm1_m",
     ]
 
     base_models = ["ncep", "era5"]
@@ -87,11 +83,10 @@ def get_features_loop(base: str, cmip: str, variable: str, regrid_name: str) -> 
     # 1.2) get cmip5 model
     cmip_dat = get_cmip5_model(cmip, variable)
 
-    # 2) regrid data
-    # print(base_dat, cmip_dat)
-    base_dat, cmip_dat = regrid_2_lower_res(
-        base_dat, cmip_dat, filename=regrid_name + ".nc"
-    )
+    # 2) regrid data w. reference grid and
+    reference_ds = get_reference_dataset("noresm1_m")
+    base_dat = regrid_data(reference_ds, base_dat, filename=regrid_name + ".nc")
+    cmip_dat = regrid_data(reference_ds, cmip_dat, filename=regrid_name + ".nc")
 
     # 3) find overlapping times
     base_dat, cmip_dat = get_time_overlap(base_dat, cmip_dat)
@@ -322,7 +317,9 @@ def experiment_compare(args):
                 )
 
                 # generate dataset per year
-                for ibase_dat, icmip_dat in generate_temporal_data(base_dat, cmip_dat):
+                for ibase_dat, icmip_dat in generate_temporal_data(
+                    base_dat, cmip_dat, time=args.time
+                ):
                     for itrial in range(args.trials):
 
                         # generate temporal data

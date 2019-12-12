@@ -96,7 +96,7 @@ def experiment_loop_comparative(
     cmip_dat = get_cmip5_model(cmip_dat, variable)
 
     # 2) regrid data w. reference grid and
-    reference_ds = get_reference_dataset("ipsl_cm5a_lr")
+    reference_ds = get_reference_dataset("noresm1_m")
     base_dat = regrid_data(reference_ds, base_dat, filename=regrid_filename + ".nc")
     cmip_dat = regrid_data(reference_ds, cmip_dat, filename=regrid_filename + ".nc")
 
