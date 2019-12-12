@@ -19,7 +19,12 @@ I have included some example experiments in the notebooks folder including the f
 ---
 ### Installation Instructions
 
-You can create the environment from the `.yml` file found in the main repo.
+1. **Firstly**, you need to clone the following [RBIG repo](https://github.com/jejjohnson/rbig) and install/put in `PYTHONPATH`
+```python
+git clone https://github.com/jejjohnson/rbig
+```
+
+2. **Secondly**, you can create the environment from the `.yml` file found in the main repo.
 
 ```python
 conda env create -f environment.yml -n myenv
