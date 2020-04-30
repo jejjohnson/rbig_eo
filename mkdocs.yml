@@ -16,7 +16,7 @@ theme:
     primary: black
     accent: gray
   font:
-    text: Source Code Pro
+    text: Roboto
     code: Source Code Pro
 
 plugins:
