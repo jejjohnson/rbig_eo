@@ -1,0 +1,291 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script>
+(function() {
+  function addWidgetsRenderer() {
+    var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
+    var scriptElement = document.createElement('script');
+    var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
+    var widgetState;
+
+    // Fallback for older version:
+    try {
+      widgetState = mimeElement && JSON.parse(mimeElement.innerHTML);
+
+      if (widgetState && (widgetState.version_major < 2 || !widgetState.version_major)) {
+        widgetRendererSrc = 'jupyter-js-widgets@*/dist/embed.js';
+      }
+    } catch(e) {}
+
+    scriptElement.src = widgetRendererSrc;
+    document.body.appendChild(scriptElement);
+  }
+
+  document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
+}());
+</script>
+
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+import os, sys
+cwd = os.getcwd()
+source_path = f"{cwd}/../../"
+sys.path.insert(0, f'{source_path}')
+
+import numpy as np
+
+# Import RBIG Helper
+from src.models.train_models import run_rbig_models
+
+# ESDC tools
+sys.path.insert(0, f'/home/emmanuel/code/py_esdc')
+from esdc.standardize import normalize_temporal
+from esdc.transform import regrid_data
+
+import cdsapi
+from zipfile import ZipFile
+import pandas as pd
+import xarray as xr
+from tqdm import tqdm
+from sklearn import preprocessing
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+plt.style.use('ggplot')
+%matplotlib inline
+
+%load_ext autoreload
+%autoreload 2
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+data_path = f"/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/"
+results_path = f"/home/emmanuel/projects/2020_rbig_rs/data/climate/results/"
+fig_path = f"/home/emmanuel/projects/2020_rbig_rs/reports/figures/climate/"
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+ncep_data = xr.open_mfdataset(f"{data_path}*mon.mean.nc")
+ncep_data = ncep_data.rename({'pres': 'sp'})
+ncep_data.attrs['model_id'] = 'ncar_ncep_doe_2'
+ncep_data
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;xarray.Dataset&gt;
+Dimensions:    (lat: 73, lon: 144, nbnds: 2, time: 489)
+Coordinates:
+  * lat        (lat) float32 90.0 87.5 85.0 82.5 ... -82.5 -85.0 -87.5 -90.0
+  * lon        (lon) float32 0.0 2.5 5.0 7.5 10.0 ... 350.0 352.5 355.0 357.5
+  * time       (time) datetime64[ns] 1979-01-01 1979-02-01 ... 2019-09-01
+Dimensions without coordinates: nbnds
+Data variables:
+    mslp       (time, lat, lon) float32 dask.array&lt;chunksize=(489, 73, 144), meta=np.ndarray&gt;
+    time_bnds  (time, nbnds) datetime64[ns] dask.array&lt;chunksize=(489, 2), meta=np.ndarray&gt;
+    pr_wtr     (time, lat, lon) float32 dask.array&lt;chunksize=(489, 73, 144), meta=np.ndarray&gt;
+    sp         (time, lat, lon) float32 dask.array&lt;chunksize=(489, 73, 144), meta=np.ndarray&gt;
+Attributes:
+    Conventions:    CF-1.0
+    title:          Monthly NCEP/DOE Reanalysis 2
+    history:        created 2002/03 by Hoop (netCDF2.3)
+    comments:       Data is from \nNCEP/DOE AMIP-II Reanalysis (Reanalysis-2)...
+    platform:       Model
+    source:         NCEP/DOE AMIP-II Reanalysis (Reanalysis-2) Model
+    institution:    National Centers for Environmental Prediction
+    dataset_title:  NCEP-DOE AMIP-II Reanalysis
+    References:     https://www.esrl.noaa.gov/psd/data/gridded/data.ncep.rean...
+    source_url:     http://www.cpc.ncep.noaa.gov/products/wesley/reanalysis2/
+    model_id:       ncar_ncep_doe_2</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+era5_data = xr.open_dataset(f"{data_path}ERA5.nc")
+era5_data = era5_data.rename({'msl': 'mslp', 'latitude': 'lat', 'longitude': 'lon'})
+# era5_data = era5_data.rename({'latitude': 'lat'})
+# era5_data.attrs['model_id'] = 'era5'
+# rescale model from 0.25 to 2.5 degrees
+# era5_data = era5_data.coarsen(lat=10, lon=10, boundary='pad').mean()
+era5_data.attrs['model_id'] = 'era5'
+era5_data
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;xarray.Dataset&gt;
+Dimensions:  (lat: 721, lon: 1440, time: 487)
+Coordinates:
+  * lon      (lon) float32 0.0 0.25 0.5 0.75 1.0 ... 359.0 359.25 359.5 359.75
+  * lat      (lat) float32 90.0 89.75 89.5 89.25 ... -89.25 -89.5 -89.75 -90.0
+  * time     (time) datetime64[ns] 1979-01-01 1979-02-01 ... 2019-07-01
+Data variables:
+    mslp     (time, lat, lon) float32 ...
+    sp       (time, lat, lon) float32 ...
+Attributes:
+    Conventions:  CF-1.6
+    history:      2019-10-07 09:20:10 GMT by grib_to_netcdf-2.10.0: /opt/ecmw...
+    model_id:     era5</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+import xesmf as xe
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+era5_data_regrid = xr.Dataset(
+        {"lat": (["lat"], ncep_data.lat), "lon": (["lon"], ncep_data.lon)}
+    )
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+method = 'conservative'
+regridder = xe.Regridder(
+    ncep_data, 
+    era5_data_regrid, 
+    method, 
+    reuse_weights=True
+)
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">KeyError</span>                                  Traceback (most recent call last)
+<span class="ansi-green-fg">~/.conda/envs/2019_rbig_ad/lib/python3.6/site-packages/xarray/core/dataset.py</span> in <span class="ansi-cyan-fg">_construct_dataarray</span><span class="ansi-blue-fg">(self, name)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1150</span>         <span class="ansi-green-fg">try</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">-&gt; 1151</span><span class="ansi-red-fg">             </span>variable <span class="ansi-blue-fg">=</span> self<span class="ansi-blue-fg">.</span>_variables<span class="ansi-blue-fg">[</span>name<span class="ansi-blue-fg">]</span>
+<span class="ansi-green-intense-fg ansi-bold">   1152</span>         <span class="ansi-green-fg">except</span> KeyError<span class="ansi-blue-fg">:</span>
+
+<span class="ansi-red-fg">KeyError</span>: &#39;lon_b&#39;
+
+During handling of the above exception, another exception occurred:
+
+<span class="ansi-red-fg">KeyError</span>                                  Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-9-73cf5d2042a7&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span>     era5_data_regrid<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-intense-fg ansi-bold">      5</span>     method<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-fg">----&gt; 6</span><span class="ansi-red-fg">     </span>reuse_weights<span class="ansi-blue-fg">=</span><span class="ansi-green-fg">True</span>
+<span class="ansi-green-intense-fg ansi-bold">      7</span> )
+
+<span class="ansi-green-fg">~/.conda/envs/2019_rbig_ad/lib/python3.6/site-packages/xesmf/frontend.py</span> in <span class="ansi-cyan-fg">__init__</span><span class="ansi-blue-fg">(self, ds_in, ds_out, method, periodic, filename, reuse_weights)</span>
+<span class="ansi-green-intense-fg ansi-bold">    135</span>         self._grid_in, shape_in = ds_to_ESMFgrid(ds_in,
+<span class="ansi-green-intense-fg ansi-bold">    136</span>                                                  need_bounds<span class="ansi-blue-fg">=</span>self<span class="ansi-blue-fg">.</span>need_bounds<span class="ansi-blue-fg">,</span>
+<span class="ansi-green-fg">--&gt; 137</span><span class="ansi-red-fg">                                                  </span>periodic<span class="ansi-blue-fg">=</span>periodic
+<span class="ansi-green-intense-fg ansi-bold">    138</span>                                                  )
+<span class="ansi-green-intense-fg ansi-bold">    139</span>         self._grid_out, shape_out = ds_to_ESMFgrid(ds_out,
+
+<span class="ansi-green-fg">~/.conda/envs/2019_rbig_ad/lib/python3.6/site-packages/xesmf/frontend.py</span> in <span class="ansi-cyan-fg">ds_to_ESMFgrid</span><span class="ansi-blue-fg">(ds, need_bounds, periodic, append)</span>
+<span class="ansi-green-intense-fg ansi-bold">     65</span> 
+<span class="ansi-green-intense-fg ansi-bold">     66</span>     <span class="ansi-green-fg">if</span> need_bounds<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">---&gt; 67</span><span class="ansi-red-fg">         </span>lon_b <span class="ansi-blue-fg">=</span> np<span class="ansi-blue-fg">.</span>asarray<span class="ansi-blue-fg">(</span>ds<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">&#39;lon_b&#39;</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     68</span>         lat_b <span class="ansi-blue-fg">=</span> np<span class="ansi-blue-fg">.</span>asarray<span class="ansi-blue-fg">(</span>ds<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">&#39;lat_b&#39;</span><span class="ansi-blue-fg">]</span><span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">     69</span>         lon_b<span class="ansi-blue-fg">,</span> lat_b <span class="ansi-blue-fg">=</span> as_2d_mesh<span class="ansi-blue-fg">(</span>lon_b<span class="ansi-blue-fg">,</span> lat_b<span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/.conda/envs/2019_rbig_ad/lib/python3.6/site-packages/xarray/core/dataset.py</span> in <span class="ansi-cyan-fg">__getitem__</span><span class="ansi-blue-fg">(self, key)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1241</span> 
+<span class="ansi-green-intense-fg ansi-bold">   1242</span>         <span class="ansi-green-fg">if</span> hashable<span class="ansi-blue-fg">(</span>key<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">-&gt; 1243</span><span class="ansi-red-fg">             </span><span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>_construct_dataarray<span class="ansi-blue-fg">(</span>key<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1244</span>         <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">   1245</span>             <span class="ansi-green-fg">return</span> self<span class="ansi-blue-fg">.</span>_copy_listed<span class="ansi-blue-fg">(</span>np<span class="ansi-blue-fg">.</span>asarray<span class="ansi-blue-fg">(</span>key<span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">~/.conda/envs/2019_rbig_ad/lib/python3.6/site-packages/xarray/core/dataset.py</span> in <span class="ansi-cyan-fg">_construct_dataarray</span><span class="ansi-blue-fg">(self, name)</span>
+<span class="ansi-green-intense-fg ansi-bold">   1152</span>         <span class="ansi-green-fg">except</span> KeyError<span class="ansi-blue-fg">:</span>
+<span class="ansi-green-intense-fg ansi-bold">   1153</span>             _, name, variable = _get_virtual_variable(
+<span class="ansi-green-fg">-&gt; 1154</span><span class="ansi-red-fg">                 </span>self<span class="ansi-blue-fg">.</span>_variables<span class="ansi-blue-fg">,</span> name<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">.</span>_level_coords<span class="ansi-blue-fg">,</span> self<span class="ansi-blue-fg">.</span>dims
+<span class="ansi-green-intense-fg ansi-bold">   1155</span>             )
+<span class="ansi-green-intense-fg ansi-bold">   1156</span> 
+
+<span class="ansi-green-fg">~/.conda/envs/2019_rbig_ad/lib/python3.6/site-packages/xarray/core/dataset.py</span> in <span class="ansi-cyan-fg">_get_virtual_variable</span><span class="ansi-blue-fg">(variables, key, level_vars, dim_sizes)</span>
+<span class="ansi-green-intense-fg ansi-bold">    144</span>         ref_var <span class="ansi-blue-fg">=</span> dim_var<span class="ansi-blue-fg">.</span>to_index_variable<span class="ansi-blue-fg">(</span><span class="ansi-blue-fg">)</span><span class="ansi-blue-fg">.</span>get_level_variable<span class="ansi-blue-fg">(</span>ref_name<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">    145</span>     <span class="ansi-green-fg">else</span><span class="ansi-blue-fg">:</span>
+<span class="ansi-green-fg">--&gt; 146</span><span class="ansi-red-fg">         </span>ref_var <span class="ansi-blue-fg">=</span> variables<span class="ansi-blue-fg">[</span>ref_name<span class="ansi-blue-fg">]</span>
+<span class="ansi-green-intense-fg ansi-bold">    147</span> 
+<span class="ansi-green-intense-fg ansi-bold">    148</span>     <span class="ansi-green-fg">if</span> var_name <span class="ansi-green-fg">is</span> <span class="ansi-green-fg">None</span><span class="ansi-blue-fg">:</span>
+
+<span class="ansi-red-fg">KeyError</span>: &#39;lon_b&#39;</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+
+```
+
+</div>
+
+</div>
+
+

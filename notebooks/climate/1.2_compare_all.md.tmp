@@ -1,0 +1,187 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script>
+(function() {
+  function addWidgetsRenderer() {
+    var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
+    var scriptElement = document.createElement('script');
+    var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
+    var widgetState;
+
+    // Fallback for older version:
+    try {
+      widgetState = mimeElement && JSON.parse(mimeElement.innerHTML);
+
+      if (widgetState && (widgetState.version_major < 2 || !widgetState.version_major)) {
+        widgetRendererSrc = 'jupyter-js-widgets@*/dist/embed.js';
+      }
+    } catch(e) {}
+
+    scriptElement.src = widgetRendererSrc;
+    document.body.appendChild(scriptElement);
+  }
+
+  document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
+}());
+</script>
+
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+import os, sys
+cwd = os.getcwd()
+source_path = f"{cwd}/../../"
+sys.path.insert(0, f'{source_path}')
+
+# Import RBIG Helper
+from src.models.train_models import run_rbig_models
+
+# ESDC tools
+sys.path.insert(0, f'/home/emmanuel/code/py_esdc')
+from esdc.preprocessing import normalize_temporal
+
+import cdsapi
+from zipfile import ZipFile
+import pandas as pd
+import xarray as xr
+from tqdm import tqdm
+from sklearn import preprocessing
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+plt.style.use('ggplot')
+%matplotlib inline
+
+%load_ext autoreload
+%autoreload 2
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+data_path = f"/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/"
+results_path = f"/home/emmanuel/projects/2020_rbig_rs/data/climate/results/"
+fig_path = f"/home/emmanuel/projects/2020_rbig_rs/reports/figures/climate/"
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### CMIP5
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+cmip5_data = xr.open_dataset(f"{data_path}CMIP5.nc")
+cmip5_data = cmip5_data.rename({'psl': 'mslp'})
+
+# rescale model from 0.25 to 2.5 degrees
+cmip5_data = cmip5_data.coarsen(lat=1, boundary='pad').mean()
+cmip5_data.attrs['model_id'] = 'cmip5'
+cmip5_data
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;xarray.Dataset&gt;
+Dimensions:    (bnds: 2, lat: 90, lon: 144, time: 240)
+Coordinates:
+  * time       (time) object 2006-01-16 12:00:00 ... 2025-12-16 12:00:00
+  * lat        (lat) float64 -89.0 -87.0 -85.0 -83.0 ... 83.0 85.0 87.0 89.0
+  * lon        (lon) float64 1.25 3.75 6.25 8.75 ... 351.2 353.8 356.2 358.8
+Dimensions without coordinates: bnds
+Data variables:
+    time_bnds  (time, bnds) object 2006-01-01 00:00:00 ... 2026-01-01 00:00:00
+    lat_bnds   (lat, bnds) float64 -90.0 -88.0 -88.0 -86.0 ... 88.0 88.0 90.0
+    lon_bnds   (lon, bnds) float64 0.0 2.5 2.5 5.0 ... 355.0 357.5 357.5 360.0
+    mslp       (time, lat, lon) float32 99793.75 99793.75 ... 99897.87 99897.87
+Attributes:
+    model_id:  cmip5</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+# cmip5_data.isel(time=0).mslp.plot()
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+cmip5_data
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;xarray.Dataset&gt;
+Dimensions:    (bnds: 2, lat: 90, lon: 144, time: 240)
+Coordinates:
+  * time       (time) object 2006-01-16 12:00:00 ... 2025-12-16 12:00:00
+  * lat        (lat) float64 -89.0 -87.0 -85.0 -83.0 ... 83.0 85.0 87.0 89.0
+  * lon        (lon) float64 1.25 3.75 6.25 8.75 ... 351.2 353.8 356.2 358.8
+Dimensions without coordinates: bnds
+Data variables:
+    time_bnds  (time, bnds) object 2006-01-01 00:00:00 ... 2026-01-01 00:00:00
+    lat_bnds   (lat, bnds) float64 -90.0 -88.0 -88.0 -86.0 ... 88.0 88.0 90.0
+    lon_bnds   (lon, bnds) float64 0.0 2.5 2.5 5.0 ... 355.0 357.5 357.5 360.0
+    mslp       (time, lat, lon) float32 99793.75 99793.75 ... 99897.87 99897.87
+Attributes:
+    model_id:  cmip5</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+
+```
+
+</div>
+
+</div>
+
+

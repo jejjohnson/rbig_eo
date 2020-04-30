@@ -1,0 +1,1380 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script>
+(function() {
+  function addWidgetsRenderer() {
+    var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
+    var scriptElement = document.createElement('script');
+    var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
+    var widgetState;
+
+    // Fallback for older version:
+    try {
+      widgetState = mimeElement && JSON.parse(mimeElement.innerHTML);
+
+      if (widgetState && (widgetState.version_major < 2 || !widgetState.version_major)) {
+        widgetRendererSrc = 'jupyter-js-widgets@*/dist/embed.js';
+      }
+    } catch(e) {}
+
+    scriptElement.src = widgetRendererSrc;
+    document.body.appendChild(scriptElement);
+  }
+
+  document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
+}());
+</script>
+
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+# Comparing Two Climate Models
+
+In this notebook, I will be comparing two climate reanalysis models:
+
+* NCEP-DOE Reanalysis 2: Surface
+* ERA5
+
+I will be looking at the following variables:
+
+* Surface Pressure
+* Mean Sea Level Pressure
+* Total Column Water
+
+The idea is simple: these two models should have very similar properties. I will be trying to user RBIG in order to assess how similar these models are. I'll be looking at the following IT measures
+
+* Entropy
+* Total Correlation
+* Mutual Information
+
+If these climate models are that similar, then they should exhibit similar IT measures.
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+## Data - Climate Models
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+import os, sys
+cwd = os.getcwd()
+source_path = f"{cwd}/../../../"
+sys.path.insert(0, f'{source_path}')
+
+import numpy as np
+
+# Data Loaders
+from src.data.climate.amip import DataDownloader, DataLoader
+
+from src.data.climate.era5 import get_era5_data
+from src.data.climate.ncep import get_ncep_data
+from src.features.climate.build_features import (
+    get_time_overlap, check_time_coords, regrid_2_lower_res, get_spatial_cubes, normalize_data)
+
+from src.experiments.climate.amip_global import (
+    experiment_loop_comparative, 
+    experiment_loop_individual
+)
+# Stat Tools
+from src.models.train_models import run_rbig_models
+from scipy import stats
+
+import pandas as pd
+import xarray as xr
+from tqdm import tqdm
+from sklearn import preprocessing
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+plt.style.use('ggplot')
+%matplotlib inline
+
+%load_ext autoreload
+%autoreload 2
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>The autoreload extension is already loaded. To reload it, use:
+  %reload_ext autoreload
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+amip_data_path = f"/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/amip/"
+era5_path = f"/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/era5/"
+ncep_path = f"/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/ncep/"
+results_path = f"/home/emmanuel/projects/2020_rbig_rs/data/climate/results/"
+fig_path = f"/home/emmanuel/projects/2020_rbig_rs/reports/figures/climate/"
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+## Demo Experiment
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Experimental Paams
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+class DataArgs:
+    data_path = "/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/amip/"
+    results_path = "/home/emmanuel/projects/2020_rbig_rs/data/climate/results/amip"
+
+class CMIPArgs:
+
+        
+    # Fixed Params
+    spatial_windows = [
+        1, 2,                # Spatial Window for Density Cubes
+        3,4,5,6,7,8,9,10
+    ]
+
+    # Free Params
+    variables = [
+        'psl'               # Mean Surface Pressure
+    ]
+    cmip_models = [
+        "inmcm4",
+        "access1_0",
+        "bcc_csm1_1",
+        "bcc_csm1_1_m",
+        "bnu_esm",
+        "giss_e2_r",
+        "cnrm_cm5",
+        "ipsl_cm5a_lr",
+        "ipsl_cm5a_mr",
+        "ipsl_cm5b_lr",
+        "mpi_esm_lr",
+        "mpi_esm_mr",
+        "noresm1_m",
+    ]
+    
+    base_models = [
+        'ncep',
+        "era5"
+    ]
+        
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+def run_exp():
+    
+    for ibase in CMIPArgs.base_models:
+        print('Base Model:', ibase)
+        for ivariable in CMIPArgs.variables:
+            print('Variable:', ivariable)
+            for icmip in CMIPArgs.cmip_models:
+                print("CMIP Model:", icmip)
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+run_exp()
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Base Model: ncep
+Variable: psl
+CMIP Model: inmcm4
+CMIP Model: access1_0
+CMIP Model: bcc_csm1_1
+CMIP Model: bcc_csm1_1_m
+CMIP Model: bnu_esm
+CMIP Model: giss_e2_r
+CMIP Model: cnrm_cm5
+CMIP Model: ipsl_cm5a_lr
+CMIP Model: ipsl_cm5a_mr
+CMIP Model: ipsl_cm5b_lr
+CMIP Model: mpi_esm_lr
+CMIP Model: mpi_esm_mr
+CMIP Model: noresm1_m
+Base Model: era5
+Variable: psl
+CMIP Model: inmcm4
+CMIP Model: access1_0
+CMIP Model: bcc_csm1_1
+CMIP Model: bcc_csm1_1_m
+CMIP Model: bnu_esm
+CMIP Model: giss_e2_r
+CMIP Model: cnrm_cm5
+CMIP Model: ipsl_cm5a_lr
+CMIP Model: ipsl_cm5a_mr
+CMIP Model: ipsl_cm5b_lr
+CMIP Model: mpi_esm_lr
+CMIP Model: mpi_esm_mr
+CMIP Model: noresm1_m
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Part I - Grab Data
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+from src.data.climate.amip import get_base_model
+
+base_dat = get_base_model(CMIPArgs.base_models[0], CMIPArgs.variables[0])
+base_dat
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;xarray.DataArray &#39;psl&#39; (time: 489, lat: 73, lon: 144)&gt;
+dask.array&lt;open_dataset-0ace0936f02ce97f3d79321b6d5f6a55mslp, shape=(489, 73, 144), dtype=float32, chunksize=(489, 73, 144), chunktype=numpy.ndarray&gt;
+Coordinates:
+  * lat      (lat) float32 90.0 87.5 85.0 82.5 80.0 ... -82.5 -85.0 -87.5 -90.0
+  * lon      (lon) float32 0.0 2.5 5.0 7.5 10.0 ... 350.0 352.5 355.0 357.5
+  * time     (time) datetime64[ns] 1979-01-01 1979-02-01 ... 2019-09-01
+Attributes:
+    long_name:             Monthly Mean Sea Level Pressure
+    valid_range:           [-32766  15234]
+    unpacked_valid_range:  [ 77000. 125000.]
+    actual_range:          [ 95644. 105703.]
+    units:                 Pascals
+    precision:             0
+    GRIB_id:               2
+    GRIB_name:             PRMSL
+    var_desc:              Mean Sea Level Pressure
+    dataset:               NCEP/DOE AMIP-II Reanalysis (Reanalysis-2) Monthly...
+    level_desc:            Sea Level
+    statistic:             Individual Obs
+    parent_stat:           Other
+    standard_name:         pressure
+    cell_methods:          time: mean (monthly from 6-hourly values)
+    model_id:              ncep</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+from src.data.climate.cmip5 import get_cmip5_model
+
+
+cmip_dat = get_cmip5_model(CMIPArgs.cmip_models[0], CMIPArgs.variables[0])
+cmip_dat
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;xarray.DataArray &#39;psl&#39; (time: 360, lat: 120, lon: 180)&gt;
+dask.array&lt;open_dataset-0a95b28dbc539d100c816bea9e2db9e7psl, shape=(360, 120, 180), dtype=float32, chunksize=(360, 120, 180), chunktype=numpy.ndarray&gt;
+Coordinates:
+  * time     (time) object 1979-01-16 12:00:00 ... 2008-12-16 12:00:00
+  * lat      (lat) float64 -89.25 -87.75 -86.25 -84.75 ... 86.25 87.75 89.25
+  * lon      (lon) float64 0.0 2.0 4.0 6.0 8.0 ... 350.0 352.0 354.0 356.0 358.0
+Attributes:
+    standard_name:     air_pressure_at_sea_level
+    long_name:         Sea Level Pressure
+    comment:           not, in general, the same as surface pressure
+    units:             Pa
+    original_name:     psl
+    cell_methods:      time: mean (interval: 1 month)
+    history:           2011-02-07T11:53:19Z altered by CMOR: Reordered dimens...
+    associated_files:  baseURL: http://cmip-pcmdi.llnl.gov/CMIP5/dataLocation...
+    model_id:          inmcm4</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+def run_exp():
+    
+    for ibase in CMIPArgs.base_models:
+        for ivariable in CMIPArgs.variables:
+            for icmip in CMIPArgs.cmip_models:
+                print(ibase)
+                print(ivariable)
+                print(icmip)
+                
+                
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Part II - Regrid Data
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+base_dat, cmip_dat = regrid_2_lower_res(base_dat, cmip_dat)
+
+assert(base_dat.shape[1] == cmip_dat.shape[1])
+assert(base_dat.shape[2] == cmip_dat.shape[2])
+base_dat
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Create weight file: nearest_s2d_120x180_73x144.nc
+Remove file nearest_s2d_120x180_73x144.nc
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;xarray.DataArray &#39;psl&#39; (time: 489, lat: 73, lon: 144)&gt;
+dask.array&lt;open_dataset-0ace0936f02ce97f3d79321b6d5f6a55mslp, shape=(489, 73, 144), dtype=float32, chunksize=(489, 73, 144), chunktype=numpy.ndarray&gt;
+Coordinates:
+  * lat      (lat) float32 90.0 87.5 85.0 82.5 80.0 ... -82.5 -85.0 -87.5 -90.0
+  * lon      (lon) float32 0.0 2.5 5.0 7.5 10.0 ... 350.0 352.5 355.0 357.5
+  * time     (time) datetime64[ns] 1979-01-01 1979-02-01 ... 2019-09-01
+Attributes:
+    long_name:             Monthly Mean Sea Level Pressure
+    valid_range:           [-32766  15234]
+    unpacked_valid_range:  [ 77000. 125000.]
+    actual_range:          [ 95644. 105703.]
+    units:                 Pascals
+    precision:             0
+    GRIB_id:               2
+    GRIB_name:             PRMSL
+    var_desc:              Mean Sea Level Pressure
+    dataset:               NCEP/DOE AMIP-II Reanalysis (Reanalysis-2) Monthly...
+    level_desc:            Sea Level
+    statistic:             Individual Obs
+    parent_stat:           Other
+    standard_name:         pressure
+    cell_methods:          time: mean (monthly from 6-hourly values)
+    model_id:              ncep</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Part III - Find Overlapping Times
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+base_dat.shape, cmip_dat.shape
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>((489, 73, 144), (360, 73, 144))</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+base_dat, cmip_dat = get_time_overlap(base_dat, cmip_dat)
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Part IV - Get Density Cubes
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+base_df = get_spatial_cubes(base_dat, CMIPArgs.spatial_windows[3])
+cmip_df = get_spatial_cubes(cmip_dat, CMIPArgs.spatial_windows[3])
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+base_df.shape
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(4826430, 16)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Test Individual Loop
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+test_base_model = 'ncep'
+test_cmip_model = 'inmcm4'
+test_variable = 'psl'
+test_spatial_window = 7
+subsamples = 1_000
+
+res = experiment_loop_individual(
+    test_base_model,
+    test_cmip_model,
+    test_variable,
+    test_spatial_window,
+    subsamples
+)
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Create weight file: nearest_s2d_120x180_73x144.nc
+Remove file nearest_s2d_120x180_73x144.nc
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+res
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&#39;h_base&#39;: -149.66922579994676,
+ &#39;tc_base&#39;: 184.67797240499547,
+ &#39;h_cmip&#39;: -112.08752658960748,
+ &#39;tc_cmip&#39;: 124.29975263830998,
+ &#39;t_base&#39;: 12.304942846298218,
+ &#39;t_cmip&#39;: 13.265496253967285}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Test Comparative Loop
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+test_base_model = 'ncep'
+test_cmip_model = 'inmcm4'
+test_variable = 'psl'
+test_spatial_window = 7
+subsamples = 1_000
+
+res = experiment_loop_comparative(
+    test_base_model,
+    test_cmip_model,
+    test_variable,
+    test_spatial_window,
+    subsamples
+)
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Create weight file: nearest_s2d_120x180_73x144.nc
+Remove file nearest_s2d_120x180_73x144.nc
+(3319314, 49) (3328560, 49)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+res
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&#39;mi&#39;: 12.93477259679793,
+ &#39;time_mi&#39;: 116.64088153839111,
+ &#39;pearson&#39;: 0.6832584799235359,
+ &#39;spearman&#39;: 0.6455462181832066,
+ &#39;kendelltau&#39;: 0.45468733761829255}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+## Experimental Loop
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Part IV - Groupby time stamp
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+time_stamps = min(len(base_dat.time), len(cmip_dat.time))
+
+with tqdm(range(time_stamps)) as progress_bar:
+    for itime in progress_bar:
+        ibase_dat = base_dat.isel(time=itime, drop=False)
+        icmip_dat = cmip_dat.isel(time=itime)
+        print(ibase_dat)
+        print(icmip_dat)
+        break
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>  0%|          | 0/359 [00:00&lt;?, ?it/s]</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>&lt;xarray.DataArray &#39;psl&#39; (lat: 73, lon: 144)&gt;
+dask.array&lt;getitem, shape=(73, 144), dtype=float32, chunksize=(73, 144), chunktype=numpy.ndarray&gt;
+Coordinates:
+  * lat      (lat) float32 90.0 87.5 85.0 82.5 80.0 ... -82.5 -85.0 -87.5 -90.0
+  * lon      (lon) float32 0.0 2.5 5.0 7.5 10.0 ... 350.0 352.5 355.0 357.5
+    time     datetime64[ns] 1979-02-01
+Attributes:
+    long_name:             Monthly Mean Sea Level Pressure
+    valid_range:           [-32766  15234]
+    unpacked_valid_range:  [ 77000. 125000.]
+    actual_range:          [ 95644. 105703.]
+    units:                 Pascals
+    precision:             0
+    GRIB_id:               2
+    GRIB_name:             PRMSL
+    var_desc:              Mean Sea Level Pressure
+    dataset:               NCEP/DOE AMIP-II Reanalysis (Reanalysis-2) Monthly...
+    level_desc:            Sea Level
+    statistic:             Individual Obs
+    parent_stat:           Other
+    standard_name:         pressure
+    cell_methods:          time: mean (monthly from 6-hourly values)
+    model_id:              ncep
+&lt;xarray.DataArray &#39;psl&#39; (lat: 73, lon: 144)&gt;
+dask.array&lt;getitem, shape=(73, 144), dtype=float64, chunksize=(73, 144), chunktype=numpy.ndarray&gt;
+Coordinates:
+    time     datetime64[ns] 1979-01-16T12:00:00
+  * lon      (lon) float32 0.0 2.5 5.0 7.5 10.0 ... 350.0 352.5 355.0 357.5
+  * lat      (lat) float32 90.0 87.5 85.0 82.5 80.0 ... -82.5 -85.0 -87.5 -90.0
+Attributes:
+    regrid_method:  nearest_s2d
+    model_id:       inmcm4
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Part IV - Get Density Cubes
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Part V - Normalize
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+base_norm = normalize_data(base_df)
+cmip_norm = normalize_data(cmip_df)
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+base_norm[:None].shape
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(4826430, 16)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Part VI - RBIG Algorithm
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+#### Entropy, Total Correlation
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+base_tc, base_h, t1 = run_rbig_models(base_norm[:1_000], measure='t', verbose=None)
+cmip_tc, cmip_h, t2 = run_rbig_models(cmip_norm[:1_000], measure='t', verbose=None)
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+base_tc/16, cmip_tc/16
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(2.8645279873342417, 2.6572342136429885)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+base_h/16, cmip_h/16
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(-2.7045988055470094, -2.0434281745463228)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+type(t1)
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>float</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+#### Mutual Information
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+mi, t_ = run_rbig_models(base_norm[:1_000], cmip_norm[:1_000], measure='mi', verbose=None)
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+mi
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>0.9339957437091543</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+from scipy import stats
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+pears = stats.pearsonr(base_norm[:1_000].ravel(), cmip_norm[:1_000].ravel())
+spears = stats.spearmanr(base_norm[:1_000].ravel(), cmip_norm[:1_000].ravel())
+kend = stats.kendalltau(base_norm[:1_000].ravel(), cmip_norm[:1_000].ravel())
+
+
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+pears[0], spears[0], kend[0]
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(0.19924053221759874, 0.18606468822908886, 0.1297966352157317)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+from 
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+## Experiment I - Comparing Climate Models
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Mean Sea Level Pressure
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+#### ERA5 vs NCEP
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+# Experiment class
+class ClimateEntropy:
+    def __init__(self, save_path: None, variable: str='mslp', save_name=None, mi: bool=True):
+        
+        self.variable = variable
+        
+        self.results_path = save_path
+        self.results_df = pd.DataFrame()
+        self.save_name = save_name
+        self.mi = mi
+    
+    def run_experiment(self, climate_model1: pd.DataFrame, climate_model2: pd.DataFrame) -> None:
+        """Training loop that goes through each year and calculates the entropy,
+        total correlation and mutual information between the two models."""
+        time_length = len(climate_model1.groupby('time.year'))
+        
+        # Normalize BEFORE the individual calculations
+        climate_model1[self.variable] = normalize_temporal(climate_model1[self.variable])
+        
+        model1_id = climate_model1.attrs['model_id']
+        model2_id = climate_model2.attrs['model_id']
+        climate_model2[self.variable] = normalize_temporal(climate_model2[self.variable])
+        
+        with tqdm(zip(
+            climate_model1.groupby('time.year'), 
+            climate_model2.groupby('time.year')
+        ), total=time_length) as progress_bar:
+            
+            for imodel1, imodel2 in progress_bar:
+                
+                # Update params in progress bar
+                
+                # Transform to dataframe, remove spatial dimensions
+                X1 = self._get_time_features(imodel1[1][self.variable])
+                X2 = self._get_time_features(imodel2[1][self.variable])
+                
+                # Normalize inputs
+                min_max_scaler = preprocessing.StandardScaler()
+                X1 = min_max_scaler.fit_transform(X1.values)
+                X2 = min_max_scaler.fit_transform(X2.values)
+                
+                dims = X1.shape[1]
+                
+                # =============================
+                # Calculate Mutual Information
+                # =============================
+                if self.mi == False:
+                    mi_ = None
+                    mi_t_ = None
+                else:
+                    mi_, mi_t_ = run_rbig_models(X1, X2, measure='mi', verbose=None)
+                
+                
+                # Update params in progress bar
+                postfix = dict(
+                    
+                )
+
+                # ========================================
+                # Calculate Entropy and Total Correlation
+                # ========================================
+                
+                # Model I
+                tc1_, h1_, h_t1_ = run_rbig_models(X1, measure='t', verbose=None)
+                
+                self._update_results(
+                    model=model1_id,
+                    year=imodel1[0],
+                    h_time=h_t1_,
+                    tc=tc1_,
+                    h=h1_,
+                    mi=mi_,
+                    mi_time=mi_t_,
+                    dims=dims,
+                    
+                )
+                
+                
+                # Model II
+                tc2_, h2_, h_t2_ = run_rbig_models(X2, measure='t', verbose=None)
+                self._update_results(
+                    model=model2_id,
+                    year=imodel2[0],
+                    h_time=h_t2_,
+                    tc=tc2_,
+                    h=h2_,
+                    mi=mi_,
+                    mi_time=mi_t_,
+                    dims=dims,
+                    
+                )
+                
+                # Update params in progress bar
+                postfix = dict(
+                    year=imodel1[0],
+                    mi=f"{mi_:.3f}" if self.mi is True else None,
+                    h1=f"{h1_:.3f}",
+                    tc1=f"{tc1_:.3f}",
+                    h2=f"{h2_:.3f}",
+                    tc2=f"{tc2_:.3f}",
+                )
+                
+
+                
+                progress_bar.set_postfix(postfix)
+            
+        
+        return None
+    
+    def _get_time_features(self, data_df: pd.DataFrame)-> pd.DataFrame:
+        """This function collapses the spatial dimensions as pivots. This allows
+        us to only consider time as the input feature."""
+        return data_df.to_dataframe().unstack(level=0).reset_index().drop(columns=['lat', 'lon']).dropna()
+    
+    def _update_results(self, model, year, tc, h, h_time, mi, mi_time, dims):
+        """appends new values to the results dataframe."""
+        self.results_df = self.results_df.append({
+            'model': model,
+            'year': year,
+            'tc': tc,
+            'h': h,
+            'h_time': h_time,
+            'mi': mi,
+            'mi_time': mi_time,
+            'dims': dims,
+        }, ignore_index=True
+        )
+        
+        if self.results_path is not None:
+            self._save_results()
+        return self
+    
+    def _save_results(self):
+        """Saves the dataframe to the assigned results path."""
+        self.results_df.to_csv(f"{self.results_path}{self.variable}_{self.save_name}.csv")
+        return None
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+# Initialize experiment
+short_decade_exp = ClimateEntropy(
+    save_path=f"{results_path}", 
+    variable='mslp',
+    save_name='era_ncep'
+)
+
+# run experiment (shorter decade)
+short_decade_exp.run_experiment(era5_data_regrid, ncep_data)
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>100%|██████████| 41/41 [1:43:03&lt;00:00, 150.83s/it, year=2019, mi=4.766, h1=-1.313, tc1=9.551, h2=-3.049, tc2=13.532] 
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+# extract results
+results_df = short_decade_exp.results_df
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+#### ERA5 vs CMIP5
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+2006-01-16, 2025-12-16, 1979-01-01, 2019-07-01
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+# Initialize experiment
+short_decade_exp = ClimateEntropy(
+    save_path=f"{results_path}", variable='mslp', save_name='era_cmip',
+    mi=True
+)
+
+# run experiment (shorter decade)
+short_decade_exp.run_experiment(
+    era5_data_regrid.sel(time=slice('2006-01-16', '2019-07-01')), 
+    cmip5_data_regrid.sel(time=slice('2006-01-16', '2019-07-01'))
+)
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>100%|██████████| 14/14 [35:08&lt;00:00, 150.61s/it, year=2019, mi=3.290, h1=-1.509, tc1=9.747, h2=-0.807, tc2=8.142]  
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+#### NCEP vs CMIP5
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+# Initialize experiment
+short_decade_exp = ClimateEntropy(
+    save_path=f"{results_path}", variable='mslp', save_name='ncep_cmip',
+    mi=True
+)
+
+# run experiment (shorter decade)
+short_decade_exp.run_experiment(
+    ncep_data.sel(time=slice('2006-01-16', '2019-07-01')), 
+    cmip5_data_regrid.sel(time=slice('2006-01-16', '2019-07-01'))
+)
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>100%|██████████| 14/14 [35:04&lt;00:00, 150.30s/it, year=2019, mi=3.552, h1=-1.495, tc1=9.760, h2=-0.807, tc2=8.142]  
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+
+```
+
+</div>
+
+</div>
+
+

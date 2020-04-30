@@ -1,0 +1,641 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script>
+(function() {
+  function addWidgetsRenderer() {
+    var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
+    var scriptElement = document.createElement('script');
+    var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
+    var widgetState;
+
+    // Fallback for older version:
+    try {
+      widgetState = mimeElement && JSON.parse(mimeElement.innerHTML);
+
+      if (widgetState && (widgetState.version_major < 2 || !widgetState.version_major)) {
+        widgetRendererSrc = 'jupyter-js-widgets@*/dist/embed.js';
+      }
+    } catch(e) {}
+
+    scriptElement.src = widgetRendererSrc;
+    document.body.appendChild(scriptElement);
+  }
+
+  document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
+}());
+</script>
+
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+# Comparing Two Climate Models
+
+In this notebook, I will be comparing two climate reanalysis models:
+
+* NCEP-DOE Reanalysis 2: Surface
+* ERA5
+
+I will be looking at the following variables:
+
+* Surface Pressure
+* Mean Sea Level Pressure
+* Total Column Water
+
+The idea is simple: these two models should have very similar properties. I will be trying to user RBIG in order to assess how similar these models are. I'll be looking at the following IT measures
+
+* Entropy
+* Total Correlation
+* Mutual Information
+
+If these climate models are that similar, then they should exhibit similar IT measures.
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+## Data - Climate Models
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+import os, sys
+cwd = os.getcwd()
+source_path = f"{cwd}/../../../"
+sys.path.insert(0, f'{source_path}')
+
+import numpy as np
+
+
+# Data Loaders
+from src.data.climate.rcp import DataDownloader as DDRCP
+from src.data.climate.historical import DataDownloader as DDHist
+from src.data.climate.rcp import DataLoader
+
+# ESDC tools
+sys.path.insert(0, f'/home/emmanuel/code/py_esdc')
+from esdc.standardize import normalize_temporal
+from esdc.grid import regrid_data
+
+import cdsapi
+from zipfile import ZipFile
+import pandas as pd
+import xarray as xr
+from tqdm import tqdm
+from sklearn import preprocessing
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+plt.style.use('ggplot')
+%matplotlib inline
+
+%load_ext autoreload
+%autoreload 2
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>The autoreload extension is already loaded. To reload it, use:
+  %reload_ext autoreload
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+data_path = f"/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/"
+results_path = f"/home/emmanuel/projects/2020_rbig_rs/data/climate/results/"
+fig_path = f"/home/emmanuel/projects/2020_rbig_rs/reports/figures/climate/"
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Download Datasets
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+downloader = DDRCP()
+
+downloader.download_all()
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2019-12-04 17:20:49,332 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/projections-cmip5-monthly-single-levels
+2019-12-04 17:20:51,321 INFO Request is completed
+2019-12-04 17:20:51,322 INFO Downloading http://136.156.132.210/cache-compute-0005/cache/data2/4ad75011-e089-4a3c-b528-066055bae5a8-psl_Amon_inmcm4_rcp85_r1i1p1_200601-210012.nc to /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/inmcm4/inmcm4.zip (94M)
+2019-12-04 17:20:58,958 INFO Download rate 12.3M/s
+2019-12-04 17:21:00,135 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/projections-cmip5-monthly-single-levels
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/inmcm4/inmcm4.zip
+Already nc...
+Changing name: 
+ /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/inmcm4/inmcm4.nc
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2019-12-04 17:21:00,782 INFO Downloading http://136.156.132.110/cache-compute-0001/cache/data5/07399125-c76c-449b-a5e8-3c770f44aef6-psl_Amon_ACCESS1-0_rcp85_r1i1p1_200601-210012.nc to /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/access1_0/access1_0.zip (121.1M)
+2019-12-04 17:21:12,223 INFO Download rate 10.6M/s
+2019-12-04 17:21:12,849 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/projections-cmip5-monthly-single-levels
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/access1_0/access1_0.zip
+Already nc...
+Changing name: 
+ /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/access1_0/access1_0.nc
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2019-12-04 17:21:13,628 INFO Downloading http://136.156.132.110/cache-compute-0001/cache/data5/27edf3e3-eb27-457f-9d08-129b97eeea14-psl_Amon_ACCESS1-3_rcp85_r1i1p1_200601-210012.nc to /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/access1_3/access1_3.zip (121.1M)
+2019-12-04 17:21:24,205 INFO Download rate 11.5M/s
+2019-12-04 17:21:25,051 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/projections-cmip5-monthly-single-levels
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/access1_3/access1_3.zip
+Already nc...
+Changing name: 
+ /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/access1_3/access1_3.nc
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2019-12-04 17:21:25,808 INFO Downloading http://136.156.132.110/cache-compute-0001/cache/data5/ca3a0414-b487-4ca6-b38c-0cd08ee6102c-psl_Amon_IPSL-CM5B-LR_rcp85_r1i1p1_200601-210012.nc to /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/ipsl_cm5a_lr/ipsl_cm5a_lr.zip (40.1M)
+2019-12-04 17:21:30,184 INFO Download rate 9.2M/s
+2019-12-04 17:21:31,063 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/projections-cmip5-monthly-single-levels
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/ipsl_cm5a_lr/ipsl_cm5a_lr.zip
+Already nc...
+Changing name: 
+ /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/ipsl_cm5a_lr/ipsl_cm5a_lr.nc
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2019-12-04 17:21:32,817 INFO Downloading http://136.156.132.110/cache-compute-0001/cache/data5/secureopendap-1575473908.9167163.nc/psl_Amon_IPSL-CM5A-MR_rcp85_r1i1p1_200601-210012.nc to /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/ipsl_cm5a_mr/ipsl_cm5a_mr.zip (89.6M)
+2019-12-04 17:21:41,259 INFO Download rate 10.6M/s
+2019-12-04 17:21:42,011 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/projections-cmip5-monthly-single-levels
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/ipsl_cm5a_mr/ipsl_cm5a_mr.zip
+Already nc...
+Changing name: 
+ /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/ipsl_cm5a_mr/ipsl_cm5a_mr.nc
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2019-12-04 17:21:42,741 INFO Downloading http://136.156.132.110/cache-compute-0001/cache/data5/c5c60a43-f042-43e8-9095-c50b18021372-psl_Amon_MPI-ESM-LR_rcp85_r1i1p1_200601-210012.nc to /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/mpi_esm_lr/mpi_esm_lr.zip (80.2M)
+2019-12-04 17:21:51,528 INFO Download rate 9.1M/s
+2019-12-04 17:21:51,901 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/projections-cmip5-monthly-single-levels
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/mpi_esm_lr/mpi_esm_lr.zip
+Already nc...
+Changing name: 
+ /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/mpi_esm_lr/mpi_esm_lr.nc
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2019-12-04 17:21:52,956 INFO Downloading http://136.156.132.110/cache-compute-0001/cache/data5/b5b75fb5-95f3-44c0-a1e1-d2ec99742915-psl_Amon_MPI-ESM-MR_rcp85_r1i1p1_200601-210012.nc to /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/mpi_esm_mr/mpi_esm_mr.zip (80.2M)
+2019-12-04 17:22:03,450 INFO Download rate 7.6M/s
+2019-12-04 17:22:08,856 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/projections-cmip5-monthly-single-levels
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/mpi_esm_mr/mpi_esm_mr.zip
+Already nc...
+Changing name: 
+ /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/mpi_esm_mr/mpi_esm_mr.nc
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2019-12-04 17:22:09,368 INFO Downloading http://136.156.132.110/cache-compute-0001/cache/data5/094f2da0-c121-4c2b-9282-a8ed13f2db60-psl_Amon_NorESM1-M_rcp85_r1i1p1_200601-210012.nc to /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/noresm1_m/noresm1_m.zip (60.2M)
+2019-12-04 17:22:17,749 INFO Download rate 7.2M/s
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/noresm1_m/noresm1_m.zip
+Already nc...
+Changing name: 
+ /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/noresm1_m/noresm1_m.nc
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+downloader = DDHist()
+
+downloader.download_all()
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2019-12-04 17:29:09,999 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/projections-cmip5-monthly-single-levels
+2019-12-04 17:29:10,479 INFO Request is completed
+2019-12-04 17:29:10,481 INFO Downloading http://136.156.133.36/cache-compute-0010/cache/data4/0ff1d385-0263-4be4-ad68-b629366d673e-psl_Amon_inmcm4_historical_r1i1p1_185001-200512.nc to /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/inmcm4/historical_inmcm4.zip (154.3M)
+2019-12-04 17:29:22,928 INFO Download rate 12.4M/s
+2019-12-04 17:29:23,195 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/projections-cmip5-monthly-single-levels
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/inmcm4/amip_inmcm4.zip
+Already nc...
+Changing name: 
+ /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/inmcm4/historical_inmcm4.nc
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2019-12-04 17:29:23,912 INFO Downloading http://136.156.132.236/cache-compute-0007/cache/data4/5dcf07e5-38e8-42da-82f1-1155ef2503a7-psl_Amon_ACCESS1-0_historical_r1i1p1_185001-200512.nc to /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/access1_0/historical_access1_0.zip (198.9M)
+2019-12-04 17:29:39,234 INFO Download rate 13M/s
+2019-12-04 17:29:39,574 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/projections-cmip5-monthly-single-levels
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/access1_0/amip_access1_0.zip
+Already nc...
+Changing name: 
+ /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/access1_0/historical_access1_0.nc
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2019-12-04 17:29:39,706 INFO Downloading http://136.156.132.236/cache-compute-0007/cache/data4/4dbbd38c-722a-44ad-a852-12af7277d46f-psl_Amon_ACCESS1-3_historical_r1i1p1_185001-200512.nc to /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/access1_3/historical_access1_3.zip (198.9M)
+2019-12-04 17:29:56,494 INFO Download rate 11.8M/s
+2019-12-04 17:29:56,813 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/projections-cmip5-monthly-single-levels
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/access1_3/amip_access1_3.zip
+Already nc...
+Changing name: 
+ /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/access1_3/historical_access1_3.nc
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2019-12-04 17:29:57,290 INFO Downloading http://136.156.132.236/cache-compute-0007/cache/data4/secureopendap-1575475938.7605283.nc/psl_Amon_IPSL-CM5B-LR_historical_r1i1p1_185001-200512.nc to /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/ipsl_cm5a_lr/historical_ipsl_cm5a_lr.zip (65.9M)
+2019-12-04 17:30:04,268 INFO Download rate 9.4M/s
+2019-12-04 17:30:04,462 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/projections-cmip5-monthly-single-levels
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/ipsl_cm5a_lr/amip_ipsl_cm5a_lr.zip
+Already nc...
+Changing name: 
+ /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/ipsl_cm5a_lr/historical_ipsl_cm5a_lr.nc
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2019-12-04 17:30:04,708 INFO Request is queued
+2019-12-04 17:30:05,770 INFO Request is running
+2019-12-04 17:30:25,852 INFO Request is completed
+2019-12-04 17:30:25,854 INFO Downloading http://136.156.133.37/cache-compute-0011/cache/data5/secureopendap-1575477007.4191332.nc/psl_Amon_IPSL-CM5A-MR_historical_r1i1p1_185001-200512.nc to /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/ipsl_cm5a_mr/historical_ipsl_cm5a_mr.zip (147.1M)
+2019-12-04 17:30:39,753 INFO Download rate 10.6M/s
+2019-12-04 17:30:39,915 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/projections-cmip5-monthly-single-levels
+2019-12-04 17:30:40,079 INFO Downloading http://136.156.132.236/cache-compute-0007/cache/data4/63c80ed5-e5c6-4dc1-b49f-d860fde6227b-psl_Amon_MPI-ESM-LR_historical_r1i1p1_185001-200512.nc to /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/mpi_esm_lr/historical_mpi_esm_lr.zip (131.7M)
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/ipsl_cm5a_mr/amip_ipsl_cm5a_mr.zip
+Already nc...
+Changing name: 
+ /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/ipsl_cm5a_mr/historical_ipsl_cm5a_mr.nc
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2019-12-04 17:30:52,217 INFO Download rate 10.8M/s
+2019-12-04 17:30:52,814 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/projections-cmip5-monthly-single-levels
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/mpi_esm_lr/amip_mpi_esm_lr.zip
+Already nc...
+Changing name: 
+ /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/mpi_esm_lr/historical_mpi_esm_lr.nc
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2019-12-04 17:30:52,998 INFO Downloading http://136.156.132.236/cache-compute-0007/cache/data4/f32b3eb9-af25-4e6f-ac60-c1ef4c813d4c-psl_Amon_MPI-ESM-MR_historical_r1i1p1_185001-200512.nc to /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/mpi_esm_mr/historical_mpi_esm_mr.zip (131.7M)
+2019-12-04 17:31:05,457 INFO Download rate 10.6M/s
+2019-12-04 17:31:06,003 INFO Sending request to https://cds.climate.copernicus.eu/api/v2/resources/projections-cmip5-monthly-single-levels
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/mpi_esm_mr/amip_mpi_esm_mr.zip
+Already nc...
+Changing name: 
+ /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/mpi_esm_mr/historical_mpi_esm_mr.nc
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>2019-12-04 17:31:06,183 INFO Downloading http://136.156.132.236/cache-compute-0007/cache/data4/5a7ba2a3-45de-40a6-a5a6-d60a4b95c493-psl_Amon_NorESM1-M_historical_r1i1p1_185001-200512.nc to /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/noresm1_m/historical_noresm1_m.zip (98.8M)
+2019-12-04 17:31:16,066 INFO Download rate 10M/s
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/noresm1_m/amip_noresm1_m.zip
+Already nc...
+Changing name: 
+ /home/emmanuel/projects/2020_rbig_rs/data/climate/raw/rcp/noresm1_m/historical_noresm1_m.nc
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Load Datasets
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+loader = DataLoader()
+
+dataset = 'ipsl_cm5a_mr'
+
+xr_data = loader.load_rcp_data(dataset)
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+xr_data
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;xarray.Dataset&gt;
+Dimensions:    (bnds: 2, lat: 143, lon: 144, time: 3012)
+Coordinates:
+  * lon        (lon) float64 0.0 2.5 5.0 7.5 10.0 ... 350.0 352.5 355.0 357.5
+  * lat        (lat) float64 -90.0 -88.73 -87.46 -86.2 ... 86.2 87.46 88.73 90.0
+  * time       (time) object 1850-01-16 12:00:00 ... 2100-12-16 12:00:00
+Dimensions without coordinates: bnds
+Data variables:
+    time_bnds  (time, bnds) object dask.array&lt;chunksize=(1872, 2), meta=np.ndarray&gt;
+    lat_bnds   (time, lat, bnds) float64 dask.array&lt;chunksize=(1872, 143, 2), meta=np.ndarray&gt;
+    lon_bnds   (time, lon, bnds) float64 dask.array&lt;chunksize=(1872, 144, 2), meta=np.ndarray&gt;
+    psl        (time, lat, lon) float32 dask.array&lt;chunksize=(1872, 143, 144), meta=np.ndarray&gt;
+Attributes:
+    institution:            IPSL (Institut Pierre Simon Laplace, Paris, France)
+    institute_id:           IPSL
+    experiment_id:          historical
+    source:                 IPSL-CM5A-MR (2010) : atmos : LMDZ4 (LMDZ4_v5, 14...
+    model_id:               IPSL-CM5A-MR
+    forcing:                Nat,Ant,GHG,SA,Oz,LU,SS,Ds,BC,MD,OC,AA
+    parent_experiment_id:   piControl
+    parent_experiment_rip:  r1i1p1
+    branch_time:            1850.0
+    contact:                ipsl-cmip5 _at_ ipsl.jussieu.fr Data manager : Se...
+    comment:                This 20th century simulation include natural and ...
+    references:             Model documentation and further reference availab...
+    initialization_method:  1
+    physics_version:        1
+    tracking_id:            ee34ce17-a474-47bb-b311-c00df6dfbf7a
+    product:                output
+    experiment:             historical
+    frequency:              mon
+    creation_date:          2011-09-22T20:43:25Z
+    history:                2011-09-22T20:43:25Z CMOR rewrote data to comply ...
+    Conventions:            CF-1.4
+    project_id:             CMIP5
+    table_id:               Table Amon (31 January 2011) 53b766a395ac41696af4...
+    title:                  IPSL-CM5A-MR model output prepared for CMIP5 hist...
+    parent_experiment:      pre-industrial control
+    modeling_realm:         atmos
+    realization:            1
+    cmor_version:           2.7.1</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Testing
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+datasets = [
+    "inmcm4",
+    "access1_0",
+    "access1_3",
+    "ipsl_cm5a_mr",
+    "mpi_esm_lr",
+    "mpi_esm_mr",
+    "noresm1_m",
+]
+
+loader = DataLoader()
+
+for idataset in datasets:
+    print(idataset)
+    data = loader.load_rcp_data(idataset)
+    print(data.psl.shape)
+    assert(type(data) is xr.Dataset)
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>inmcm4
+(3012, 120, 180)
+access1_0
+(3012, 145, 192)
+access1_3
+(3012, 145, 192)
+ipsl_cm5a_mr
+(3012, 143, 144)
+mpi_esm_lr
+(3012, 96, 192)
+mpi_esm_mr
+(3012, 96, 192)
+noresm1_m
+(3012, 96, 144)
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+
+```
+
+</div>
+
+</div>
+
+
