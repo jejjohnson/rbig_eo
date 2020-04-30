@@ -1,0 +1,9 @@
+[user]
+    name = Emmanuel Johnson
+    email = emanjohnson91@gmail.com
+[github]
+    user = jejjohnson
+[color]
+    ui = true
+[core]
+    editor = code

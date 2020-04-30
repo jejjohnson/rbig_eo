@@ -1,0 +1,1054 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script>
+(function() {
+  function addWidgetsRenderer() {
+    var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
+    var scriptElement = document.createElement('script');
+    var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
+    var widgetState;
+
+    // Fallback for older version:
+    try {
+      widgetState = mimeElement && JSON.parse(mimeElement.innerHTML);
+
+      if (widgetState && (widgetState.version_major < 2 || !widgetState.version_major)) {
+        widgetRendererSrc = 'jupyter-js-widgets@*/dist/embed.js';
+      }
+    } catch(e) {}
+
+    scriptElement.src = widgetRendererSrc;
+    document.body.appendChild(scriptElement);
+  }
+
+  document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
+}());
+</script>
+
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+# Spatial-Temporal Experiment
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+import sys, os
+cwd = os.getcwd()
+sys.path.insert(0, f'{cwd}/../../')
+sys.path.insert(0, '/home/emmanuel/code/py_esdc')
+sys.path.insert(0, '/home/emmanuel/code/gp_model_zoo')
+
+# standard python packages
+import xarray as xr
+import pandas as pd
+import numpy as np
+
+# 
+from src.models.spatemp.train_models import Metrics
+
+# esdc tools
+from esdc.subset import select_pixel
+from esdc.shape import ShapeFileExtract, rasterize
+from esdc.transform import DensityCubes
+
+from tqdm import tqdm
+
+import matplotlib.pyplot as plt
+import cartopy
+import cartopy.crs as ccrs
+plt.style.use(['fivethirtyeight', 'seaborn-poster'])
+%matplotlib inline
+
+%load_ext autoreload
+%autoreload 2
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>The autoreload extension is already loaded. To reload it, use:
+  %reload_ext autoreload
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+!ls /media/disk/databases/ESDC/
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Cube_2019highColombiaCube_184x120x120.zarr
+Cube_2019highColombiaCube_1x3360x2760.zarr
+esdc-8d-0.083deg-184x270x270-2.0.0.zarr
+esdc-8d-0.083deg-1x2160x4320-2.0.0.zarr
+esdc-8d-0.25deg-184x90x90-2.0.0.zarr
+esdc-8d-0.25deg-1x720x1440-2.0.0.zarr
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+## 1. Get DataCubes
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+filename = '/media/disk/databases/ESDC/esdc-8d-0.25deg-1x720x1440-2.0.0.zarr'
+
+datacube = xr.open_zarr(filename)
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+lst_cube = datacube[['soil_moisture', 'land_surface_temperature']]
+lst_cube
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>&lt;xarray.Dataset&gt;
+Dimensions:                   (lat: 720, lon: 1440, time: 1702)
+Coordinates:
+  * lat                       (lat) float32 89.875 89.625 ... -89.625 -89.875
+  * time                      (time) datetime64[ns] 1980-01-05 ... 2016-12-30
+  * lon                       (lon) float32 -179.875 -179.625 ... 179.875
+Data variables:
+    soil_moisture             (time, lat, lon) float32 dask.array&lt;chunksize=(1, 720, 1440), meta=np.ndarray&gt;
+    land_surface_temperature  (time, lat, lon) float32 dask.array&lt;chunksize=(1, 720, 1440), meta=np.ndarray&gt;
+Attributes:
+    Metadata_conventions :     Unidata Dataset Discovery v1.0
+    acknowledgment:            The ESDL team acknowledges all data providers! 
+    chunking:                  1x720x1440
+    comment:                   none. 
+    contributor_name:          Max Planck Institute for Biogeochemistry
+    contributor_role:          ESDL Science Lead 
+    creator_email:             info@earthsystemdatalab.net
+    creator_name:              Brockmann Consult GmbH 
+    creator_url:               www.earthsystemdatalab.net
+    date_created:              17.12.2018
+    date_issued:               19.12.2018
+    date_modified:             17.12.2018
+    geospatial_lat_max:        89.75
+    geospatial_lat_min:        -89.75
+    geospatial_lon_max:        179.75
+    geospatial_lon_min:        -179.75
+    geospatial_resolution:     1/4deg
+    history:                   - processing with esdl cube v0.1  (https://git...
+    id:                        v2.0.0
+    institution:               Brockmann Consult GmbH 
+    keywords:                  Earth Science, Geophysical Variables
+    license:                   Please refer to individual variables
+    naming_authority:          Earth System Data Lab team
+    processing_level:          Level 4
+    project:                   ESA Earth System Data Lab 
+    publisher_email:           info@earthsystemdatalab.net
+    publisher_name:            Brockmann Consult GmbH &amp; Max Planck Institute ...
+    publisher_url:             www.brockmann-consult.de
+    standard_name_vocabulary:  CF-1.7
+    summary:                   This data set contains a data cube of Earth Sy...
+    time_coverage_duration:    P37Y
+    time_coverage_end:         30.12.2016
+    time_coverage_resolution:  P8D
+    time_coverage_start:       05.01.1980
+    title:                     Earth System Data Cube</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+## 2. Select Region
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+europe = lst_cube.sel(lat=slice(71.5, 35.5), lon=slice(-18.0, 60.0))
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+## 3. Get Density Cubes
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+spatial = 7
+temporal = 1
+
+# initialize minicuber
+minicuber = DensityCubes(
+    spatial_window=spatial, 
+    time_window=temporal, 
+)
+
+europe_df = minicuber.get_minicubes(europe.land_surface_temperature)
+europe_df.shape
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(5982624, 49)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+print(7 * 7 * 1 - 1)
+print(5 * 5 * 2 - 1)
+print(4 * 4 * 3 - 1)
+print(3 * 3 * 5 - 1)
+print(2 * 2 * 11 - 1)
+print(1 * 1 * 46 - 1)
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>48
+49
+47
+44
+43
+45
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+europe_df.shape
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(2052734, 46)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+## 4. ML Model Framework
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### 4.1 Preprocessing
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+#### 4.1.1 - Training and testing
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+europe_df.head()
+
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th></th>
+      <th>var_x0</th>
+      <th>var_x1</th>
+      <th>var_x2</th>
+      <th>var_x3</th>
+      <th>var_x4</th>
+      <th>var_x5</th>
+      <th>var_x6</th>
+      <th>var_x7</th>
+      <th>var_x8</th>
+      <th>var_x9</th>
+      <th>...</th>
+      <th>var_x39</th>
+      <th>var_x40</th>
+      <th>var_x41</th>
+      <th>var_x42</th>
+      <th>var_x43</th>
+      <th>var_x44</th>
+      <th>var_x45</th>
+      <th>var_x46</th>
+      <th>var_x47</th>
+      <th>var_x48</th>
+    </tr>
+    <tr>
+      <th>time</th>
+      <th>lat</th>
+      <th>lon</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th rowspan="5" valign="top">2002-05-21</th>
+      <th rowspan="5" valign="top">70.625</th>
+      <th>54.375</th>
+      <td>268.145142</td>
+      <td>267.553741</td>
+      <td>267.075653</td>
+      <td>266.539734</td>
+      <td>265.585785</td>
+      <td>266.500458</td>
+      <td>270.357666</td>
+      <td>269.060791</td>
+      <td>268.648926</td>
+      <td>268.229797</td>
+      <td>...</td>
+      <td>269.760193</td>
+      <td>271.069000</td>
+      <td>271.488525</td>
+      <td>268.266052</td>
+      <td>269.794861</td>
+      <td>270.075409</td>
+      <td>271.263397</td>
+      <td>270.822144</td>
+      <td>271.262665</td>
+      <td>269.876068</td>
+    </tr>
+    <tr>
+      <th>54.625</th>
+      <td>267.553741</td>
+      <td>267.075653</td>
+      <td>266.539734</td>
+      <td>265.585785</td>
+      <td>266.500458</td>
+      <td>270.357666</td>
+      <td>269.116730</td>
+      <td>268.648926</td>
+      <td>268.229797</td>
+      <td>268.201996</td>
+      <td>...</td>
+      <td>271.069000</td>
+      <td>271.488525</td>
+      <td>270.526123</td>
+      <td>269.794861</td>
+      <td>270.075409</td>
+      <td>271.263397</td>
+      <td>270.822144</td>
+      <td>271.262665</td>
+      <td>269.876068</td>
+      <td>267.898865</td>
+    </tr>
+    <tr>
+      <th>54.875</th>
+      <td>267.075653</td>
+      <td>266.539734</td>
+      <td>265.585785</td>
+      <td>266.500458</td>
+      <td>270.357666</td>
+      <td>269.116730</td>
+      <td>269.217926</td>
+      <td>268.229797</td>
+      <td>268.201996</td>
+      <td>268.216003</td>
+      <td>...</td>
+      <td>271.488525</td>
+      <td>270.526123</td>
+      <td>266.060333</td>
+      <td>270.075409</td>
+      <td>271.263397</td>
+      <td>270.822144</td>
+      <td>271.262665</td>
+      <td>269.876068</td>
+      <td>267.898865</td>
+      <td>267.227875</td>
+    </tr>
+    <tr>
+      <th>55.125</th>
+      <td>266.539734</td>
+      <td>265.585785</td>
+      <td>266.500458</td>
+      <td>270.357666</td>
+      <td>269.116730</td>
+      <td>269.217926</td>
+      <td>268.337921</td>
+      <td>268.201996</td>
+      <td>268.216003</td>
+      <td>268.703064</td>
+      <td>...</td>
+      <td>270.526123</td>
+      <td>266.060333</td>
+      <td>265.535248</td>
+      <td>271.263397</td>
+      <td>270.822144</td>
+      <td>271.262665</td>
+      <td>269.876068</td>
+      <td>267.898865</td>
+      <td>267.227875</td>
+      <td>267.252319</td>
+    </tr>
+    <tr>
+      <th>55.375</th>
+      <td>265.585785</td>
+      <td>266.500458</td>
+      <td>270.357666</td>
+      <td>269.116730</td>
+      <td>269.217926</td>
+      <td>268.337921</td>
+      <td>269.024597</td>
+      <td>268.216003</td>
+      <td>268.703064</td>
+      <td>268.308807</td>
+      <td>...</td>
+      <td>266.060333</td>
+      <td>265.535248</td>
+      <td>267.518524</td>
+      <td>270.822144</td>
+      <td>271.262665</td>
+      <td>269.876068</td>
+      <td>267.898865</td>
+      <td>267.227875</td>
+      <td>267.252319</td>
+      <td>267.736053</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 49 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+y = europe_df.iloc[:, 0][:, np.newaxis]
+X = europe_df.iloc[:, 1:]
+
+d_dimensions = X.shape[1]
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+#### 4.1.2 - Train-Test Split
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+from sklearn.model_selection import train_test_split
+
+
+train_size = 1_000
+random_state = 123
+
+xtrain, xtest, ytrain, ytest = train_test_split(
+    X, y, train_size=train_size, random_state=random_state)
+
+test_size = xtest.shape[0]
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+#### 4.1.1 - Normalize
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+from sklearn.preprocessing import StandardScaler
+
+# normalize inputs
+x_normalizer = StandardScaler(with_mean=True, with_std=False)
+
+xtrain_norm = x_normalizer.fit_transform(xtrain)
+xtest_norm = x_normalizer.transform(xtest)
+
+# remove mean outputs
+y_normalizer = StandardScaler(with_std=False)
+
+ytrain_norm = y_normalizer.fit_transform(ytrain)
+ytest_norm = y_normalizer.transform(ytest)
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### 4.2 - Training
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+from gpy.sparse import SparseGPR
+import GPy
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+# gp params
+n_dims = xtrain_norm.shape[1]
+kernel = GPy.kern.RBF(input_dim=n_dims, ARD=False)
+inference = 'vfe'
+n_inducing = 300
+verbose = 1
+max_iters = 5_000
+n_restarts = 0
+
+# initialize GP Model
+sgp_model = SparseGPR(
+    kernel=kernel, 
+    inference=inference, 
+    n_inducing=n_inducing, 
+    verbose=verbose,
+    max_iters=max_iters,
+    n_restarts=n_restarts
+)
+
+# train GP model
+sgp_model.fit(xtrain_norm, ytrain_norm)
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+
+
+
+<div id="0636c0b1-b0e0-4af9-a14d-3d0ca34a070b"></div>
+<div class="output_subarea output_widget_view ">
+<script type="text/javascript">
+var element = $('#0636c0b1-b0e0-4af9-a14d-3d0ca34a070b');
+</script>
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id": "5177959d6e784819826fd52f757d39ae", "version_major": 2, "version_minor": 0}
+</script>
+</div>
+
+</div>
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>SparseGPR(alpha=0.5, inference=&#39;vfe&#39;,
+          kernel=&lt;GPy.kern.src.rbf.RBF object at 0x7f17d6d41780&gt;,
+          max_iters=5000, n_inducing=300, n_restarts=0, optimizer=&#39;scg&#39;,
+          verbose=1)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+sgp_model.display_model()
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<style type="text/css">
+.pd{
+    font-family: "Courier New", Courier, monospace !important;
+    width: 100%;
+    padding: 3px;
+}
+</style>
+
+<p class=pd>
+<b>Model</b>: sparse_gp<br>
+<b>Objective</b>: 4313.986904027843<br>
+<b>Number of Parameters</b>: 14403<br>
+<b>Number of Optimization Parameters</b>: 14403<br>
+<b>Updates</b>: True<br>
+</p>
+<style type="text/css">
+.tg  {font-family:"Courier New", Courier, monospace !important;padding:2px 3px;word-break:normal;border-collapse:collapse;border-spacing:0;border-color:#DCDCDC;margin:0px auto;width:100%;}
+.tg td{font-family:"Courier New", Courier, monospace !important;font-weight:bold;color:#444;background-color:#F7FDFA;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#DCDCDC;}
+.tg th{font-family:"Courier New", Courier, monospace !important;font-weight:normal;color:#fff;background-color:#26ADE4;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#DCDCDC;}
+.tg .tg-left{font-family:"Courier New", Courier, monospace !important;font-weight:normal;text-align:left;}
+.tg .tg-center{font-family:"Courier New", Courier, monospace !important;font-weight:normal;text-align:center;}
+.tg .tg-right{font-family:"Courier New", Courier, monospace !important;font-weight:normal;text-align:right;}
+</style>
+<table class="tg"><tr><th><b>  sparse_gp.             </b></th><th><b>                 value</b></th><th><b>constraints</b></th><th><b>priors</b></th></tr>
+<tr><td class=tg-left>  inducing inputs        </td><td class=tg-right>             (300, 48)</td><td class=tg-center>           </td><td class=tg-center>      </td></tr>
+<tr><td class=tg-left>  rbf.variance           </td><td class=tg-right>2.1394880780812098e-16</td><td class=tg-center>    +ve    </td><td class=tg-center>      </td></tr>
+<tr><td class=tg-left>  rbf.lengthscale        </td><td class=tg-right>    0.8861813022707942</td><td class=tg-center>    +ve    </td><td class=tg-center>      </td></tr>
+<tr><td class=tg-left>  Gaussian_noise.variance</td><td class=tg-right>    326.94648917027007</td><td class=tg-center>    +ve    </td><td class=tg-center>      </td></tr>
+</table>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### 4.3 - Testing
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+ypred = sgp_model.predict(xtest_norm, return_std=False)
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+ypred.shape, ytest_norm.shape
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>((5981624, 1), (5981624, 1))</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+stats = Metrics().get_all(ypred.squeeze(), ytest_norm.squeeze())
+stats
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>mae</th>
+      <th>mse</th>
+      <th>rmse</th>
+      <th>r2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>15.522687</td>
+      <td>338.304949</td>
+      <td>18.393068</td>
+      <td>-0.000268</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+stats['r2'].values
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>array([-0.00026803])</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+def _predict(model, Xs, batch_size):
+    ms = []
+    n = max(len(Xs) / batch_size, 1)  # predict in small batches
+    with tqdm(np.array_split(Xs, n)) as bar:
+        for xs in bar:
+            m = model.predict(xs,)
+            ms.append(m)
+
+    return np.vstack(ms)
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+batch_size = 5_000
+ms = []
+n = max(len(xtest_norm) / batch_size, 1)  # predict in small batches
+with tqdm(np.array_split(xtest_norm, n)) as bar:
+    for xs in bar:
+        m = sgp_model.predict(xs,)
+        ms.append(m)
+
+
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>100%|██████████| 598/598 [00:51&lt;00:00, 11.56it/s]
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+np.vstack(ms).shape
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>(5981624, 1)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+ypred = _predict(sgp_model, xtest_norm, 5_000)
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>100%|██████████| 1196/1196 [00:44&lt;00:00, 27.05it/s]
+</pre>
+</div>
+</div>
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ValueError</span>                                Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-82-585df2283be9&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>ypred <span class="ansi-blue-fg">=</span> _predict<span class="ansi-blue-fg">(</span>sgp_model<span class="ansi-blue-fg">,</span> xtest_norm<span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">5_000</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">&lt;ipython-input-81-0f411118c22e&gt;</span> in <span class="ansi-cyan-fg">_predict</span><span class="ansi-blue-fg">(model, Xs, batch_size)</span>
+<span class="ansi-green-intense-fg ansi-bold">      7</span>             ms<span class="ansi-blue-fg">.</span>append<span class="ansi-blue-fg">(</span>m<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      8</span> 
+<span class="ansi-green-fg">----&gt; 9</span><span class="ansi-red-fg">     </span><span class="ansi-green-fg">return</span> np<span class="ansi-blue-fg">.</span>concatenate<span class="ansi-blue-fg">(</span>ms<span class="ansi-blue-fg">,</span> <span class="ansi-cyan-fg">1</span><span class="ansi-blue-fg">)</span>
+
+<span class="ansi-green-fg">&lt;__array_function__ internals&gt;</span> in <span class="ansi-cyan-fg">concatenate</span><span class="ansi-blue-fg">(*args, **kwargs)</span>
+
+<span class="ansi-red-fg">ValueError</span>: all the input array dimensions for the concatenation axis must match exactly, but along dimension 0, the array at index 0 has size 5002 and the array at index 428 has size 5001</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+ypred.shape
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+
+```
+
+</div>
+
+</div>
+
+

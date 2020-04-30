@@ -1,0 +1,69 @@
+name: rbig_eo
+channels:
+- defaults
+- conda-forge
+dependencies:
+- python=3.8
+# Standard Libraries
+- numpy             # Numerical Linear Algebra
+- scipy             # Scientific Computing
+- xarray            # Data structures
+- pandas            # Data structure
+- scikit-learn      # Machine Learning
+- scikit-image      # Image Processing
+- statsmodels       # Statistical Learning
+- pymc3             # Probabilistic programming library
+# VISUALIZATION
+- matplotlib
+- seaborn
+- bokeh
+- plotly::plotly==4.6.0
+- pyviz::geoviews
+- conda-forge::cartopy
+- datashader
+# GEOSPATIAL PACKAGES
+- geopandas
+- conda-forge::regionmask
+- conda-forge::xesmf
+- conda-forge::xcube
+- conda-forge::rioxarray
+# SCALE
+- numba
+- dask              # Out-of-Core processing
+- dask-ml           # Out-of-Core machine learning
+# Storage
+- hdf5              # standard large storage h5
+- conda-forge::zarr
+# GUI
+- conda-forge::nb_conda_kernels     # Access to other conda kernels
+- conda-forge::nodejs               # for extensions in jupyterlab
+- conda-forge::tqdm       
+- pip
+- pip:
+  # GPY
+  - "git+https://github.com/SheffieldML/GPy.git#egg=GPy"
+  # Jupyter
+  - ipykernel
+  - ipywidgets
+  # Formatters
+  - black
+  - pylint
+  - isort
+  - flake8
+  - mypy
+  - pytest
+  - pyproject
+  # Extra
+  - "git+https://github.com/swartn/cmipdata.git#egg=cmipdata"
+  - -e "git+https://github.com/jejjohnson/rbig.git#egg=rbig"
+  - emukit
+  - netCDF4
+  - shapely
+  - affine
+  - netCDF4
+  - joblib          # Embarssingly parallel
+  # Documentation
+  - mkdocs-material 
+  - mknotebooks
+  - pymdown-extensions 
+  - pdoc3

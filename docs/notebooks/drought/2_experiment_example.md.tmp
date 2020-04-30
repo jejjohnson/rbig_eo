@@ -1,0 +1,521 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script>
+(function() {
+  function addWidgetsRenderer() {
+    var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
+    var scriptElement = document.createElement('script');
+    var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
+    var widgetState;
+
+    // Fallback for older version:
+    try {
+      widgetState = mimeElement && JSON.parse(mimeElement.innerHTML);
+
+      if (widgetState && (widgetState.version_major < 2 || !widgetState.version_major)) {
+        widgetRendererSrc = 'jupyter-js-widgets@*/dist/embed.js';
+      }
+    } catch(e) {}
+
+    scriptElement.src = widgetRendererSrc;
+    document.body.appendChild(scriptElement);
+  }
+
+  document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
+}());
+</script>
+
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+# Experiment Example
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+import sys, os
+cwd = os.getcwd()
+sys.path.insert(0, f'{cwd}/../../')
+sys.path.insert(0, '/home/emmanuel/code/py_esdc')
+
+
+import xarray as xr
+import pandas as pd
+import numpy as np
+
+# drought tools
+from src.data.drought.loader import DataLoader
+from src.features.drought.build_features import (
+    get_cali_geometry,
+    mask_datacube,
+    smooth_vod_signal,
+    remove_climatology,
+    get_cali_emdata,
+    get_drought_years,
+    get_density_cubes,
+    get_common_elements_many,
+    normalize
+)
+from src.visualization.drought.analysis import plot_mean_time
+
+# esdc tools
+from esdc.subset import select_pixel
+from esdc.shape import ShapeFileExtract, rasterize
+from esdc.transform import DensityCubes
+
+# RBIG
+from src.models.train_models import run_rbig_models
+from sklearn.preprocessing import StandardScaler
+from scipy import stats
+from tqdm import tqdm
+
+import matplotlib.pyplot as plt
+import cartopy
+import cartopy.crs as ccrs
+plt.style.use(['fivethirtyeight', 'seaborn-poster'])
+%matplotlib inline
+
+%load_ext autoreload
+%autoreload 2
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>The autoreload extension is already loaded. To reload it, use:
+  %reload_ext autoreload
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+# Load Data
+region = 'conus'
+sampling = '14D'
+
+drought_cube = DataLoader().load_data(region, sampling)
+
+# Subset california
+cali_geoms = get_cali_geometry()
+
+drought_cube = mask_datacube(drought_cube, cali_geoms)
+
+# interpolate
+# interpolation arguments
+interp_dim = 'time'
+method = 'linear'
+
+# do interpolation
+drought_cube = drought_cube.interpolate_na(
+    dim=interp_dim, 
+    method=method
+)
+
+# remove climatology
+drought_cube, _ = remove_climatology(drought_cube)
+
+
+# drought years
+drought_years = {
+    "2010": False,
+    "2011": False,
+    "2012": True,
+    "2013": False,
+    "2014": True,
+    "2015": True,
+}
+
+# MI elements
+common_vars = [
+    ('VOD', 'NDVI'),
+    ('VOD', 'LST'),
+    ('VOD', 'SM'),
+    ('NDVI', 'LST'),
+    ('NDVI', 'SM'),
+    ('LST', 'SM')
+]
+
+variables = [
+    'VOD', 'NDVI', 'SM', 'LST'
+]
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+## Experiment I - Individual Measurements
+
+In this part, we will look at the standard individual measurements such as 
+
+* Entropy, H
+* Total Correlation, TC
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+time_steps = range(1,12)
+spatial = 1
+results_df_single = pd.DataFrame()
+
+
+with tqdm(drought_cube.groupby('time.year')) as years_bar:
+    # group datacube by years
+    for iyear, icube in years_bar:
+
+        # Loop through time steps
+        for itime_step in time_steps:
+
+            # extract density cubes
+            vod_df, lst_df, ndvi_df, sm_df = get_density_cubes(icube, spatial, itime_step)
+
+
+            # get common elements
+            dfs = get_common_elements_many([vod_df, lst_df, ndvi_df, sm_df])
+            vod_df, lst_df, ndvi_df, sm_df = dfs[0], dfs[1], dfs[2], dfs[3]
+
+
+            variables = {
+                'VOD': vod_df,
+                'NDVI': ndvi_df,
+                'SM': sm_df,
+                'LST': lst_df
+            }
+
+
+
+            # do calculations for H, TC
+            for iname, idata in variables.items():
+                
+
+
+                # normalize data
+                X_norm = StandardScaler().fit_transform(idata)
+
+                # entropy, total correlation
+                tc, h, t_ = run_rbig_models(X_norm, measure="t", random_state=123)
+
+                # get H and TC
+                results_df_single = results_df_single.append({
+                    'year': iyear,
+                    'drought': drought_years[iyear],
+                    'samples': X_norm.shape[0],
+                    'dimensions': X_norm.shape[1],
+                    'temporal': itime_step,
+                    'variable': iname,
+                    'tc': tc,
+                    'h': h,
+                    'time': t_,
+
+                }, ignore_index=True)
+            
+                postfix = dict(
+                    Dims=f"{itime_step}",
+                    Variable=f"{iname}",
+                )
+                years_bar.set_postfix(postfix)
+            # do calculations for 
+            break
+        break
+    
+    
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>  0%|          | 0/6 [00:03&lt;?, ?it/s, Dims=1, Variable=LST] 
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+## Experiment II - Comparing Measurements
+
+In this experiment, we will look at different combinations of variables. The following measurements will be calculated and compared:
+
+* Pearson Correlation
+* Spearman Correlation
+* Mutual Information
+* HSIC...
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+time_steps = range(1,12)
+spatial = 1
+results_df_single = pd.DataFrame()
+
+
+with tqdm(drought_cube.groupby('time.year')) as years_bar:
+    # group datacube by years
+    for iyear, icube in years_bar:
+
+        # Loop through time steps
+        for itime_step in time_steps:
+
+            # extract density cubes
+            vod_df, lst_df, ndvi_df, sm_df = get_density_cubes(icube, spatial, itime_step)
+
+
+            # get common elements
+            dfs = get_common_elements_many([vod_df, lst_df, ndvi_df, sm_df])
+            vod_df, lst_df, ndvi_df, sm_df = dfs[0], dfs[1], dfs[2], dfs[3]
+
+
+            variables = {
+                'VOD': vod_df,
+                'NDVI': ndvi_df,
+                'SM': sm_df,
+                'LST': lst_df
+            }
+
+
+
+            # do calculations for H, TC
+            for (ivar1, ivar2) in common_vars:
+#             for iname, idata in variables.items():
+
+                # Pearson coeffcient
+                pears = stats.pearsonr(
+                    variables[ivar1].values.ravel(), 
+                    variables[ivar2].values.ravel()
+                )[0]
+                
+                # Spearman Coefficient
+                spears = stats.spearmanr(
+                    variables[ivar1].values.ravel(), 
+                    variables[ivar2].values.ravel()
+                )[0]
+
+                # normalize data
+                X_norm = StandardScaler().fit_transform(variables[ivar1])
+                Y_norm = StandardScaler().fit_transform(variables[ivar2])
+
+                # entropy, total correlation
+                mi, t_ = run_rbig_models(X_norm, Y_norm, measure="mi", random_state=123)
+
+                # get H and TC
+                results_df_single = results_df_single.append({
+                    'year': iyear,
+                    'drought': drought_years[str(iyear)],
+                    'samples': X_norm.shape[0],
+                    'dimensions': X_norm.shape[1],
+                    'temporal': itime_step,
+                    'variable1': ivar1,
+                    'variable2': ivar2,
+                    'pearson': pears,
+                    'mi': mi,
+                    'time': t_,
+
+                }, ignore_index=True)
+            
+                postfix = dict(
+                    Year=f"{iyear}", 
+                    Dims=f"{itime_step}",
+                    Variables=f"{ivar1}-{ivar2}",
+                    MI=f"{mi:.3f}",
+                    Pear=f"{pears:.3f}",
+                    Spear=f"{spears:.3f}",
+                )
+                years_bar.set_postfix(postfix)
+            # do calculations for 
+            break
+        break
+    
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stderr output_text">
+<pre>  0%|          | 0/6 [00:18&lt;?, ?it/s, Year=2010, Dims=1, Variables=LST-SM, MI=0.183, Pear=-0.232, Spear=-0.214]  
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+results_df_single.head()
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>dimensions</th>
+      <th>mi</th>
+      <th>samples</th>
+      <th>temporal</th>
+      <th>time</th>
+      <th>variable1</th>
+      <th>variable2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1.0</td>
+      <td>0.014735</td>
+      <td>25779.0</td>
+      <td>1.0</td>
+      <td>2.484674</td>
+      <td>VOD</td>
+      <td>NDVI</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1.0</td>
+      <td>0.024350</td>
+      <td>25779.0</td>
+      <td>1.0</td>
+      <td>2.564911</td>
+      <td>VOD</td>
+      <td>LST</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.0</td>
+      <td>0.157174</td>
+      <td>25779.0</td>
+      <td>1.0</td>
+      <td>2.743430</td>
+      <td>VOD</td>
+      <td>SM</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.0</td>
+      <td>0.019120</td>
+      <td>25779.0</td>
+      <td>1.0</td>
+      <td>2.564871</td>
+      <td>NDVI</td>
+      <td>LST</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1.0</td>
+      <td>0.059311</td>
+      <td>25779.0</td>
+      <td>1.0</td>
+      <td>2.583604</td>
+      <td>NDVI</td>
+      <td>SM</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+stats.spearmanr(variables[ivar1].values.ravel(), variables[ivar2].values.ravel())
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>SpearmanrResult(correlation=0.08307110054436087, pvalue=1.0326962564352802e-40)</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+
+```
+
+</div>
+
+</div>
+
+

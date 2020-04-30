@@ -9,25 +9,36 @@ import os
 import sys
 from shutil import rmtree
 
-from setuptools import find_packages, setup, Command
+from setuptools import Command, find_packages, setup
 
 # Package meta-data.
-NAME = "src"
-DESCRIPTION = "My short description for my project."
-URL = "https://github.com/jejjohnson/myproject"
+NAME = "rbig_eo"
+DESCRIPTION = "Using RBIG for Earth observation"
+URL = "https://github.com/jejjohnson/rbig_eo"
 EMAIL = "jemanjohnson34@gmail.com"
 AUTHOR = "J. Emmanuel Johnson"
-REQUIRES_PYTHON = ">=3.6.0"
-VERSION = "0.1.0"
+REQUIRES_PYTHON = ">=3.8.0"
+VERSION = "0.0.1"
+
+# Keywords
+KEYWORDS = ["machine learning python scikit-learn gaussianization"]
 
 # What packages are required for this module to be executed?
-REQUIRED = [
-    # 'requests', 'maya', 'records',
-]
+REQUIRED = ["numpy", "scipy", "scikit-learn"]
 
 # What packages are optional?
 EXTRAS = {
-    # 'fancy feature': ['django'],
+    "dev": [
+        "flake8",
+        "pylint",  # checkers
+        "black",
+        "isort",  # formatters
+        "mypy",  # Type checking
+        "pyproject",
+    ],
+    "notebooks": ["ipykernels"],  # Notebooks
+    "examples": ["matplotlib", "seaborn"],  # almost always have plots
+    "tests": ["pytest", "pytest-cov"],  # test library
 }
 
 # The rest you shouldn't have to touch too much :)
@@ -109,19 +120,21 @@ setup(
     # entry_points={
     #     'console_scripts': ['mycli=mymodule:cli'],
     # },
+    setup_requires=["setuptools-yaml"],
+    metadata_yaml="environment.yml",
     install_requires=REQUIRED,
     extras_require=EXTRAS,
     include_package_data=True,
     license="MIT",
+    keywords=KEYWORDS,
     classifiers=[
         # Trove classifiers
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
+        "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT License",
+        "Intended Audience :: Science/Research",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: Implementation :: CPython",
-        "Programming Language :: Python :: Implementation :: PyPy",
+        "Programming Language :: Python :: 3.8",
     ],
     # $ setup.py publish support.
     cmdclass={"upload": UploadCommand},
