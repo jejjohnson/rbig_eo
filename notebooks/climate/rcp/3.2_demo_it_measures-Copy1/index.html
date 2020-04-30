@@ -1,1143 +1,664 @@
 
+<!DOCTYPE html>
 
-
-<!doctype html>
-<html lang="en" class="no-js">
-  <head>
-    
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width,initial-scale=1">
-      
-        <meta name="description" content="RBIG for Earth Observation">
-      
-      
-        <link rel="canonical" href="https://jejjohnson.github.io/rbig_eo/notebooks/climate/rcp/3.2_demo_it_measures-Copy1/">
-      
-      
-        <meta name="author" content="J. Emmanuel Johnson">
-      
-      <link rel="shortcut icon" href="../../../../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.1, mkdocs-material-5.1.4">
-    
-    
-      
-        <title>3.2 demo it measures Copy1 - RBIG4EO</title>
-      
-    
-    
-      <link rel="stylesheet" href="../../../../assets/stylesheets/main.c4007cdc.min.css">
-      
-        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.8435c73a.min.css">
-      
-      
-        
-        
-        <meta name="theme-color" content="">
-      
-    
-    
-    
-      
-        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CSource+Code+Pro&display=fallback">
-        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
-      
-    
-    
-    
-      <link rel="stylesheet" href="../../../../css/ansi-colours.css">
-    
-      <link rel="stylesheet" href="../../../../css/jupyter-cells.css">
-    
-      <link rel="stylesheet" href="../../../../css/pandas-dataframe.css">
-    
-    
-      
-    
-    
-  </head>
-  
-  
-    
-    
-    <body dir="ltr" data-md-color-primary="black" data-md-color-accent="gray">
-  
-    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
-    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
-    <label class="md-overlay" for="__drawer"></label>
-    <div data-md-component="skip">
-      
-        
-        <a href="#information-theory-measures" class="md-skip">
+<html class="no-js" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<meta content="RBIG for Earth Observation" name="description"/>
+<link href="https://jejjohnson.github.io/rbig_eo/notebooks/climate/rcp/3.2_demo_it_measures-Copy1/" rel="canonical"/>
+<meta content="J. Emmanuel Johnson" name="author"/>
+<link href="../../../../assets/images/favicon.png" rel="shortcut icon"/>
+<meta content="mkdocs-1.1, mkdocs-material-5.1.4" name="generator"/>
+<title>3.2 demo it measures Copy1 - RBIG4EO</title>
+<link href="../../../../assets/stylesheets/main.c4007cdc.min.css" rel="stylesheet"/>
+<link href="../../../../assets/stylesheets/palette.8435c73a.min.css" rel="stylesheet"/>
+<meta content="" name="theme-color"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CSource+Code+Pro&amp;display=fallback" rel="stylesheet"/>
+<style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+<link href="../../../../css/ansi-colours.css" rel="stylesheet"/>
+<link href="../../../../css/jupyter-cells.css" rel="stylesheet"/>
+<link href="../../../../css/pandas-dataframe.css" rel="stylesheet"/>
+</head>
+<body data-md-color-accent="gray" data-md-color-primary="black" dir="ltr">
+<input autocomplete="off" class="md-toggle" data-md-toggle="drawer" id="__drawer" type="checkbox"/>
+<input autocomplete="off" class="md-toggle" data-md-toggle="search" id="__search" type="checkbox"/>
+<label class="md-overlay" for="__drawer"></label>
+<div data-md-component="skip">
+<a class="md-skip" href="#information-theory-measures">
           Skip to content
         </a>
-      
-    </div>
-    <div data-md-component="announce">
-      
-    </div>
-    
-      <header class="md-header" data-md-component="header">
-  <nav class="md-header-nav md-grid" aria-label="Header">
-    <a href="https://jejjohnson.github.io/rbig_eo" title="RBIG4EO" class="md-header-nav__button md-logo" aria-label="RBIG4EO">
-      
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
-
-    </a>
-    <label class="md-header-nav__button md-icon" for="__drawer">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
-    </label>
-    <div class="md-header-nav__title" data-md-component="header-title">
-      
-        <div class="md-header-nav__ellipsis">
-          <span class="md-header-nav__topic md-ellipsis">
+</div>
+<div data-md-component="announce">
+</div>
+<header class="md-header" data-md-component="header">
+<nav aria-label="Header" class="md-header-nav md-grid">
+<a aria-label="RBIG4EO" class="md-header-nav__button md-logo" href="https://jejjohnson.github.io/rbig_eo" title="RBIG4EO">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"></path></svg>
+</a>
+<label class="md-header-nav__button md-icon" for="__drawer">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"></path></svg>
+</label>
+<div class="md-header-nav__title" data-md-component="header-title">
+<div class="md-header-nav__ellipsis">
+<span class="md-header-nav__topic md-ellipsis">
             RBIG4EO
           </span>
-          <span class="md-header-nav__topic md-ellipsis">
+<span class="md-header-nav__topic md-ellipsis">
             
               3.2 demo it measures Copy1
             
           </span>
-        </div>
-      
-    </div>
-    
-      <label class="md-header-nav__button md-icon" for="__search">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
-      </label>
-      
+</div>
+</div>
+<label class="md-header-nav__button md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"></path></svg>
+</label>
 <div class="md-search" data-md-component="search" role="dialog">
-  <label class="md-search__overlay" for="__search"></label>
-  <div class="md-search__inner" role="search">
-    <form class="md-search__form" name="search">
-      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active">
-      <label class="md-search__icon md-icon" for="__search">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-      </label>
-      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
-      </button>
-    </form>
-    <div class="md-search__output">
-      <div class="md-search__scrollwrap" data-md-scrollfix>
-        <div class="md-search-result" data-md-component="search-result">
-          <div class="md-search-result__meta">
+<label class="md-search__overlay" for="__search"></label>
+<div class="md-search__inner" role="search">
+<form class="md-search__form" name="search">
+<input aria-label="Search" autocapitalize="off" autocomplete="off" autocorrect="off" class="md-search__input" data-md-component="search-query" data-md-state="active" name="query" placeholder="Search" spellcheck="false" type="text"/>
+<label class="md-search__icon md-icon" for="__search">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"></path></svg>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"></path></svg>
+</label>
+<button aria-label="Clear" class="md-search__icon md-icon" data-md-component="search-reset" tabindex="-1" type="reset">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"></path></svg>
+</button>
+</form>
+<div class="md-search__output">
+<div class="md-search__scrollwrap" data-md-scrollfix="">
+<div class="md-search-result" data-md-component="search-result">
+<div class="md-search-result__meta">
             Initializing search
           </div>
-          <ol class="md-search-result__list"></ol>
-        </div>
-      </div>
-    </div>
-  </div>
+<ol class="md-search-result__list"></ol>
 </div>
-    
-    
-      <div class="md-header-nav__source">
-        
-<a href="https://github.com/jejjohnson/rbig_eo/" title="Go to repository" class="md-source">
-  <div class="md-source__icon md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
-  </div>
-  <div class="md-source__repository">
+</div>
+</div>
+</div>
+</div>
+<div class="md-header-nav__source">
+<a class="md-source" href="https://github.com/jejjohnson/rbig_eo/" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"></path></svg>
+</div>
+<div class="md-source__repository">
     jejjohnson/rbig_eo
   </div>
 </a>
-      </div>
-    
-  </nav>
+</div>
+</nav>
 </header>
-    
-    <div class="md-container" data-md-component="container">
-      
-        
-      
-      
-        
-      
-      <main class="md-main" data-md-component="main">
-        <div class="md-main__inner md-grid">
-          
-            
-              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
-  <label class="md-nav__title" for="__drawer">
-    <a href="https://jejjohnson.github.io/rbig_eo" title="RBIG4EO" class="md-nav__button md-logo" aria-label="RBIG4EO">
-      
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
-
-    </a>
+<div class="md-container" data-md-component="container">
+<main class="md-main" data-md-component="main">
+<div class="md-main__inner md-grid">
+<div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Navigation" class="md-nav md-nav--primary" data-md-level="0">
+<label class="md-nav__title" for="__drawer">
+<a aria-label="RBIG4EO" class="md-nav__button md-logo" href="https://jejjohnson.github.io/rbig_eo" title="RBIG4EO">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"></path></svg>
+</a>
     RBIG4EO
   </label>
-  
-    <div class="md-nav__source">
-      
-<a href="https://github.com/jejjohnson/rbig_eo/" title="Go to repository" class="md-source">
-  <div class="md-source__icon md-icon">
-    
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
-  </div>
-  <div class="md-source__repository">
+<div class="md-nav__source">
+<a class="md-source" href="https://github.com/jejjohnson/rbig_eo/" title="Go to repository">
+<div class="md-source__icon md-icon">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"></path></svg>
+</div>
+<div class="md-source__repository">
     jejjohnson/rbig_eo
   </div>
 </a>
-    </div>
-  
-  <ul class="md-nav__list" data-md-scrollfix>
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../../../.." title="RBIG4EO" class="md-nav__link">
+</div>
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../.." title="RBIG4EO">
       RBIG4EO
     </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../../../../ideas/" title="Ideas" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../ideas/" title="Ideas">
       Ideas
     </a>
-  </li>
-
-    
-      
-      
-      
-
-
-  <li class="md-nav__item">
-    <a href="../../../../todo/" title="TODO" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../../todo/" title="TODO">
       TODO
     </a>
-  </li>
-
-    
-      
-      
-      
-
-  
-
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-    
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
-    
-    <label class="md-nav__link" for="nav-4">
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="nav-4" id="nav-4" type="checkbox"/>
+<label class="md-nav__link" for="nav-4">
       Notebooks
       <span class="md-nav__icon md-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
-      </span>
-    </label>
-    <nav class="md-nav" aria-label="Notebooks" data-md-level="1">
-      <label class="md-nav__title" for="nav-4">
-        <span class="md-nav__icon md-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-        </span>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"></path></svg>
+</span>
+</label>
+<nav aria-label="Notebooks" class="md-nav" data-md-level="1">
+<label class="md-nav__title" for="nav-4">
+<span class="md-nav__icon md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"></path></svg>
+</span>
         Notebooks
       </label>
-      <ul class="md-nav__list" data-md-scrollfix>
-        
-        
-          
-          
-          
-
-  
-
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-    
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1" type="checkbox" id="nav-4-1" checked>
-    
-    <label class="md-nav__link" for="nav-4-1">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1" id="nav-4-1" type="checkbox"/>
+<label class="md-nav__link" for="nav-4-1">
       Climate
       <span class="md-nav__icon md-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
-      </span>
-    </label>
-    <nav class="md-nav" aria-label="Climate" data-md-level="2">
-      <label class="md-nav__title" for="nav-4-1">
-        <span class="md-nav__icon md-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-        </span>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"></path></svg>
+</span>
+</label>
+<nav aria-label="Climate" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="nav-4-1">
+<span class="md-nav__icon md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"></path></svg>
+</span>
         Climate
       </label>
-      <ul class="md-nav__list" data-md-scrollfix>
-        
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../0_visualize/" title="0 visualize" class="md-nav__link">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../0_visualize/" title="0 visualize">
       0 visualize
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../1.1_compare_similar/" title="1.1 compare similar" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../1.1_compare_similar/" title="1.1 compare similar">
       1.1 compare similar
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../1.2_compare_all/" title="1.2 compare all" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../1.2_compare_all/" title="1.2 compare all">
       1.2 compare all
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../2.1_regridding/" title="2.1 regridding" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../2.1_regridding/" title="2.1 regridding">
       2.1 regridding
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item md-nav__item--nested">
-    
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-5" type="checkbox" id="nav-4-1-5">
-    
-    <label class="md-nav__link" for="nav-4-1-5">
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-5" id="nav-4-1-5" type="checkbox"/>
+<label class="md-nav__link" for="nav-4-1-5">
       Amip
       <span class="md-nav__icon md-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
-      </span>
-    </label>
-    <nav class="md-nav" aria-label="Amip" data-md-level="3">
-      <label class="md-nav__title" for="nav-4-1-5">
-        <span class="md-nav__icon md-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-        </span>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"></path></svg>
+</span>
+</label>
+<nav aria-label="Amip" class="md-nav" data-md-level="3">
+<label class="md-nav__title" for="nav-4-1-5">
+<span class="md-nav__icon md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"></path></svg>
+</span>
         Amip
       </label>
-      <ul class="md-nav__list" data-md-scrollfix>
-        
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../amip/0_data_download/" title="0 data download" class="md-nav__link">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../amip/0_data_download/" title="0 data download">
       0 data download
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../amip/1.1_compare_similar-Copy1/" title="1.1 compare similar Copy1" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../amip/1.1_compare_similar-Copy1/" title="1.1 compare similar Copy1">
       1.1 compare similar Copy1
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../amip/1_regridding/" title="1 regridding" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../amip/1_regridding/" title="1 regridding">
       1 regridding
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../amip/2_time_overlap/" title="2 time overlap" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../amip/2_time_overlap/" title="2 time overlap">
       2 time overlap
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../amip/3.1_demo_exp_global/" title="3.1 demo exp global" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../amip/3.1_demo_exp_global/" title="3.1 demo exp global">
       3.1 demo exp global
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../amip/3.2_demo_exp_spatial/" title="3.2 demo exp spatial" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../amip/3.2_demo_exp_spatial/" title="3.2 demo exp spatial">
       3.2 demo exp spatial
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../amip/3.2_demo_it_measures/" title="3.2 demo it measures" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../amip/3.2_demo_it_measures/" title="3.2 demo it measures">
       3.2 demo it measures
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../amip/4.1_visualize_global/" title="4.1 visualize global" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../amip/4.1_visualize_global/" title="4.1 visualize global">
       4.1 visualize global
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../amip/4.2_visualize_spatial/" title="4.2 visualize spatial" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../amip/4.2_visualize_spatial/" title="4.2 visualize spatial">
       4.2 visualize spatial
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../amip/4.3_visualize_local_indi/" title="4.3 visualize local indi" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../amip/4.3_visualize_local_indi/" title="4.3 visualize local indi">
       4.3 visualize local indi
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../amip/4.4_visualize_local_compare/" title="4.4 visualize local compare" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../amip/4.4_visualize_local_compare/" title="4.4 visualize local compare">
       4.4 visualize local compare
     </a>
-  </li>
-
-        
-      </ul>
-    </nav>
-  </li>
-
-        
-          
-          
-          
-
-  
-
-
-  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
-    
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-6" type="checkbox" id="nav-4-1-6" checked>
-    
-    <label class="md-nav__link" for="nav-4-1-6">
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--active md-nav__item--nested">
+<input checked="" class="md-nav__toggle md-toggle" data-md-toggle="nav-4-1-6" id="nav-4-1-6" type="checkbox"/>
+<label class="md-nav__link" for="nav-4-1-6">
       Rcp
       <span class="md-nav__icon md-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
-      </span>
-    </label>
-    <nav class="md-nav" aria-label="Rcp" data-md-level="3">
-      <label class="md-nav__title" for="nav-4-1-6">
-        <span class="md-nav__icon md-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-        </span>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"></path></svg>
+</span>
+</label>
+<nav aria-label="Rcp" class="md-nav" data-md-level="3">
+<label class="md-nav__title" for="nav-4-1-6">
+<span class="md-nav__icon md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"></path></svg>
+</span>
         Rcp
       </label>
-      <ul class="md-nav__list" data-md-scrollfix>
-        
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../0_data_download/" title="0 data download" class="md-nav__link">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../0_data_download/" title="0 data download">
       0 data download
     </a>
-  </li>
-
-        
-          
-          
-          
-
-  
-
-
-  <li class="md-nav__item md-nav__item--active">
-    
-    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-    
-      
-    
-    
-      <label class="md-nav__link md-nav__link--active" for="__toc">
+</li>
+<li class="md-nav__item md-nav__item--active">
+<input class="md-nav__toggle md-toggle" data-md-toggle="toc" id="__toc" type="checkbox"/>
+<label class="md-nav__link md-nav__link--active" for="__toc">
         3.2 demo it measures Copy1
         <span class="md-nav__icon md-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9h14V7H3v2m0 4h14v-2H3v2m0 4h14v-2H3v2m16 0h2v-2h-2v2m0-10v2h2V7h-2m0 6h2v-2h-2v2z"/></svg>
-        </span>
-      </label>
-    
-    <a href="./" title="3.2 demo it measures Copy1" class="md-nav__link md-nav__link--active">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M3 9h14V7H3v2m0 4h14v-2H3v2m0 4h14v-2H3v2m16 0h2v-2h-2v2m0-10v2h2V7h-2m0 6h2v-2h-2v2z"></path></svg>
+</span>
+</label>
+<a class="md-nav__link md-nav__link--active" href="./" title="3.2 demo it measures Copy1">
       3.2 demo it measures Copy1
     </a>
-    
-      
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-      </span>
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"></path></svg>
+</span>
       Table of contents
     </label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#data-climate-models" class="md-nav__link">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#data-climate-models">
     Data - Climate Models
   </a>
-  
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#demo-experiment" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#demo-experiment">
     Demo Experiment
   </a>
-  
-    <nav class="md-nav" aria-label="Demo Experiment">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#experimental-paams" class="md-nav__link">
+<nav aria-label="Demo Experiment" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#experimental-paams">
     Experimental Paams
   </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#part-i-grab-data" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#part-i-grab-data">
     Part I - Grab Data
   </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#part-ii-regrid-data" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#part-ii-regrid-data">
     Part II - Regrid Data
   </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#part-iii-find-overlapping-times" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#part-iii-find-overlapping-times">
     Part III - Find Overlapping Times
   </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#part-iv-get-density-cubes" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#part-iv-get-density-cubes">
     Part IV - Get Density Cubes
   </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#normalize" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#normalize">
     Normalize
   </a>
-  
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#information-theory-measures_1" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#information-theory-measures_1">
     Information Theory Measures
   </a>
-  
-    <nav class="md-nav" aria-label="Information Theory Measures">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#entropy-hxx" class="md-nav__link">
+<nav aria-label="Information Theory Measures" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#entropy-hxx">
     Entropy, H(XX)
   </a>
-  
-    <nav class="md-nav" aria-label="Entropy, H(XX)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#with-bootstrap" class="md-nav__link">
+<nav aria-label="Entropy, H(XX)" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#with-bootstrap">
     with Bootstrap
   </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#w-batches" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#w-batches">
     W. Batches
   </a>
-  
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#total-correlation-tcxx" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#total-correlation-tcxx">
     Total Correlation, TC(XX)
   </a>
-  
-    <nav class="md-nav" aria-label="Total Correlation, TC(XX)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#w-batches_1" class="md-nav__link">
+<nav aria-label="Total Correlation, TC(XX)" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#w-batches_1">
     w. Batches
   </a>
-  
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#mutual-information-mixx" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mutual-information-mixx">
     Mutual Information, MI(XX)
   </a>
-  
-    <nav class="md-nav" aria-label="Mutual Information, MI(XX)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#w-batches_2" class="md-nav__link">
+<nav aria-label="Mutual Information, MI(XX)" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#w-batches_2">
     w. Batches
   </a>
-  
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#mutual-information-ii-hx-hy-hxy" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mutual-information-ii-hx-hy-hxy">
     Mutual Information II, H(X) + H(Y) - H(X,Y)
   </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#correlation-pearson-spearman-kendalltau" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#correlation-pearson-spearman-kendalltau">
     Correlation: Pearson, Spearman, KendallTau
   </a>
-  
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
+</ul>
 </nav>
-    
-  </li>
-
-        
-      </ul>
-    </nav>
-  </li>
-
-        
-      </ul>
-    </nav>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item md-nav__item--nested">
-    
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-2" type="checkbox" id="nav-4-2">
-    
-    <label class="md-nav__link" for="nav-4-2">
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-2" id="nav-4-2" type="checkbox"/>
+<label class="md-nav__link" for="nav-4-2">
       Drought
       <span class="md-nav__icon md-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
-      </span>
-    </label>
-    <nav class="md-nav" aria-label="Drought" data-md-level="2">
-      <label class="md-nav__title" for="nav-4-2">
-        <span class="md-nav__icon md-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-        </span>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"></path></svg>
+</span>
+</label>
+<nav aria-label="Drought" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="nav-4-2">
+<span class="md-nav__icon md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"></path></svg>
+</span>
         Drought
       </label>
-      <ul class="md-nav__list" data-md-scrollfix>
-        
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../../drought/1.1_drought_features/" title="1.1 drought features" class="md-nav__link">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../drought/1.1_drought_features/" title="1.1 drought features">
       1.1 drought features
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../../drought/1_drought_features/" title="1 drought features" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../drought/1_drought_features/" title="1 drought features">
       1 drought features
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../../drought/2_experiment_example/" title="2 experiment example" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../drought/2_experiment_example/" title="2 experiment example">
       2 experiment example
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../../drought/visualization/" title="Visualization" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../drought/visualization/" title="Visualization">
       Visualization
     </a>
-  </li>
-
-        
-      </ul>
-    </nav>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item md-nav__item--nested">
-    
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-3" type="checkbox" id="nav-4-3">
-    
-    <label class="md-nav__link" for="nav-4-3">
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-3" id="nav-4-3" type="checkbox"/>
+<label class="md-nav__link" for="nav-4-3">
       Explore
       <span class="md-nav__icon md-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
-      </span>
-    </label>
-    <nav class="md-nav" aria-label="Explore" data-md-level="2">
-      <label class="md-nav__title" for="nav-4-3">
-        <span class="md-nav__icon md-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-        </span>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"></path></svg>
+</span>
+</label>
+<nav aria-label="Explore" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="nav-4-3">
+<span class="md-nav__icon md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"></path></svg>
+</span>
         Explore
       </label>
-      <ul class="md-nav__list" data-md-scrollfix>
-        
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../../explore/kernel_alignment/" title="Kernel alignment" class="md-nav__link">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../explore/kernel_alignment/" title="Kernel alignment">
       Kernel alignment
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../../explore/variation_of_information/" title="Variation of information" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../explore/variation_of_information/" title="Variation of information">
       Variation of information
     </a>
-  </li>
-
-        
-      </ul>
-    </nav>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item md-nav__item--nested">
-    
-      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-4" type="checkbox" id="nav-4-4">
-    
-    <label class="md-nav__link" for="nav-4-4">
+</li>
+</ul>
+</nav>
+</li>
+<li class="md-nav__item md-nav__item--nested">
+<input class="md-nav__toggle md-toggle" data-md-toggle="nav-4-4" id="nav-4-4" type="checkbox"/>
+<label class="md-nav__link" for="nav-4-4">
       Spatial temporal
       <span class="md-nav__icon md-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
-      </span>
-    </label>
-    <nav class="md-nav" aria-label="Spatial temporal" data-md-level="2">
-      <label class="md-nav__title" for="nav-4-4">
-        <span class="md-nav__icon md-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-        </span>
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"></path></svg>
+</span>
+</label>
+<nav aria-label="Spatial temporal" class="md-nav" data-md-level="2">
+<label class="md-nav__title" for="nav-4-4">
+<span class="md-nav__icon md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"></path></svg>
+</span>
         Spatial temporal
       </label>
-      <ul class="md-nav__list" data-md-scrollfix>
-        
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../../spatial_temporal/1_experiment_walkthrough/" title="1 experiment walkthrough" class="md-nav__link">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../spatial_temporal/1.0_load_esdc/" title="1.0 load esdc">
+      1.0 load esdc
+    </a>
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../spatial_temporal/1_experiment_walkthrough/" title="1 experiment walkthrough">
       1 experiment walkthrough
     </a>
-  </li>
-
-        
-          
-          
-          
-
-
-  <li class="md-nav__item">
-    <a href="../../../spatial_temporal/Untitled/" title="Untitled" class="md-nav__link">
+</li>
+<li class="md-nav__item">
+<a class="md-nav__link" href="../../../spatial_temporal/Untitled/" title="Untitled">
       Untitled
     </a>
-  </li>
-
-        
-      </ul>
-    </nav>
-  </li>
-
-        
-      </ul>
-    </nav>
-  </li>
-
-    
-  </ul>
+</li>
+</ul>
 </nav>
-                  </div>
-                </div>
-              </div>
-            
-            
-              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
-                <div class="md-sidebar__scrollwrap">
-                  <div class="md-sidebar__inner">
-                    
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-      </span>
+</li>
+</ul>
+</nav>
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+<div class="md-sidebar__scrollwrap">
+<div class="md-sidebar__inner">
+<nav aria-label="Table of contents" class="md-nav md-nav--secondary">
+<label class="md-nav__title" for="__toc">
+<span class="md-nav__icon md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"></path></svg>
+</span>
       Table of contents
     </label>
-    <ul class="md-nav__list" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#data-climate-models" class="md-nav__link">
+<ul class="md-nav__list" data-md-scrollfix="">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#data-climate-models">
     Data - Climate Models
   </a>
-  
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#demo-experiment" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#demo-experiment">
     Demo Experiment
   </a>
-  
-    <nav class="md-nav" aria-label="Demo Experiment">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#experimental-paams" class="md-nav__link">
+<nav aria-label="Demo Experiment" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#experimental-paams">
     Experimental Paams
   </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#part-i-grab-data" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#part-i-grab-data">
     Part I - Grab Data
   </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#part-ii-regrid-data" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#part-ii-regrid-data">
     Part II - Regrid Data
   </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#part-iii-find-overlapping-times" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#part-iii-find-overlapping-times">
     Part III - Find Overlapping Times
   </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#part-iv-get-density-cubes" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#part-iv-get-density-cubes">
     Part IV - Get Density Cubes
   </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#normalize" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#normalize">
     Normalize
   </a>
-  
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#information-theory-measures_1" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#information-theory-measures_1">
     Information Theory Measures
   </a>
-  
-    <nav class="md-nav" aria-label="Information Theory Measures">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#entropy-hxx" class="md-nav__link">
+<nav aria-label="Information Theory Measures" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#entropy-hxx">
     Entropy, H(XX)
   </a>
-  
-    <nav class="md-nav" aria-label="Entropy, H(XX)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#with-bootstrap" class="md-nav__link">
+<nav aria-label="Entropy, H(XX)" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#with-bootstrap">
     with Bootstrap
   </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#w-batches" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#w-batches">
     W. Batches
   </a>
-  
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#total-correlation-tcxx" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#total-correlation-tcxx">
     Total Correlation, TC(XX)
   </a>
-  
-    <nav class="md-nav" aria-label="Total Correlation, TC(XX)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#w-batches_1" class="md-nav__link">
+<nav aria-label="Total Correlation, TC(XX)" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#w-batches_1">
     w. Batches
   </a>
-  
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#mutual-information-mixx" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mutual-information-mixx">
     Mutual Information, MI(XX)
   </a>
-  
-    <nav class="md-nav" aria-label="Mutual Information, MI(XX)">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#w-batches_2" class="md-nav__link">
+<nav aria-label="Mutual Information, MI(XX)" class="md-nav">
+<ul class="md-nav__list">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#w-batches_2">
     w. Batches
   </a>
-  
 </li>
-        
-      </ul>
-    </nav>
-  
+</ul>
+</nav>
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#mutual-information-ii-hx-hy-hxy" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#mutual-information-ii-hx-hy-hxy">
     Mutual Information II, H(X) + H(Y) - H(X,Y)
   </a>
-  
 </li>
-        
-          <li class="md-nav__item">
-  <a href="#correlation-pearson-spearman-kendalltau" class="md-nav__link">
+<li class="md-nav__item">
+<a class="md-nav__link" href="#correlation-pearson-spearman-kendalltau">
     Correlation: Pearson, Spearman, KendallTau
   </a>
-  
 </li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
+</ul>
 </nav>
-                  </div>
-                </div>
-              </div>
-            
-          
-          <div class="md-content">
-            <article class="md-content__inner md-typeset">
-              
-                
-                  <a href="https://github.com/jejjohnson/rbig_eo/edit/master/docs/notebooks/climate/rcp/3.2_demo_it_measures-Copy1.ipynb" title="Edit this page" class="md-content__button md-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
-                  </a>
-                
-                
-                  
-                
-                
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
-
+</li>
+</ul>
+</nav>
+</div>
+</div>
+</div>
+<div class="md-content">
+<article class="md-content__inner md-typeset">
+<a class="md-content__button md-icon" href="https://github.com/jejjohnson/rbig_eo/edit/master/docs/notebooks/climate/rcp/3.2_demo_it_measures-Copy1.ipynb" title="Edit this page">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"></path></svg>
+</a>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
-
 <script>
 (function() {
   function addWidgetsRenderer() {
@@ -1162,29 +683,27 @@
   document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
 }());
 </script>
+<div class="cell border-box-sizing text_cell rendered">
+<p><div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h1 id="information-theory-measures">Information Theory Measures<a class="headerlink" href="#information-theory-measures" title="Permanent link">¶</a></h1>
+<p>In this notebook, I will be demonstrating some of the aspects of information theory measures.
+</p></div>
+</article></div></div></main></div></body></html>
 
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h1 id="information-theory-measures">Information Theory Measures<a class="headerlink" href="#information-theory-measures" title="Permanent link">&para;</a></h1>
-<p>In this notebook, I will be demonstrating some of the aspects of information theory measures.
-</div>
-</div></p>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h2 id="data-climate-models">Data - Climate Models<a class="headerlink" href="#data-climate-models" title="Permanent link">&para;</a></h2>
-<p></div>
-</div></p>
-</div>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h2 id="data-climate-models">Data - Climate Models<a class="headerlink" href="#data-climate-models" title="Permanent link">¶</a></h2>
+<p></p></div>
+
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">sys</span>
 <span class="n">cwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
-<span class="n">source_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cwd</span><span class="si">}</span><span class="s2">/../../../&quot;</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">source_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="n">source_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">cwd</span><span class="si">}</span><span class="s2">/../../../"</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">source_path</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -1213,49 +732,43 @@
 
 <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;ggplot&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">'ggplot'</span><span class="p">)</span>
 <span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
 
 <span class="o">%</span><span class="n">load_ext</span> <span class="n">autoreload</span>
 <span class="o">%</span><span class="n">autoreload</span> <span class="mi">2</span>
 </code></pre></div>
-
 </div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
-<div class="highlight"><pre><span></span><code><span class="n">amip_data_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/amip/&quot;</span>
-<span class="n">era5_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/era5/&quot;</span>
-<span class="n">ncep_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/ncep/&quot;</span>
-<span class="n">results_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/home/emmanuel/projects/2020_rbig_rs/data/climate/results/&quot;</span>
-<span class="n">fig_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/home/emmanuel/projects/2020_rbig_rs/reports/figures/climate/&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="n">amip_data_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/amip/"</span>
+<span class="n">era5_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/era5/"</span>
+<span class="n">ncep_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/ncep/"</span>
+<span class="n">results_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"/home/emmanuel/projects/2020_rbig_rs/data/climate/results/"</span>
+<span class="n">fig_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"/home/emmanuel/projects/2020_rbig_rs/reports/figures/climate/"</span>
 </code></pre></div>
-
 </div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h2 id="demo-experiment">Demo Experiment<a class="headerlink" href="#demo-experiment" title="Permanent link">&para;</a></h2>
-<p></div>
-</div></p>
-</div>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h2 id="demo-experiment">Demo Experiment<a class="headerlink" href="#demo-experiment" title="Permanent link">¶</a></h2>
+<p></p></div>
+
+
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h3 id="experimental-paams">Experimental Paams<a class="headerlink" href="#experimental-paams" title="Permanent link">&para;</a></h3>
-<p></div>
-</div></p>
-</div>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h3 id="experimental-paams">Experimental Paams<a class="headerlink" href="#experimental-paams" title="Permanent link">¶</a></h3>
+<p></p></div>
+
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="k">class</span> <span class="nc">DataArgs</span><span class="p">:</span>
-    <span class="n">data_path</span> <span class="o">=</span> <span class="s2">&quot;/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/amip/&quot;</span>
-    <span class="n">results_path</span> <span class="o">=</span> <span class="s2">&quot;/home/emmanuel/projects/2020_rbig_rs/data/climate/results/amip&quot;</span>
+    <span class="n">data_path</span> <span class="o">=</span> <span class="s2">"/home/emmanuel/projects/2020_rbig_rs/data/climate/raw/amip/"</span>
+    <span class="n">results_path</span> <span class="o">=</span> <span class="s2">"/home/emmanuel/projects/2020_rbig_rs/data/climate/results/amip"</span>
 
 <span class="k">class</span> <span class="nc">CMIPArgs</span><span class="p">:</span>
 
@@ -1268,88 +781,75 @@
 
     <span class="c1"># Free Params</span>
     <span class="n">variables</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s1">&#39;psl&#39;</span>               <span class="c1"># Mean Surface Pressure</span>
+        <span class="s1">'psl'</span>               <span class="c1"># Mean Surface Pressure</span>
     <span class="p">]</span>
     <span class="n">cmip_models</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;inmcm4&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;access1_0&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;bcc_csm1_1&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;bcc_csm1_1_m&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;bnu_esm&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;giss_e2_r&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;cnrm_cm5&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ipsl_cm5a_lr&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ipsl_cm5a_mr&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ipsl_cm5b_lr&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;mpi_esm_lr&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;mpi_esm_mr&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;noresm1_m&quot;</span><span class="p">,</span>
+        <span class="s2">"inmcm4"</span><span class="p">,</span>
+        <span class="s2">"access1_0"</span><span class="p">,</span>
+        <span class="s2">"bcc_csm1_1"</span><span class="p">,</span>
+        <span class="s2">"bcc_csm1_1_m"</span><span class="p">,</span>
+        <span class="s2">"bnu_esm"</span><span class="p">,</span>
+        <span class="s2">"giss_e2_r"</span><span class="p">,</span>
+        <span class="s2">"cnrm_cm5"</span><span class="p">,</span>
+        <span class="s2">"ipsl_cm5a_lr"</span><span class="p">,</span>
+        <span class="s2">"ipsl_cm5a_mr"</span><span class="p">,</span>
+        <span class="s2">"ipsl_cm5b_lr"</span><span class="p">,</span>
+        <span class="s2">"mpi_esm_lr"</span><span class="p">,</span>
+        <span class="s2">"mpi_esm_mr"</span><span class="p">,</span>
+        <span class="s2">"noresm1_m"</span><span class="p">,</span>
     <span class="p">]</span>
 
     <span class="n">base_models</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s1">&#39;ncep&#39;</span><span class="p">,</span>
-        <span class="s2">&quot;era5&quot;</span>
+        <span class="s1">'ncep'</span><span class="p">,</span>
+        <span class="s2">"era5"</span>
     <span class="p">]</span>
 </code></pre></div>
-
 </div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h3 id="part-i-grab-data">Part I - Grab Data<a class="headerlink" href="#part-i-grab-data" title="Permanent link">&para;</a></h3>
-<p></div>
-</div></p>
-</div>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h3 id="part-i-grab-data">Part I - Grab Data<a class="headerlink" href="#part-i-grab-data" title="Permanent link">¶</a></h3>
+<p></p></div>
+
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">src.data.climate.amip</span> <span class="kn">import</span> <span class="n">get_base_model</span>
 
 <span class="n">base_dat</span> <span class="o">=</span> <span class="n">get_base_model</span><span class="p">(</span><span class="n">CMIPArgs</span><span class="o">.</span><span class="n">base_models</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">CMIPArgs</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="c1"># base_dat</span>
 </code></pre></div>
-
 </div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">src.data.climate.cmip5</span> <span class="kn">import</span> <span class="n">get_cmip5_model</span>
 
 
 <span class="n">cmip_dat</span> <span class="o">=</span> <span class="n">get_cmip5_model</span><span class="p">(</span><span class="n">CMIPArgs</span><span class="o">.</span><span class="n">cmip_models</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">CMIPArgs</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="c1"># cmip_dat</span>
 </code></pre></div>
-
 </div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h3 id="part-ii-regrid-data">Part II - Regrid Data<a class="headerlink" href="#part-ii-regrid-data" title="Permanent link">&para;</a></h3>
-<p></div>
-</div></p>
-</div>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h3 id="part-ii-regrid-data">Part II - Regrid Data<a class="headerlink" href="#part-ii-regrid-data" title="Permanent link">¶</a></h3>
+<p></p></div>
+
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">base_dat</span><span class="p">,</span> <span class="n">cmip_dat</span> <span class="o">=</span> <span class="n">regrid_2_lower_res</span><span class="p">(</span><span class="n">base_dat</span><span class="p">,</span> <span class="n">cmip_dat</span><span class="p">)</span>
 
 <span class="k">assert</span><span class="p">(</span><span class="n">base_dat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">cmip_dat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 <span class="k">assert</span><span class="p">(</span><span class="n">base_dat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">cmip_dat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 <span class="c1"># base_dat</span>
 </code></pre></div>
-
 </div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Create weight file: nearest_s2d_120x180_73x144.nc
@@ -1357,128 +857,96 @@ Remove file nearest_s2d_120x180_73x144.nc
 </pre>
 </div>
 </div>
-
 </div>
 </div>
-
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h3 id="part-iii-find-overlapping-times">Part III - Find Overlapping Times<a class="headerlink" href="#part-iii-find-overlapping-times" title="Permanent link">&para;</a></h3>
-<p></div>
-</div></p>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h3 id="part-iii-find-overlapping-times">Part III - Find Overlapping Times<a class="headerlink" href="#part-iii-find-overlapping-times" title="Permanent link">¶</a></h3>
+<p></p></div>
 </div>
-</div>
+
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">base_dat</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">cmip_dat</span><span class="o">.</span><span class="n">shape</span>
 </code></pre></div>
-
 </div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
-
-
 <div class="output_text output_subarea output_execute_result">
 <pre>((489, 73, 144), (360, 73, 144))</pre>
 </div>
-
-</div>
-
 </div>
 </div>
-
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">base_dat</span><span class="p">,</span> <span class="n">cmip_dat</span> <span class="o">=</span> <span class="n">get_time_overlap</span><span class="p">(</span><span class="n">base_dat</span><span class="p">,</span> <span class="n">cmip_dat</span><span class="p">)</span>
 </code></pre></div>
-
 </div>
-
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h3 id="part-iv-get-density-cubes">Part IV - Get Density Cubes<a class="headerlink" href="#part-iv-get-density-cubes" title="Permanent link">&para;</a></h3>
-<p></div>
-</div></p>
-</div>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h3 id="part-iv-get-density-cubes">Part IV - Get Density Cubes<a class="headerlink" href="#part-iv-get-density-cubes" title="Permanent link">¶</a></h3>
+<p></p></div>
+
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">base_df</span> <span class="o">=</span> <span class="n">get_spatial_cubes</span><span class="p">(</span><span class="n">base_dat</span><span class="p">,</span> <span class="n">CMIPArgs</span><span class="o">.</span><span class="n">spatial_windows</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
 <span class="n">cmip_df</span> <span class="o">=</span> <span class="n">get_spatial_cubes</span><span class="p">(</span><span class="n">cmip_dat</span><span class="p">,</span> <span class="n">CMIPArgs</span><span class="o">.</span><span class="n">spatial_windows</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
 </code></pre></div>
-
 </div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">base_df</span><span class="o">.</span><span class="n">shape</span>
 </code></pre></div>
-
 </div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
-
-
 <div class="output_text output_subarea output_execute_result">
 <pre>(3543330, 16)</pre>
 </div>
-
-</div>
-
 </div>
 </div>
-
+</div>
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h3 id="normalize">Normalize<a class="headerlink" href="#normalize" title="Permanent link">&para;</a></h3>
-<p></div>
-</div></p>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h3 id="normalize">Normalize<a class="headerlink" href="#normalize" title="Permanent link">¶</a></h3>
+<p></p></div>
 </div>
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 </div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="n">base_df</span> <span class="o">=</span> <span class="n">normalize_data</span><span class="p">(</span><span class="n">base_df</span><span class="p">)</span>
 <span class="n">cmip_df</span> <span class="o">=</span> <span class="n">normalize_data</span><span class="p">(</span><span class="n">cmip_df</span><span class="p">)</span>
 </code></pre></div>
 
-</div>
+<div class="cell border-box-sizing text_cell rendered">
+<p><div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h2 id="information-theory-measures_1">Information Theory Measures<a class="headerlink" href="#information-theory-measures_1" title="Permanent link">¶</a></h2>
+<p></p></div>
+
 
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h2 id="information-theory-measures_1">Information Theory Measures<a class="headerlink" href="#information-theory-measures_1" title="Permanent link">&para;</a></h2>
-<p></div>
-</div></p>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h3 id="entropy-hxx">Entropy, H(<span><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span>)<a class="headerlink" href="#entropy-hxx" title="Permanent link">&para;</a></h3>
-<p></div>
-</div></p>
-</div>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h3 id="entropy-hxx">Entropy, H(<span><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span>)<a class="headerlink" href="#entropy-hxx" title="Permanent link">¶</a></h3>
+<p></p></div>
+
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">subsample</span> <span class="o">=</span> <span class="mi">10_000</span>
 <span class="n">batch_size</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">bootstrap</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1493,35 +961,25 @@ Remove file nearest_s2d_120x180_73x144.nc
 
 <span class="n">h</span>
 </code></pre></div>
-
 </div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
-
-
 <div class="output_text output_subarea output_execute_result">
 <pre>-33.116467738349236</pre>
 </div>
-
-</div>
-
 </div>
 </div>
-
+</div>
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h4 id="with-bootstrap">with Bootstrap<a class="headerlink" href="#with-bootstrap" title="Permanent link">&para;</a></h4>
-<p></div>
-</div></p>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h4 id="with-bootstrap">with Bootstrap<a class="headerlink" href="#with-bootstrap" title="Permanent link">¶</a></h4>
+<p></p></div>
 </div>
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 </div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="n">batch_size</span> <span class="o">=</span> <span class="mi">10_000</span>
@@ -1541,72 +999,43 @@ Remove file nearest_s2d_120x180_73x144.nc
 <span class="n">h</span>
 </code></pre></div>
 
-</div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
-
-
 <div class="output_text output_subarea output_execute_result">
 <pre>-31.881844520814997</pre>
 </div>
-
-</div>
-
 </div>
 </div>
-
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">ent_est</span><span class="o">.</span><span class="n">raw_scores</span><span class="p">)</span>
 </code></pre></div>
-
 </div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code>
 </code></pre></div>
-
 </div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
-
-
 <div class="output_text output_subarea output_execute_result">
 <pre>-28.48503649185888</pre>
 </div>
-
-</div>
-
 </div>
 </div>
-
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">plt</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">ent_est</span><span class="o">.</span><span class="n">raw_scores</span><span class="p">)</span>
 </code></pre></div>
-
 </div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
-
-
 <div class="output_text output_subarea output_execute_result">
 <pre>(array([ 1.,  0.,  1.,  0.,  9., 11., 26., 28., 14., 10.]),
  array([-30.9162801 , -30.56606644, -30.21585278, -29.86563913,
@@ -1614,35 +1043,26 @@ Remove file nearest_s2d_120x180_73x144.nc
         -28.11457085, -27.76435719, -27.41414354]),
  &lt;a list of 10 Patch objects&gt;)</pre>
 </div>
-
 </div>
-
 <div class="output_area" markdown="1">
-
-
-<div class="output_png output_subarea ">
+<div class="output_png output_subarea">
 <img src="data:image/png;base64,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
-"
->
-</div>
-
-</div>
-
+"/>
 </div>
 </div>
-
+</div>
+</div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h4 id="w-batches">W. Batches<a class="headerlink" href="#w-batches" title="Permanent link">&para;</a></h4>
-<p></div>
-</div></p>
-</div>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h4 id="w-batches">W. Batches<a class="headerlink" href="#w-batches" title="Permanent link">¶</a></h4>
+<p></p></div>
+
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">subsample</span> <span class="o">=</span> <span class="mi">40_000</span>
 
 <span class="n">ent_est</span> <span class="o">=</span> <span class="n">RBIGENTEST</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">10_000</span><span class="p">)</span>
@@ -1653,64 +1073,44 @@ Remove file nearest_s2d_120x180_73x144.nc
 
 <span class="n">h</span>
 </code></pre></div>
-
 </div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
-
-
 <div class="output_text output_subarea output_execute_result">
 <pre>-31.84759524855099</pre>
 </div>
-
-</div>
-
 </div>
 </div>
-
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">ent_est</span><span class="o">.</span><span class="n">raw_scores</span>
 </code></pre></div>
-
 </div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
-
-
 <div class="output_text output_subarea output_execute_result">
 <pre>[-32.17903374504498,
  -31.753140917432507,
  -31.67399995592763,
  -31.784206375798846]</pre>
 </div>
-
-</div>
-
 </div>
 </div>
-
+</div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h3 id="total-correlation-tcxx">Total Correlation, TC(<span><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span>)<a class="headerlink" href="#total-correlation-tcxx" title="Permanent link">&para;</a></h3>
-<p></div>
-</div></p>
-</div>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h3 id="total-correlation-tcxx">Total Correlation, TC(<span><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span>)<a class="headerlink" href="#total-correlation-tcxx" title="Permanent link">¶</a></h3>
+<p></p></div>
+
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">subsample</span> <span class="o">=</span> <span class="mi">40_000</span>
 
 <span class="n">tc_est</span> <span class="o">=</span> <span class="n">RBIGMIEST</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
@@ -1721,35 +1121,25 @@ Remove file nearest_s2d_120x180_73x144.nc
 
 <span class="n">tc</span>
 </code></pre></div>
-
 </div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
-
-
 <div class="output_text output_subarea output_execute_result">
 <pre>51.735384060195784</pre>
 </div>
-
-</div>
-
 </div>
 </div>
-
+</div>
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h4 id="w-batches_1">w. Batches<a class="headerlink" href="#w-batches_1" title="Permanent link">&para;</a></h4>
-<p></div>
-</div></p>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h4 id="w-batches_1">w. Batches<a class="headerlink" href="#w-batches_1" title="Permanent link">¶</a></h4>
+<p></p></div>
 </div>
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 </div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="n">subsample</span> <span class="o">=</span> <span class="mi">40_000</span>
@@ -1763,58 +1153,38 @@ Remove file nearest_s2d_120x180_73x144.nc
 <span class="n">tc</span>
 </code></pre></div>
 
-</div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
-
-
 <div class="output_text output_subarea output_execute_result">
 <pre>50.6219155716329</pre>
 </div>
-
-</div>
-
 </div>
 </div>
-
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">tc_est</span><span class="o">.</span><span class="n">raw_scores</span>
 </code></pre></div>
-
 </div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
-
-
 <div class="output_text output_subarea output_execute_result">
 <pre>[50.29844313632438, 51.03391865505402, 50.72933249988033, 50.425967995272856]</pre>
 </div>
-
-</div>
-
 </div>
 </div>
-
+</div>
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h3 id="mutual-information-mixx">Mutual Information, MI(<span><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span>)<a class="headerlink" href="#mutual-information-mixx" title="Permanent link">&para;</a></h3>
-<p></div>
-</div></p>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h3 id="mutual-information-mixx">Mutual Information, MI(<span><span class="MathJax_Preview">X</span><script type="math/tex">X</script></span>)<a class="headerlink" href="#mutual-information-mixx" title="Permanent link">¶</a></h3>
+<p></p></div>
 </div>
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 </div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="n">subsample</span> <span class="o">=</span> <span class="mi">100_000</span>
@@ -1831,34 +1201,24 @@ Remove file nearest_s2d_120x180_73x144.nc
 <span class="n">mi</span>
 </code></pre></div>
 
-</div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
-
-
 <div class="output_text output_subarea output_execute_result">
 <pre>1.2438747143982896</pre>
 </div>
-
-</div>
-
 </div>
 </div>
-
+</div>
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h4 id="w-batches_2">w. Batches<a class="headerlink" href="#w-batches_2" title="Permanent link">&para;</a></h4>
-<p></div>
-</div></p>
-</div>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h4 id="w-batches_2">w. Batches<a class="headerlink" href="#w-batches_2" title="Permanent link">¶</a></h4>
+<p></p></div>
+
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">subsample</span> <span class="o">=</span> <span class="mi">100_000</span>
 
 <span class="n">mi_est</span> <span class="o">=</span> <span class="n">RBIGMIEST</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">50_000</span><span class="p">)</span>
@@ -1872,37 +1232,23 @@ Remove file nearest_s2d_120x180_73x144.nc
 
 <span class="n">mi</span>
 </code></pre></div>
-
 </div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
-
-
 <div class="output_text output_subarea output_execute_result">
 <pre>1.215228412628969</pre>
 </div>
-
-</div>
-
 </div>
 </div>
-
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">mi_est</span><span class="o">.</span><span class="n">raw_values</span>
 </code></pre></div>
-
 </div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
 <div class="output_subarea output_text output_error">
 <pre>
@@ -1911,30 +1257,27 @@ Remove file nearest_s2d_120x180_73x144.nc
 <span class="ansi-green-fg">&lt;ipython-input-84-f0a0474b33b1&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
 <span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>mi_est<span class="ansi-blue-fg">.</span>raw_values
 
-<span class="ansi-red-fg">AttributeError</span>: &#39;RBIGEstimator&#39; object has no attribute &#39;raw_values&#39;</pre>
+<span class="ansi-red-fg">AttributeError</span>: 'RBIGEstimator' object has no attribute 'raw_values'</pre>
 </div>
 </div>
-
 </div>
 </div>
-
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h3 id="mutual-information-ii-hx-hy-hxy">Mutual Information II, H(X) + H(Y) - H(X,Y)<a class="headerlink" href="#mutual-information-ii-hx-hy-hxy" title="Permanent link">&para;</a></h3>
-<p></div>
-</div></p>
-</div>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h3 id="mutual-information-ii-hx-hy-hxy">Mutual Information II, H(X) + H(Y) - H(X,Y)<a class="headerlink" href="#mutual-information-ii-hx-hy-hxy" title="Permanent link">¶</a></h3>
+<p></p></div>
+
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">subsample</span> <span class="o">=</span> <span class="mi">100_000</span>
 <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">25_000</span>
 
 <span class="c1"># H(X)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;H(X)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'H(X)'</span><span class="p">)</span>
 <span class="n">x_ent_est</span> <span class="o">=</span> <span class="n">RBIGENTEST</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
 
 <span class="n">x_ent_est</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">base_df</span><span class="o">.</span><span class="n">values</span><span class="p">[:</span><span class="n">subsample</span><span class="p">])</span>
@@ -1942,7 +1285,7 @@ Remove file nearest_s2d_120x180_73x144.nc
 <span class="n">h_x</span> <span class="o">=</span> <span class="n">x_ent_est</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">base_df</span><span class="o">.</span><span class="n">values</span><span class="p">[:</span><span class="n">subsample</span><span class="p">])</span>
 
 <span class="c1"># H(Y)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;H(Y)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'H(Y)'</span><span class="p">)</span>
 <span class="n">y_ent_est</span> <span class="o">=</span> <span class="n">RBIGENTEST</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
 
 <span class="n">y_ent_est</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">cmip_df</span><span class="o">.</span><span class="n">values</span><span class="p">[:</span><span class="n">subsample</span><span class="p">])</span>
@@ -1950,7 +1293,7 @@ Remove file nearest_s2d_120x180_73x144.nc
 <span class="n">h_y</span> <span class="o">=</span> <span class="n">y_ent_est</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">cmip_df</span><span class="o">.</span><span class="n">values</span><span class="p">[:</span><span class="n">subsample</span><span class="p">])</span>
 
 <span class="c1"># H(X,Y)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;H(X,Y)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'H(X,Y)'</span><span class="p">)</span>
 <span class="n">xy_ent_est</span> <span class="o">=</span> <span class="n">RBIGENTEST</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">50_000</span><span class="p">)</span>
 
 <span class="n">xy_ent_est</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
@@ -1965,13 +1308,9 @@ Remove file nearest_s2d_120x180_73x144.nc
 
 <span class="n">h_xy</span> <span class="o">=</span> <span class="n">xy_ent_est</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">base_df</span><span class="o">.</span><span class="n">values</span><span class="p">[:</span><span class="n">subsample</span><span class="p">])</span>
 </code></pre></div>
-
 </div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>H(X)
@@ -1980,17 +1319,14 @@ H(X,Y)
 </pre>
 </div>
 </div>
-
 </div>
 </div>
-
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 </div>
 </div>
 <div class="highlight"><pre><span></span><code><span class="c1"># H(X,Y)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;H(X,Y)&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'H(X,Y)'</span><span class="p">)</span>
 <span class="n">xy_ent_est</span> <span class="o">=</span> <span class="n">RBIGENTEST</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="mi">50_000</span><span class="p">)</span>
 
 <span class="n">xy_ent_est</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
@@ -2006,92 +1342,61 @@ H(X,Y)
 <span class="n">h_xy</span> <span class="o">=</span> <span class="n">xy_ent_est</span><span class="o">.</span><span class="n">score</span><span class="p">(</span><span class="n">base_df</span><span class="o">.</span><span class="n">values</span><span class="p">[:</span><span class="n">subsample</span><span class="p">])</span>
 <span class="n">h_xy</span>
 </code></pre></div>
-
 </div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>H(X,Y)
 </pre>
 </div>
 </div>
-
 <div class="output_area" markdown="1">
-
-
 <div class="output_text output_subarea output_execute_result">
 <pre>165.23978712025018</pre>
 </div>
-
-</div>
-
 </div>
 </div>
-
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">h_x</span><span class="p">,</span> <span class="n">h_y</span><span class="p">,</span> <span class="n">h_xy</span><span class="p">,</span> <span class="n">h_x</span> <span class="o">+</span> <span class="n">h_y</span> <span class="o">-</span> <span class="n">h_xy</span>
 </code></pre></div>
-
 </div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
-
-
 <div class="output_text output_subarea output_execute_result">
 <pre>(79.10616714936484, 87.19046271977632, 165.45410606367204, 0.8425238054691135)</pre>
 </div>
-
-</div>
-
 </div>
 </div>
-
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code>
 </code></pre></div>
-
 </div>
-
 <div class="output_wrapper" markdown="1">
 <div class="output" markdown="1">
-
-
 <div class="output_area" markdown="1">
-
-
 <div class="output_text output_subarea output_execute_result">
 <pre>0.4360788203771051</pre>
 </div>
-
-</div>
-
 </div>
 </div>
-
+</div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
-<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
-<h3 id="correlation-pearson-spearman-kendalltau">Correlation: Pearson, Spearman, KendallTau<a class="headerlink" href="#correlation-pearson-spearman-kendalltau" title="Permanent link">&para;</a></h3>
-<p></div>
-</div></p>
-</div>
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></div></div></p>
+<h3 id="correlation-pearson-spearman-kendalltau">Correlation: Pearson, Spearman, KendallTau<a class="headerlink" href="#correlation-pearson-spearman-kendalltau" title="Permanent link">¶</a></h3>
+<p></p></div>
+
+
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">pear</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">(</span>
     <span class="n">base_df</span><span class="p">[:</span><span class="n">subsample</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
     <span class="n">cmip_df</span><span class="p">[:</span><span class="n">subsample</span><span class="p">]</span><span class="o">.</span><span class="n">ravel</span><span class="p">(),</span>
@@ -2109,121 +1414,82 @@ H(X,Y)
 
 <span class="n">pear</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">spear</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">kend</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 </code></pre></div>
-
 </div>
-
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-
 <div class="highlight"><pre><span></span><code>
 </code></pre></div>
-
+</div>
 </div>
 
-</div>
-                
-              
-              
-                
 
 
-              
-            </article>
-          </div>
-        </div>
-      </main>
-      
-        
+
 <footer class="md-footer">
-  
-    <div class="md-footer-nav">
-      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
-        
-          <a href="../0_data_download/" title="0 data download" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
-            <div class="md-footer-nav__button md-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
-            </div>
-            <div class="md-footer-nav__title">
-              <div class="md-ellipsis">
-                <span class="md-footer-nav__direction">
+<div class="md-footer-nav">
+<nav aria-label="Footer" class="md-footer-nav__inner md-grid">
+<a class="md-footer-nav__link md-footer-nav__link--prev" href="../0_data_download/" rel="prev" title="0 data download">
+<div class="md-footer-nav__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"></path></svg>
+</div>
+<div class="md-footer-nav__title">
+<div class="md-ellipsis">
+<span class="md-footer-nav__direction">
                   Previous
                 </span>
                 0 data download
               </div>
-            </div>
-          </a>
-        
-        
-          <a href="../../../drought/1.1_drought_features/" title="1.1 drought features" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
-            <div class="md-footer-nav__title">
-              <div class="md-ellipsis">
-                <span class="md-footer-nav__direction">
+</div>
+</a>
+<a class="md-footer-nav__link md-footer-nav__link--next" href="../../../drought/1.1_drought_features/" rel="next" title="1.1 drought features">
+<div class="md-footer-nav__title">
+<div class="md-ellipsis">
+<span class="md-footer-nav__direction">
                   Next
                 </span>
                 1.1 drought features
               </div>
-            </div>
-            <div class="md-footer-nav__button md-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
-    </div>
-  
-  <div class="md-footer-meta md-typeset">
-    <div class="md-footer-meta__inner md-grid">
-      <div class="md-footer-copyright">
-        
-          <div class="md-footer-copyright__highlight">
-            Copyright &copy; 2020 J. Emmanuel Johnson
+</div>
+<div class="md-footer-nav__button md-icon">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"></path></svg>
+</div>
+</a>
+</nav>
+</div>
+<div class="md-footer-meta md-typeset">
+<div class="md-footer-meta__inner md-grid">
+<div class="md-footer-copyright">
+<div class="md-footer-copyright__highlight">
+            Copyright © 2020 J. Emmanuel Johnson
           </div>
         
         Made with
-        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+        <a href="https://squidfunk.github.io/mkdocs-material/" rel="noopener" target="_blank">
           Material for MkDocs
         </a>
-      </div>
-      
-  <div class="md-footer-social">
-    
-      
-      
-      <a href="https://github.com/jejjohnson" target="_blank" rel="noopener" title="github.com" class="md-footer-social__link">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
-      </a>
-    
-      
-      
-      <a href="https://twitter.com/jejjohnson" target="_blank" rel="noopener" title="twitter.com" class="md-footer-social__link">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
-      </a>
-    
-      
-      
-      <a href="https://linkedin.com/in/jejjohnson" target="_blank" rel="noopener" title="linkedin.com" class="md-footer-social__link">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
-      </a>
-    
-      
-      
-      <a href="https://jejjohnson.netlify.com" target="_blank" rel="noopener" title="jejjohnson.netlify.com" class="md-footer-social__link">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M336.5 160C322 70.7 287.8 8 248 8s-74 62.7-88.5 152h177zM152 256c0 22.2 1.2 43.5 3.3 64h185.3c2.1-20.5 3.3-41.8 3.3-64s-1.2-43.5-3.3-64H155.3c-2.1 20.5-3.3 41.8-3.3 64zm324.7-96c-28.6-67.9-86.5-120.4-158-141.6 24.4 33.8 41.2 84.7 50 141.6h108zM177.2 18.4C105.8 39.6 47.8 92.1 19.3 160h108c8.7-56.9 25.5-107.8 49.9-141.6zM487.4 192H372.7c2.1 21 3.3 42.5 3.3 64s-1.2 43-3.3 64h114.6c5.5-20.5 8.6-41.8 8.6-64s-3.1-43.5-8.5-64zM120 256c0-21.5 1.2-43 3.3-64H8.6C3.2 212.5 0 233.8 0 256s3.2 43.5 8.6 64h114.6c-2-21-3.2-42.5-3.2-64zm39.5 96c14.5 89.3 48.7 152 88.5 152s74-62.7 88.5-152h-177zm159.3 141.6c71.4-21.2 129.4-73.7 158-141.6h-108c-8.8 56.9-25.6 107.8-50 141.6zM19.3 352c28.6 67.9 86.5 120.4 158 141.6-24.4-33.8-41.2-84.7-50-141.6h-108z"/></svg>
-      </a>
-    
-  </div>
-
-    </div>
-  </div>
+</div>
+<div class="md-footer-social">
+<a class="md-footer-social__link" href="https://github.com/jejjohnson" rel="noopener" target="_blank" title="github.com">
+<svg viewbox="0 0 496 512" xmlns="http://www.w3.org/2000/svg"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg>
+</a>
+<a class="md-footer-social__link" href="https://twitter.com/jejjohnson" rel="noopener" target="_blank" title="twitter.com">
+<svg viewbox="0 0 512 512" xmlns="http://www.w3.org/2000/svg"><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"></path></svg>
+</a>
+<a class="md-footer-social__link" href="https://linkedin.com/in/jejjohnson" rel="noopener" target="_blank" title="linkedin.com">
+<svg viewbox="0 0 448 512" xmlns="http://www.w3.org/2000/svg"><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"></path></svg>
+</a>
+<a class="md-footer-social__link" href="https://jejjohnson.netlify.com" rel="noopener" target="_blank" title="jejjohnson.netlify.com">
+<svg viewbox="0 0 496 512" xmlns="http://www.w3.org/2000/svg"><path d="M336.5 160C322 70.7 287.8 8 248 8s-74 62.7-88.5 152h177zM152 256c0 22.2 1.2 43.5 3.3 64h185.3c2.1-20.5 3.3-41.8 3.3-64s-1.2-43.5-3.3-64H155.3c-2.1 20.5-3.3 41.8-3.3 64zm324.7-96c-28.6-67.9-86.5-120.4-158-141.6 24.4 33.8 41.2 84.7 50 141.6h108zM177.2 18.4C105.8 39.6 47.8 92.1 19.3 160h108c8.7-56.9 25.5-107.8 49.9-141.6zM487.4 192H372.7c2.1 21 3.3 42.5 3.3 64s-1.2 43-3.3 64h114.6c5.5-20.5 8.6-41.8 8.6-64s-3.1-43.5-8.5-64zM120 256c0-21.5 1.2-43 3.3-64H8.6C3.2 212.5 0 233.8 0 256s3.2 43.5 8.6 64h114.6c-2-21-3.2-42.5-3.2-64zm39.5 96c14.5 89.3 48.7 152 88.5 152s74-62.7 88.5-152h-177zm159.3 141.6c71.4-21.2 129.4-73.7 158-141.6h-108c-8.8 56.9-25.6 107.8-50 141.6zM19.3 352c28.6 67.9 86.5 120.4 158 141.6-24.4-33.8-41.2-84.7-50-141.6h-108z"></path></svg>
+</a>
+</div>
+</div>
+</div>
 </footer>
-      
-    </div>
-    
-      <script src="../../../../assets/javascripts/vendor.83fe6e3c.min.js"></script>
-      <script src="../../../../assets/javascripts/bundle.7e1cb91c.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
-      
-      <script>
+
+<script src="../../../../assets/javascripts/vendor.83fe6e3c.min.js"></script>
+<script src="../../../../assets/javascripts/bundle.7e1cb91c.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+<script>
         app = initialize({
           base: "../../../..",
           features: [],
@@ -2232,13 +1498,7 @@ H(X,Y)
           }, typeof search !== "undefined" && search)
         })
       </script>
-      
-        <script src="../../../../javascripts/extra.js"></script>
-      
-        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-      
-        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-      
-    
-  </body>
-</html>
+<script src="../../../../javascripts/extra.js"></script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+

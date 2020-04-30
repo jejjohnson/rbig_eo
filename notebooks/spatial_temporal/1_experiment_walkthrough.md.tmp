@@ -37,10 +37,8 @@
 
 ```python
 import sys, os
-cwd = os.getcwd()
-sys.path.insert(0, f'{cwd}/../../')
-sys.path.insert(0, '/home/emmanuel/code/py_esdc')
-sys.path.insert(0, '/home/emmanuel/code/gp_model_zoo')
+from pyprojroot import here
+# sys.path.append(here)
 
 # standard python packages
 import xarray as xr
@@ -50,10 +48,10 @@ import numpy as np
 # 
 from src.models.spatemp.train_models import Metrics
 
-# esdc tools
-from esdc.subset import select_pixel
-from esdc.shape import ShapeFileExtract, rasterize
-from esdc.transform import DensityCubes
+# # esdc tools
+# from src.esdc.subset import select_pixel
+# from src.esdc.shape import ShapeFileExtract, rasterize
+# from esdc.transform import DensityCubes
 
 from tqdm import tqdm
 
@@ -74,10 +72,18 @@ plt.style.use(['fivethirtyeight', 'seaborn-poster'])
 
 
 <div class="output_area" markdown="1">
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>The autoreload extension is already loaded. To reload it, use:
-  %reload_ext autoreload
-</pre>
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">ModuleNotFoundError</span>                       Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-1-9a645161431b&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">      1</span> <span class="ansi-green-fg">import</span> sys<span class="ansi-blue-fg">,</span> os
+<span class="ansi-green-fg">----&gt; 2</span><span class="ansi-red-fg"> </span><span class="ansi-green-fg">from</span> pyprojroot <span class="ansi-green-fg">import</span> here
+<span class="ansi-green-intense-fg ansi-bold">      3</span> <span class="ansi-red-fg"># sys.path.append(here)</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span> 
+<span class="ansi-green-intense-fg ansi-bold">      5</span> <span class="ansi-red-fg"># standard python packages</span>
+
+<span class="ansi-red-fg">ModuleNotFoundError</span>: No module named &#39;pyprojroot&#39;</pre>
 </div>
 </div>
 
@@ -691,10 +697,10 @@ sgp_model.fit(xtrain_norm, ytrain_norm)
 
 
 
-<div id="d48eb376-3b32-46d0-9f04-d95814ca6cf2"></div>
+<div id="9bbb1c79-70c3-4459-a8f7-6558a1da5e10"></div>
 <div class="output_subarea output_widget_view ">
 <script type="text/javascript">
-var element = $('#d48eb376-3b32-46d0-9f04-d95814ca6cf2');
+var element = $('#9bbb1c79-70c3-4459-a8f7-6558a1da5e10');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "5177959d6e784819826fd52f757d39ae", "version_major": 2, "version_minor": 0}
