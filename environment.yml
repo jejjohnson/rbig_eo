@@ -52,7 +52,7 @@ dependencies:
   - flake8
   - mypy
   - pytest
-  - pyproject
+  - pyprojroot
   # Extra
   - "git+https://github.com/swartn/cmipdata.git#egg=cmipdata"
   - -e "git+https://github.com/jejjohnson/rbig.git#egg=rbig"

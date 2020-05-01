@@ -1,116 +1,26 @@
-import sys
+from typing import Dict
 
-sys.path.insert(0, "/home/emmanuel/code/rbig")
-
-from rbig import RBIG, RBIGMI
-# from src.models.information.entropy import RBIGEstimator as RBIGENT
-# from src.models.information.mutual_information import RBIGEstimator as RBIGMI
-
-import numpy as np
-import time
+import pandas as pd
+from src.models.similarity import rv_coefficient, rbig_it_measures
 
 
-def run_rbig_models(
-    X1, X2=None, measure="t", verbose=None, random_state=123, batch_size=None
-):
+def get_similarity_scores(
+    X_ref: pd.DataFrame, Y_compare: pd.DataFrame, smoke_test: bool = False
+) -> Dict:
 
-    # RBIG Parameters
-    n_layers = 10000
-    rotation_type = "PCA"
-    zero_tolerance = 60
-    pdf_extension = 10
-    pdf_resolution = None
-    tolerance = None
+    if smoke_test is True:
+        X_ref = X_ref[:500]
+        Y_compare = Y_compare[:500]
 
-    if measure.lower() == "t" or measure.lower() == "h":
+    # RV Coefficient
+    rv_results = rv_coefficient(X_ref, Y_compare)
 
-        # RBIG MODEL 0
-        rbig_model = RBIG(
-            n_layers=n_layers,
-            rotation_type=rotation_type,
-            random_state=random_state,
-            zero_tolerance=zero_tolerance,
-            tolerance=tolerance,
-            pdf_extension=pdf_extension,
-            pdf_resolution=pdf_resolution,
-            verbose=verbose,
-        )
+    # RBIG Coefficient
+    rbig_results = rbig_it_measures(X_ref, Y_compare)
 
-        # fit model to the data
-        t0 = time.time()
-        rbig_model.fit(X1)
-        t1 = time.time() - t0
-        if verbose:
-            print(
-                f"Trained RBIG ({X1.shape[0]:,} points, {X1.shape[1]:,} dimensions): {t1:.3f} secs"
-            )
+    results = {
+        **rv_results,
+        **rbig_results,
+    }
 
-        tc = rbig_model.mutual_information * np.log(2)
-        h = rbig_model.entropy(correction=True) * np.log(2)
-        if verbose:
-            print(f"TC: {tc:.3f}")
-            print(f"H: {h:.3f}")
-
-        return tc, h, t1
-
-    elif measure.lower() == "mi":
-        # RBIG MODEL 0
-        rbig_mi_model = RBIGMI(
-            n_layers=n_layers,
-            rotation_type=rotation_type,
-            random_state=random_state,
-            zero_tolerance=zero_tolerance,
-            tolerance=tolerance,
-            pdf_extension=pdf_extension,
-            pdf_resolution=pdf_resolution,
-            verbose=verbose,
-        )
-
-        # fit model to the data
-        t0 = time.time()
-        rbig_mi_model.fit(X1, X2)
-        t1 = time.time() - t0
-        if verbose:
-            print(
-                f"Trained RBIG1 MI ({X1.shape[0]:,} points, {X1.shape[1]:,} dimensions): {t1:.3f} secs"
-            )
-
-        mi = rbig_mi_model.mutual_information() * np.log(2)
-
-        if verbose:
-            print(f"MI: {mi:.3f}")
-
-        return mi, t1
-
-    elif measure.lower() == "kld":
-
-        rbig_kld_model = RBIGKLD(
-            n_layers=n_layers,
-            rotation_type=rotation_type,
-            random_state=random_state,
-            zero_tolerance=zero_tolerance,
-            tolerance=tolerance,
-            pdf_extension=pdf_extension,
-            pdf_resolution=pdf_resolution,
-            verbose=verbose,
-        )
-
-        # fit model to the data
-        t0 = time.time()
-        rbig_kld_model.fit(X1, X2)
-        t1 = time.time() - t0
-
-        if verbose:
-            print(
-                f"Trained RBIG KLD ({X1.shape[0]:,}, {X2.shape[0]:,} points): {t1:.3f} secs"
-            )
-
-        kld = rbig_kld_model.kld * np.log(2)
-        if verbose:
-            print(f"KLD: {kld:.3f}")
-
-        return kld, t1
-
-    else:
-        raise ValueError(f"Unrecognized measure: {measure}.")
-
+    return results
