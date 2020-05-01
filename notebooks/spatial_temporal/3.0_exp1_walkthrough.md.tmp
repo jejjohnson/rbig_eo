@@ -1,0 +1,527 @@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<script>
+(function() {
+  function addWidgetsRenderer() {
+    var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
+    var scriptElement = document.createElement('script');
+    var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
+    var widgetState;
+
+    // Fallback for older version:
+    try {
+      widgetState = mimeElement && JSON.parse(mimeElement.innerHTML);
+
+      if (widgetState && (widgetState.version_major < 2 || !widgetState.version_major)) {
+        widgetRendererSrc = 'jupyter-js-widgets@*/dist/embed.js';
+      }
+    } catch(e) {}
+
+    scriptElement.src = widgetRendererSrc;
+    document.body.appendChild(scriptElement);
+  }
+
+  document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
+}());
+</script>
+
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+# Spatial-Temporal Experiment
+
+In this notebook, I will be walking through how we can estimate different methods based on the density cubes that we derive.
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+import sys, os
+from pyprojroot import here
+root = here(project_files=[".here"])
+sys.path.append(str(here()))
+
+import pathlib
+
+# standard python packages
+import xarray as xr
+import pandas as pd
+import numpy as np
+from xcube.core.geom import clip_dataset_by_geometry
+
+# 
+from src.features import Metrics
+from src.features.preprocessing import DensityCubes
+from sklearn.preprocessing import StandardScaler
+
+# # esdc tools
+# from src.esdc.subset import select_pixel
+# from src.esdc.shape import ShapeFileExtract, rasterize
+# from esdc.transform import DensityCubes
+
+from typing import List, Dict
+import xarray as xr
+
+from tqdm import tqdm
+
+import cartopy
+import cartopy.crs as ccrs
+
+# NUMPY SETTINGS
+import numpy as onp
+onp.set_printoptions(precision=3, suppress=True)
+
+# MATPLOTLIB Settings
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+%matplotlib inline
+%config InlineBackend.figure_format = 'retina'
+
+# SEABORN SETTINGS
+import seaborn as sns
+sns.set_context(context='talk',font_scale=0.7)
+# sns.set(rc={'figure.figsize': (12, 9.)})
+# sns.set_style("whitegrid")
+
+# PANDAS SETTINGS
+import pandas as pd
+pd.set_option("display.max_rows", 120)
+pd.set_option("display.max_columns", 120)
+
+# LOGGING SETTINGS
+import sys
+import logging
+logging.basicConfig(
+    level=logging.INFO, 
+    stream=sys.stdout,
+    format='%(asctime)s:%(levelname)s:%(message)s'
+)
+logger = logging.getLogger()
+#logger.setLevel(logging.INFO)
+
+%load_ext autoreload
+%autoreload 2
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>The autoreload extension is already loaded. To reload it, use:
+  %reload_ext autoreload
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+## Experiment Steps
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Global Variables
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+from collections import namedtuple
+from typing import Union, Tuple
+import xarray as xr
+import rioxarray
+import shapely
+# global variables
+
+# Datapath
+DATA_PATH = pathlib.Path("/media/disk/databases/ESDC/")
+
+levels = ['time', 'lon', 'lat']
+
+# get filename
+filename = DATA_PATH.joinpath("esdc-8d-0.25deg-1x720x1440-2.0.0.zarr")
+
+Region = namedtuple("Region", ["name", "lonmin", "lonmax", "latmin", "latmax"])
+TimePeriod = namedtuple("TimePeriod", ["name", "start", "end"])
+
+def get_test_time() -> TimePeriod:
+    return TimePeriod(name='test_201007', start='July-2010', end='July-2010')
+
+def get_europe() -> Region:
+    """As an example, I often choose Europe. This is a decent bounding box."""
+    return Region(name="europe", latmax=35.5, latmin=71.5, lonmax=60.0, lonmin=-18.0)
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Parameters
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+variables = [
+    'gross_primary_productivity',
+    'root_moisture',
+    'land_surface_temperature'
+]
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Functions
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+from prefect import task, Flow, Parameter
+
+@task # get Dataset
+def get_dataset(variable: str)-> xr.Dataset:
+    return xr.open_zarr(str(filename))[[variable]]
+
+@task # subset datacube
+def cube_spatial_subset(xr_data: xr.Dataset, bbox: Region) -> xr.Dataset:
+    """Function to spatially subset an xarray dataset from a bounding box."""
+    # get bounding box
+    bbox = shapely.geometry.box(
+        bbox.lonmin,
+        bbox.latmin,
+        bbox.lonmax,
+        bbox.latmax
+    )
+    # subset datacube
+    return clip_dataset_by_geometry(xr_data, bbox)
+
+@task 
+def cube_temporal_subset(xr_data: xr.DataArray, period: Tuple[str, str]) -> xr.DataArray:
+    """Function to temporally subset an xarray dataset from a tuple of
+    start date and end date
+    """
+    return xr_data.sel(time=slice(period.start, period.end))
+
+@task # get reference cube
+def get_reference_cube(data: xr.DataArray) -> pd.DataFrame:
+    """Wrapper Function to get reference cube"""
+    return data.to_dataframe().dropna().reorder_levels(levels)
+
+@task # get density cubes
+def get_density_cubes(data: xr.DataArray, spatial: int, temporal: int) -> pd.DataFrame:
+    """Wrapper Function to get density cubes from a dataarray"""
+    return DensityCubes(
+        spatial_window=spatial,
+        time_window=temporal
+    ).get_minicubes(data).reorder_levels(levels)
+    
+@task # get common indices
+def get_common_indices(
+    reference_df: pd.DataFrame, density_df: pd.DataFrame
+) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    idx = density_df.index.intersection(reference_df.index)
+    return reference_df.loc[idx,:], density_df.loc[idx, :]
+
+@task # standardize the data before
+def standardizer_data(X: pd.DataFrame, Y: pd.DataFrame) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    
+    # standardizer
+    normalizer = StandardScaler(with_mean=True, with_std=True)
+    
+    # standardize X values
+    X_values = normalizer.fit_transform(X.values)
+    X = pd.DataFrame(data=X_values, index=X.index, columns=X.columns)
+    
+    # standardize Y Values
+    Y_values = normalizer.fit_transform(Y.values)
+    Y = pd.DataFrame(data=Y_values, index=Y.index, columns=Y.columns)
+    
+    return X, Y
+
+@task
+def get_similarity_scores(X_ref: pd.DataFrame, Y_compare: pd.DataFrame) -> Dict:
+    
+    # RV Coefficient
+    rv_results = rv_coefficient(X_ref, Y_compare)
+    
+#     # CKA Coefficient
+#     cka_results = cka_coefficient(X_ref, Y_compare)
+    
+    # RBIG Coefficient
+    rbig_results = rbig_it_measures(X_ref, Y_compare)
+    
+    results = {
+        **rv_results,
+#         **cka_results,
+        **rbig_results
+    }
+    
+    return results
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+from src.models.similarity import cka_coefficient, rv_coefficient, rbig_it_measures
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+### Experiment Run
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+# variable = 'gross_primary_productivity'
+# region = get_europe()
+
+# datacube = get_dataset(variable)
+
+# datacube = subset_cube(xr_data=datacube, bbox=region)
+
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+logger.setLevel(logging.INFO)
+
+with Flow("Experiment-Step") as flow:
+    
+    # ======================
+    # experiment parameters
+    # ======================
+    variable = Parameter("variable", default='gross_primary_productivity')
+    region = Parameter("region", default=get_europe())
+    period = Parameter("period", default=get_test_time())
+    spatial = Parameter("spatial", default=1)
+    temporal = Parameter("temporal", default=3)
+    
+    # ======================
+    # experiment - Data
+    # ======================
+    # Get DataCube
+    datacube = get_dataset(variable)
+    
+    # subset datacube (spatially)
+    datacube = cube_spatial_subset(xr_data=datacube, bbox=region)[variable]
+
+    # subset datacube (temporally)
+    datacube = cube_temporal_subset(xr_data=datacube, period=period)
+    
+    # get datacubes
+    reference_cube_df = get_reference_cube(data=datacube)
+    
+    # get density cubes
+    density_cube_df = get_density_cubes(
+        data=datacube, 
+        spatial=spatial, 
+        temporal=temporal
+    )
+    
+    # get reference dataframe
+    dfs = get_common_indices(
+        reference_df=reference_cube_df, 
+        density_df=density_cube_df
+    )
+    
+    # standardize data
+    dfs = standardizer_data(X=dfs[0], Y=dfs[1])
+    
+    # ======================
+    # experiment - Methods
+    # ======================
+    res = get_similarity_scores(X_ref=dfs[0], Y_compare=dfs[1])
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+    
+state = flow.run()
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[2020-05-01 10:16:21] INFO - prefect.FlowRunner | Beginning Flow run for &#39;Experiment-Step&#39;
+2020-05-01 12:16:21,361:INFO:Beginning Flow run for &#39;Experiment-Step&#39;
+[2020-05-01 10:16:21] INFO - prefect.FlowRunner | Starting flow run.
+2020-05-01 12:16:21,372:INFO:Starting flow run.
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;variable&#39;: Starting task run...
+2020-05-01 12:16:21,411:INFO:Task &#39;variable&#39;: Starting task run...
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;variable&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:21,424:INFO:Task &#39;variable&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;region&#39;: Starting task run...
+2020-05-01 12:16:21,454:INFO:Task &#39;region&#39;: Starting task run...
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;region&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:21,467:INFO:Task &#39;region&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;period&#39;: Starting task run...
+2020-05-01 12:16:21,496:INFO:Task &#39;period&#39;: Starting task run...
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;period&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:21,509:INFO:Task &#39;period&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;temporal&#39;: Starting task run...
+2020-05-01 12:16:21,539:INFO:Task &#39;temporal&#39;: Starting task run...
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;temporal&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:21,551:INFO:Task &#39;temporal&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;get_dataset&#39;: Starting task run...
+2020-05-01 12:16:21,581:INFO:Task &#39;get_dataset&#39;: Starting task run...
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;get_dataset&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:22,485:INFO:Task &#39;get_dataset&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;cube_spatial_subset&#39;: Starting task run...
+2020-05-01 12:16:22,505:INFO:Task &#39;cube_spatial_subset&#39;: Starting task run...
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;cube_spatial_subset&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:22,525:INFO:Task &#39;cube_spatial_subset&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: Starting task run...
+2020-05-01 12:16:22,545:INFO:Task &#39;GetItem&#39;: Starting task run...
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:22,554:INFO:Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;cube_temporal_subset&#39;: Starting task run...
+2020-05-01 12:16:22,574:INFO:Task &#39;cube_temporal_subset&#39;: Starting task run...
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;cube_temporal_subset&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:22,585:INFO:Task &#39;cube_temporal_subset&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;get_reference_cube&#39;: Starting task run...
+2020-05-01 12:16:22,605:INFO:Task &#39;get_reference_cube&#39;: Starting task run...
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;get_reference_cube&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:22,653:INFO:Task &#39;get_reference_cube&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;spatial&#39;: Starting task run...
+2020-05-01 12:16:22,687:INFO:Task &#39;spatial&#39;: Starting task run...
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;spatial&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:22,700:INFO:Task &#39;spatial&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;get_density_cubes&#39;: Starting task run...
+2020-05-01 12:16:22,729:INFO:Task &#39;get_density_cubes&#39;: Starting task run...
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;get_density_cubes&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:22,769:INFO:Task &#39;get_density_cubes&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;get_common_indices&#39;: Starting task run...
+2020-05-01 12:16:22,799:INFO:Task &#39;get_common_indices&#39;: Starting task run...
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;get_common_indices&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:23,766:INFO:Task &#39;get_common_indices&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: Starting task run...
+2020-05-01 12:16:23,786:INFO:Task &#39;GetItem&#39;: Starting task run...
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:23,795:INFO:Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: Starting task run...
+2020-05-01 12:16:23,815:INFO:Task &#39;GetItem&#39;: Starting task run...
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:23,824:INFO:Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;standardizer_data&#39;: Starting task run...
+2020-05-01 12:16:23,843:INFO:Task &#39;standardizer_data&#39;: Starting task run...
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;standardizer_data&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:23,855:INFO:Task &#39;standardizer_data&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: Starting task run...
+2020-05-01 12:16:23,874:INFO:Task &#39;GetItem&#39;: Starting task run...
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:23,883:INFO:Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: Starting task run...
+2020-05-01 12:16:23,903:INFO:Task &#39;GetItem&#39;: Starting task run...
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:23,912:INFO:Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;get_similarity_scores&#39;: Starting task run...
+2020-05-01 12:16:23,931:INFO:Task &#39;get_similarity_scores&#39;: Starting task run...
+[2020-05-01 10:16:50] INFO - prefect.TaskRunner | Task &#39;get_similarity_scores&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:50,094:INFO:Task &#39;get_similarity_scores&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:50] INFO - prefect.FlowRunner | Flow run SUCCESS: all reference tasks succeeded
+2020-05-01 12:16:50,097:INFO:Flow run SUCCESS: all reference tasks succeeded
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+state.result[res].result
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&#39;rv_coeff&#39;: 0.9697258,
+ &#39;rv_x_norm&#39;: 26692.072,
+ &#39;rv_y_norm&#39;: 77907.49,
+ &#39;rv_xy_norm&#39;: 2016556900.0,
+ &#39;rbig_H_x&#39;: 1.855240533094599,
+ &#39;rbig_H_y&#39;: 1.1286197933913034,
+ &#39;rbig_I_xy&#39;: 5.499353957238775,
+ &#39;rbig_vi_coeff&#39;: 3.8004736863738287}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+
+```
+
+</div>
+
+</div>
+
+

@@ -1,0 +1,1823 @@
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="RBIG for Earth Observation">
+      
+      
+        <link rel="canonical" href="https://jejjohnson.github.io/rbig_eo/notebooks/spatial_temporal/3.1_exp1_walkthrough_dask/">
+      
+      
+        <meta name="author" content="J. Emmanuel Johnson">
+      
+      <link rel="shortcut icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1, mkdocs-material-5.1.4">
+    
+    
+      
+        <title>3.1 exp1 walkthrough dask - RBIG4EO</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.c4007cdc.min.css">
+      
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.8435c73a.min.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="">
+      
+    
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CSource+Code+Pro&display=fallback">
+        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="../../../css/ansi-colours.css">
+    
+      <link rel="stylesheet" href="../../../css/jupyter-cells.css">
+    
+      <link rel="stylesheet" href="../../../css/pandas-dataframe.css">
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="black" data-md-color-accent="gray">
+  
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#spatial-temporal-experiment" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://jejjohnson.github.io/rbig_eo" title="RBIG4EO" class="md-header-nav__button md-logo" aria-label="RBIG4EO">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            RBIG4EO
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              3.1 exp1 walkthrough dask
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active">
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/jejjohnson/rbig_eo/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jejjohnson/rbig_eo
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+        
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://jejjohnson.github.io/rbig_eo" title="RBIG4EO" class="md-nav__button md-logo" aria-label="RBIG4EO">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    RBIG4EO
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/jejjohnson/rbig_eo/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jejjohnson/rbig_eo
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../.." title="RBIG4EO" class="md-nav__link">
+      RBIG4EO
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../experiments/" title="Experiments" class="md-nav__link">
+      Experiments
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../ideas/" title="Ideas" class="md-nav__link">
+      Ideas
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../../../todo/" title="TODO" class="md-nav__link">
+      TODO
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5" type="checkbox" id="nav-5" checked>
+    
+    <label class="md-nav__link" for="nav-5">
+      Notebooks
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Notebooks" data-md-level="1">
+      <label class="md-nav__title" for="nav-5">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Notebooks
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5-1" type="checkbox" id="nav-5-1">
+    
+    <label class="md-nav__link" for="nav-5-1">
+      Climate
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Climate" data-md-level="2">
+      <label class="md-nav__title" for="nav-5-1">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Climate
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/0_visualize/" title="0 visualize" class="md-nav__link">
+      0 visualize
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/1.1_compare_similar/" title="1.1 compare similar" class="md-nav__link">
+      1.1 compare similar
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/1.2_compare_all/" title="1.2 compare all" class="md-nav__link">
+      1.2 compare all
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/2.1_regridding/" title="2.1 regridding" class="md-nav__link">
+      2.1 regridding
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5-1-5" type="checkbox" id="nav-5-1-5">
+    
+    <label class="md-nav__link" for="nav-5-1-5">
+      Amip
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Amip" data-md-level="3">
+      <label class="md-nav__title" for="nav-5-1-5">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Amip
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/amip/0_data_download/" title="0 data download" class="md-nav__link">
+      0 data download
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/amip/1.1_compare_similar-Copy1/" title="1.1 compare similar Copy1" class="md-nav__link">
+      1.1 compare similar Copy1
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/amip/1_regridding/" title="1 regridding" class="md-nav__link">
+      1 regridding
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/amip/2_time_overlap/" title="2 time overlap" class="md-nav__link">
+      2 time overlap
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/amip/3.1_demo_exp_global/" title="3.1 demo exp global" class="md-nav__link">
+      3.1 demo exp global
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/amip/3.2_demo_exp_spatial/" title="3.2 demo exp spatial" class="md-nav__link">
+      3.2 demo exp spatial
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/amip/3.2_demo_it_measures/" title="3.2 demo it measures" class="md-nav__link">
+      3.2 demo it measures
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/amip/4.1_visualize_global/" title="4.1 visualize global" class="md-nav__link">
+      4.1 visualize global
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/amip/4.2_visualize_spatial/" title="4.2 visualize spatial" class="md-nav__link">
+      4.2 visualize spatial
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/amip/4.3_visualize_local_indi/" title="4.3 visualize local indi" class="md-nav__link">
+      4.3 visualize local indi
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/amip/4.4_visualize_local_compare/" title="4.4 visualize local compare" class="md-nav__link">
+      4.4 visualize local compare
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5-1-6" type="checkbox" id="nav-5-1-6">
+    
+    <label class="md-nav__link" for="nav-5-1-6">
+      Rcp
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Rcp" data-md-level="3">
+      <label class="md-nav__title" for="nav-5-1-6">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Rcp
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/rcp/0_data_download/" title="0 data download" class="md-nav__link">
+      0 data download
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../climate/rcp/3.2_demo_it_measures-Copy1/" title="3.2 demo it measures Copy1" class="md-nav__link">
+      3.2 demo it measures Copy1
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5-2" type="checkbox" id="nav-5-2">
+    
+    <label class="md-nav__link" for="nav-5-2">
+      Drought
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Drought" data-md-level="2">
+      <label class="md-nav__title" for="nav-5-2">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Drought
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../drought/1.1_drought_features/" title="1.1 drought features" class="md-nav__link">
+      1.1 drought features
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../drought/1_drought_features/" title="1 drought features" class="md-nav__link">
+      1 drought features
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../drought/2_experiment_example/" title="2 experiment example" class="md-nav__link">
+      2 experiment example
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../drought/visualization/" title="Visualization" class="md-nav__link">
+      Visualization
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5-3" type="checkbox" id="nav-5-3">
+    
+    <label class="md-nav__link" for="nav-5-3">
+      Explore
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Explore" data-md-level="2">
+      <label class="md-nav__title" for="nav-5-3">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Explore
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../explore/kernel_alignment/" title="Kernel alignment" class="md-nav__link">
+      Kernel alignment
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../explore/variation_of_information/" title="Variation of information" class="md-nav__link">
+      Variation of information
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-5-4" type="checkbox" id="nav-5-4" checked>
+    
+    <label class="md-nav__link" for="nav-5-4">
+      Spatial temporal
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Spatial temporal" data-md-level="2">
+      <label class="md-nav__title" for="nav-5-4">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Spatial temporal
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../1.0_load_esdc/" title="1.0 load esdc" class="md-nav__link">
+      1.0 load esdc
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../1_experiment_walkthrough/" title="1 experiment walkthrough" class="md-nav__link">
+      1 experiment walkthrough
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../2.0_methods_walkthrough/" title="2.0 methods walkthrough" class="md-nav__link">
+      2.0 methods walkthrough
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../3.0_exp1_walkthrough/" title="3.0 exp1 walkthrough" class="md-nav__link">
+      3.0 exp1 walkthrough
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        3.1 exp1 walkthrough dask
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9h14V7H3v2m0 4h14v-2H3v2m0 4h14v-2H3v2m16 0h2v-2h-2v2m0-10v2h2V7h-2m0 6h2v-2h-2v2z"/></svg>
+        </span>
+      </label>
+    
+    <a href="./" title="3.1 exp1 walkthrough dask" class="md-nav__link md-nav__link--active">
+      3.1 exp1 walkthrough dask
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#experiment-steps" class="md-nav__link">
+    Experiment Steps
+  </a>
+  
+    <nav class="md-nav" aria-label="Experiment Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#global-variables" class="md-nav__link">
+    Global Variables
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#experimental-step" class="md-nav__link">
+    Experimental Step
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#experiment-run" class="md-nav__link">
+    Experiment Run
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../Untitled/" title="Untitled" class="md-nav__link">
+      Untitled
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#experiment-steps" class="md-nav__link">
+    Experiment Steps
+  </a>
+  
+    <nav class="md-nav" aria-label="Experiment Steps">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#global-variables" class="md-nav__link">
+    Global Variables
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    Parameters
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#experimental-step" class="md-nav__link">
+    Experimental Step
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#experiment-run" class="md-nav__link">
+    Experiment Run
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/jejjohnson/rbig_eo/edit/master/docs/notebooks/spatial_temporal/3.1_exp1_walkthrough_dask.ipynb" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  
+                
+                
+                <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<script>
+(function() {
+  function addWidgetsRenderer() {
+    var mimeElement = document.querySelector('script[type="application/vnd.jupyter.widget-view+json"]');
+    var scriptElement = document.createElement('script');
+    var widgetRendererSrc = 'https://unpkg.com/@jupyter-widgets/html-manager@*/dist/embed-amd.js';
+    var widgetState;
+
+    // Fallback for older version:
+    try {
+      widgetState = mimeElement && JSON.parse(mimeElement.innerHTML);
+
+      if (widgetState && (widgetState.version_major < 2 || !widgetState.version_major)) {
+        widgetRendererSrc = 'jupyter-js-widgets@*/dist/embed.js';
+      }
+    } catch(e) {}
+
+    scriptElement.src = widgetRendererSrc;
+    document.body.appendChild(scriptElement);
+  }
+
+  document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
+}());
+</script>
+
+<div class="cell border-box-sizing text_cell rendered">
+<p><div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
+<h1 id="spatial-temporal-experiment">Spatial-Temporal Experiment<a class="headerlink" href="#spatial-temporal-experiment" title="Permanent link">&para;</a></h1>
+<p>In this notebook, I will be walking through how we can estimate different methods based on the density cubes that we derive.
+</div>
+</div></p>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">pyprojroot</span> <span class="kn">import</span> <span class="n">here</span>
+<span class="n">root</span> <span class="o">=</span> <span class="n">here</span><span class="p">(</span><span class="n">project_files</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;.here&quot;</span><span class="p">])</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">here</span><span class="p">()))</span>
+
+<span class="kn">import</span> <span class="nn">pathlib</span>
+
+<span class="c1"># standard python packages</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># </span>
+<span class="c1"># Experiment Functions</span>
+<span class="kn">from</span> <span class="nn">src.data.esdc</span> <span class="kn">import</span> <span class="n">get_dataset</span>
+<span class="kn">from</span> <span class="nn">src.features</span> <span class="kn">import</span> <span class="n">Metrics</span>
+<span class="kn">from</span> <span class="nn">src.features.temporal</span> <span class="kn">import</span> <span class="n">select_period</span><span class="p">,</span> <span class="n">get_smoke_test_time</span>
+<span class="kn">from</span> <span class="nn">src.features.spatial</span> <span class="kn">import</span> <span class="n">select_region</span><span class="p">,</span> <span class="n">get_europe</span>
+<span class="kn">from</span> <span class="nn">src.models.train_models</span> <span class="kn">import</span> <span class="n">get_similarity_scores</span>
+<span class="kn">from</span> <span class="nn">src.experiments.utils</span> <span class="kn">import</span> <span class="n">dict_product</span><span class="p">,</span> <span class="n">run_parallel_step</span>
+
+<span class="kn">from</span> <span class="nn">src.features</span> <span class="kn">import</span> <span class="n">Metrics</span>
+<span class="kn">from</span> <span class="nn">src.features.density</span> <span class="kn">import</span> <span class="n">get_density_cubes</span>
+<span class="kn">from</span> <span class="nn">src.features.preprocessing</span> <span class="kn">import</span> <span class="n">standardizer_data</span><span class="p">,</span> <span class="n">get_reference_cube</span><span class="p">,</span> <span class="n">get_common_indices</span>
+<span class="kn">from</span> <span class="nn">src.models.similarity</span> <span class="kn">import</span> <span class="n">cka_coefficient</span><span class="p">,</span> <span class="n">rv_coefficient</span><span class="p">,</span> <span class="n">rbig_it_measures</span>
+
+<span class="c1"># # esdc tools</span>
+<span class="c1"># from src.esdc.subset import select_pixel</span>
+<span class="c1"># from src.esdc.shape import ShapeFileExtract, rasterize</span>
+<span class="c1"># from esdc.transform import DensityCubes</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">import</span> <span class="nn">xarray</span> <span class="k">as</span> <span class="nn">xr</span>
+
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">import</span> <span class="nn">cartopy</span>
+<span class="kn">import</span> <span class="nn">cartopy.crs</span> <span class="k">as</span> <span class="nn">ccrs</span>
+
+<span class="c1"># NUMPY SETTINGS</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">onp</span>
+<span class="n">onp</span><span class="o">.</span><span class="n">set_printoptions</span><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># MATPLOTLIB Settings</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">mpl</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="o">%</span><span class="n">config</span> <span class="n">InlineBackend</span><span class="o">.</span><span class="n">figure_format</span> <span class="o">=</span> <span class="s1">&#39;retina&#39;</span>
+
+<span class="c1"># SEABORN SETTINGS</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="s1">&#39;talk&#39;</span><span class="p">,</span><span class="n">font_scale</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+<span class="c1"># sns.set(rc={&#39;figure.figsize&#39;: (12, 9.)})</span>
+<span class="c1"># sns.set_style(&quot;whitegrid&quot;)</span>
+
+<span class="c1"># PANDAS SETTINGS</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">&quot;display.max_rows&quot;</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">&quot;display.max_columns&quot;</span><span class="p">,</span> <span class="mi">120</span><span class="p">)</span>
+
+<span class="c1"># LOGGING SETTINGS</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> 
+    <span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1">:</span><span class="si">%(levelname)s</span><span class="s1">:</span><span class="si">%(message)s</span><span class="s1">&#39;</span>
+<span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+<span class="c1">#logger.setLevel(logging.INFO)</span>
+
+<span class="o">%</span><span class="n">load_ext</span> <span class="n">autoreload</span>
+<span class="o">%</span><span class="n">autoreload</span> <span class="mi">2</span>
+</code></pre></div>
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>The autoreload extension is already loaded. To reload it, use:
+  %reload_ext autoreload
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="cell border-box-sizing text_cell rendered">
+<p><div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
+<h2 id="experiment-steps">Experiment Steps<a class="headerlink" href="#experiment-steps" title="Permanent link">&para;</a></h2>
+<p></div>
+</div></p>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<p><div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
+<h3 id="global-variables">Global Variables<a class="headerlink" href="#global-variables" title="Permanent link">&para;</a></h3>
+<p></div>
+</div></p>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<p><div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
+<h3 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h3>
+<p></div>
+</div></p>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="n">parameters</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;variable&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;gross_primary_productivity&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;root_moisture&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;land_surface_temperature&#39;</span>
+<span class="p">]</span>
+<span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;region&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_europe</span><span class="p">()]</span>
+<span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;period&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_smoke_test_time</span><span class="p">()]</span>
+<span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+<span class="n">parameters</span><span class="p">[</span><span class="s1">&#39;temporal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+
+<span class="c1"># params = list(dict_product(parameters))</span>
+
+<span class="n">params</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dict_product</span><span class="p">(</span><span class="n">parameters</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">))</span>
+<span class="n">smoke_test</span> <span class="o">=</span> <span class="kc">True</span>
+</code></pre></div>
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>108
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="cell border-box-sizing text_cell rendered">
+<p><div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
+<h3 id="experimental-step">Experimental Step<a class="headerlink" href="#experimental-step" title="Permanent link">&para;</a></h3>
+<p></div>
+</div></p>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="n">params</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">smoke_test</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="c1"># ======================</span>
+    <span class="c1"># experiment - Data</span>
+    <span class="c1"># ======================</span>
+    <span class="c1"># Get DataCube</span>
+    <span class="n">datacube</span> <span class="o">=</span> <span class="n">get_dataset</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;variable&#39;</span><span class="p">])</span>
+
+    <span class="c1"># subset datacube (spatially)</span>
+    <span class="n">datacube</span> <span class="o">=</span> <span class="n">select_region</span><span class="p">(</span>
+        <span class="n">xr_data</span><span class="o">=</span><span class="n">datacube</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;region&#39;</span><span class="p">]</span>
+    <span class="p">)[</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;variable&#39;</span><span class="p">]]</span>
+
+    <span class="c1"># subset datacube (temporally)</span>
+    <span class="n">datacube</span> <span class="o">=</span> <span class="n">select_period</span><span class="p">(</span><span class="n">xr_data</span><span class="o">=</span><span class="n">datacube</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;period&#39;</span><span class="p">])</span>
+
+    <span class="c1"># get datacubes</span>
+    <span class="n">reference_cube_df</span> <span class="o">=</span> <span class="n">get_reference_cube</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">datacube</span><span class="p">)</span>
+
+    <span class="c1"># get density cubes</span>
+    <span class="n">density_cube_df</span> <span class="o">=</span> <span class="n">get_density_cubes</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">datacube</span><span class="p">,</span> 
+        <span class="n">spatial</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">],</span> 
+        <span class="n">temporal</span><span class="o">=</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;temporal&#39;</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="c1"># get reference dataframe</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">get_common_indices</span><span class="p">(</span>
+        <span class="n">reference_df</span><span class="o">=</span><span class="n">reference_cube_df</span><span class="p">,</span> 
+        <span class="n">density_df</span><span class="o">=</span><span class="n">density_cube_df</span>
+    <span class="p">)</span>
+
+    <span class="c1"># standardize data</span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">standardizer_data</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="o">=</span><span class="n">Y</span><span class="p">)</span>
+
+    <span class="c1"># ======================</span>
+    <span class="c1"># experiment - Methods</span>
+    <span class="c1"># ======================</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">get_similarity_scores</span><span class="p">(</span><span class="n">X_ref</span><span class="o">=</span><span class="n">X</span><span class="p">,</span> <span class="n">Y_compare</span><span class="o">=</span><span class="n">Y</span><span class="p">,</span> <span class="n">smoke_test</span><span class="o">=</span><span class="n">smoke_test</span><span class="p">)</span>
+
+    <span class="c1"># Save Results</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s1">&#39;region&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;region&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="s1">&#39;period&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;period&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="s1">&#39;variable&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;variable&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;spatial&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;spatial&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;temporal&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;temporal&#39;</span><span class="p">],</span>
+        <span class="o">**</span><span class="n">res</span>
+
+    <span class="p">},</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">results</span>
+</code></pre></div>
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code>
+</code></pre></div>
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="n">results</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">smoke_test</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="n">results</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div>
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>region</th>
+      <th>period</th>
+      <th>variable</th>
+      <th>spatial</th>
+      <th>temporal</th>
+      <th>rv_coeff</th>
+      <th>rv_x_norm</th>
+      <th>rv_y_norm</th>
+      <th>rv_xy_norm</th>
+      <th>rv_time</th>
+      <th>rbig_H_x</th>
+      <th>rbig_H_y</th>
+      <th>rbig_H_time</th>
+      <th>rbig_I_xy</th>
+      <th>rbig_I_time</th>
+      <th>rbig_vi_coeff</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>europe</td>
+      <td>test_201007</td>
+      <td>gross_primary_productivity</td>
+      <td>1</td>
+      <td>1</td>
+      <td>1.0</td>
+      <td>100.801453</td>
+      <td>100.801453</td>
+      <td>10160.93457</td>
+      <td>0.00383</td>
+      <td>0.835917</td>
+      <td>0.835917</td>
+      <td>0.232885</td>
+      <td>25.802617</td>
+      <td>0.468356</td>
+      <td>30.867425</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="n">res</span>
+</code></pre></div>
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&#39;rv_coeff&#39;: 0.9403951,
+ &#39;rv_x_norm&#39;: 44288.883,
+ &#39;rv_y_norm&#39;: 357065.0,
+ &#39;rv_xy_norm&#39;: 14871418000.0,
+ &#39;rv_time&#39;: 38.40082359313965,
+ &#39;rbig_H_x&#39;: 1.9247062049009207,
+ &#39;rbig_H_y&#39;: 4.4428976758211896,
+ &#39;rbig_H_time&#39;: 3.0350914001464844,
+ &#39;rbig_I_xy&#39;: 3.649542912651551,
+ &#39;rbig_I_time&#39;: 31.18929934501648,
+ &#39;rbig_vi_coeff&#39;: 1.2480244562128495}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+<div class="cell border-box-sizing code_cell rendered"></div>
+</div>
+</div>
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="n">res</span>
+</code></pre></div>
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&#39;rv_coeff&#39;: 0.9697245,
+ &#39;rv_x_norm&#39;: 26692.102,
+ &#39;rv_y_norm&#39;: 77907.13,
+ &#39;rv_xy_norm&#39;: 2016547100.0,
+ &#39;rbig_H_x&#39;: 1.855240533094599,
+ &#39;rbig_H_y&#39;: 1.0902273375895914,
+ &#39;rbig_I_xy&#39;: 5.405821100129361,
+ &#39;rbig_vi_coeff&#39;: 3.801045104354525}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">prefect</span> <span class="kn">import</span> <span class="n">task</span><span class="p">,</span> <span class="n">Flow</span><span class="p">,</span> <span class="n">Parameter</span>
+
+<span class="nd">@task</span> <span class="c1"># get Dataset</span>
+<span class="k">def</span> <span class="nf">get_dataset</span><span class="p">(</span><span class="n">variable</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span><span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">xr</span><span class="o">.</span><span class="n">open_zarr</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">filename</span><span class="p">))[[</span><span class="n">variable</span><span class="p">]]</span>
+
+<span class="nd">@task</span> <span class="c1"># subset datacube</span>
+<span class="k">def</span> <span class="nf">cube_spatial_subset</span><span class="p">(</span><span class="n">xr_data</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span> <span class="n">bbox</span><span class="p">:</span> <span class="n">Region</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Function to spatially subset an xarray dataset from a bounding box.&quot;&quot;&quot;</span>
+    <span class="c1"># get bounding box</span>
+    <span class="n">bbox</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">box</span><span class="p">(</span>
+        <span class="n">bbox</span><span class="o">.</span><span class="n">lonmin</span><span class="p">,</span>
+        <span class="n">bbox</span><span class="o">.</span><span class="n">latmin</span><span class="p">,</span>
+        <span class="n">bbox</span><span class="o">.</span><span class="n">lonmax</span><span class="p">,</span>
+        <span class="n">bbox</span><span class="o">.</span><span class="n">latmax</span>
+    <span class="p">)</span>
+    <span class="c1"># subset datacube</span>
+    <span class="k">return</span> <span class="n">clip_dataset_by_geometry</span><span class="p">(</span><span class="n">xr_data</span><span class="p">,</span> <span class="n">bbox</span><span class="p">)</span>
+
+<span class="nd">@task</span> 
+<span class="k">def</span> <span class="nf">cube_temporal_subset</span><span class="p">(</span><span class="n">xr_data</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">period</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Function to temporally subset an xarray dataset from a tuple of</span>
+<span class="sd">    start date and end date</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">xr_data</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">time</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="n">period</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="n">period</span><span class="o">.</span><span class="n">end</span><span class="p">))</span>
+
+<span class="nd">@task</span> <span class="c1"># get reference cube</span>
+<span class="k">def</span> <span class="nf">get_reference_cube</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Wrapper Function to get reference cube&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">data</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">reorder_levels</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span>
+
+<span class="nd">@task</span> <span class="c1"># get density cubes</span>
+<span class="k">def</span> <span class="nf">get_density_cubes</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span> <span class="n">spatial</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">temporal</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Wrapper Function to get density cubes from a dataarray&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">DensityCubes</span><span class="p">(</span>
+        <span class="n">spatial_window</span><span class="o">=</span><span class="n">spatial</span><span class="p">,</span>
+        <span class="n">time_window</span><span class="o">=</span><span class="n">temporal</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">get_minicubes</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">reorder_levels</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span>
+
+<span class="nd">@task</span> <span class="c1"># get common indices</span>
+<span class="k">def</span> <span class="nf">get_common_indices</span><span class="p">(</span>
+    <span class="n">reference_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">density_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">density_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">reference_df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">reference_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">,:],</span> <span class="n">density_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="p">:]</span>
+
+<span class="nd">@task</span> <span class="c1"># standardize the data before</span>
+<span class="k">def</span> <span class="nf">standardizer_data</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Y</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+
+    <span class="c1"># standardizer</span>
+    <span class="n">normalizer</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">(</span><span class="n">with_mean</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">with_std</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># standardize X values</span>
+    <span class="n">X_values</span> <span class="o">=</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">X_values</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">X</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+    <span class="c1"># standardize Y Values</span>
+    <span class="n">Y_values</span> <span class="o">=</span> <span class="n">normalizer</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">Y_values</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">Y</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">Y</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">X</span><span class="p">,</span> <span class="n">Y</span>
+
+<span class="nd">@task</span>
+<span class="k">def</span> <span class="nf">get_similarity_scores</span><span class="p">(</span><span class="n">X_ref</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">Y_compare</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">:</span>
+
+    <span class="c1"># RV Coefficient</span>
+    <span class="n">rv_results</span> <span class="o">=</span> <span class="n">rv_coefficient</span><span class="p">(</span><span class="n">X_ref</span><span class="p">,</span> <span class="n">Y_compare</span><span class="p">)</span>
+
+<span class="c1">#     # CKA Coefficient</span>
+<span class="c1">#     cka_results = cka_coefficient(X_ref, Y_compare)</span>
+
+    <span class="c1"># RBIG Coefficient</span>
+    <span class="n">rbig_results</span> <span class="o">=</span> <span class="n">rbig_it_measures</span><span class="p">(</span><span class="n">X_ref</span><span class="p">,</span> <span class="n">Y_compare</span><span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="o">**</span><span class="n">rv_results</span><span class="p">,</span>
+<span class="c1">#         **cka_results,</span>
+        <span class="o">**</span><span class="n">rbig_results</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">results</span>
+</code></pre></div>
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code>
+</code></pre></div>
+
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<p><div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
+<h3 id="experiment-run">Experiment Run<a class="headerlink" href="#experiment-run" title="Permanent link">&para;</a></h3>
+<p></div>
+</div></p>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="c1"># variable = &#39;gross_primary_productivity&#39;</span>
+<span class="c1"># region = get_europe()</span>
+
+<span class="c1"># datacube = get_dataset(variable)</span>
+
+<span class="c1"># datacube = subset_cube(xr_data=datacube, bbox=region)</span>
+</code></pre></div>
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">Flow</span><span class="p">(</span><span class="s2">&quot;Experiment-Step&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">flow</span><span class="p">:</span>
+
+    <span class="c1"># ======================</span>
+    <span class="c1"># experiment parameters</span>
+    <span class="c1"># ======================</span>
+    <span class="n">variable</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="s2">&quot;variable&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;gross_primary_productivity&#39;</span><span class="p">)</span>
+    <span class="n">region</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="s2">&quot;region&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">get_europe</span><span class="p">())</span>
+    <span class="n">period</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="s2">&quot;period&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="n">get_test_time</span><span class="p">())</span>
+    <span class="n">spatial</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="s2">&quot;spatial&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">temporal</span> <span class="o">=</span> <span class="n">Parameter</span><span class="p">(</span><span class="s2">&quot;temporal&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="c1"># ======================</span>
+    <span class="c1"># experiment - Data</span>
+    <span class="c1"># ======================</span>
+    <span class="c1"># Get DataCube</span>
+    <span class="n">datacube</span> <span class="o">=</span> <span class="n">get_dataset</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
+
+    <span class="c1"># subset datacube (spatially)</span>
+    <span class="n">datacube</span> <span class="o">=</span> <span class="n">cube_spatial_subset</span><span class="p">(</span><span class="n">xr_data</span><span class="o">=</span><span class="n">datacube</span><span class="p">,</span> <span class="n">bbox</span><span class="o">=</span><span class="n">region</span><span class="p">)[</span><span class="n">variable</span><span class="p">]</span>
+
+    <span class="c1"># subset datacube (temporally)</span>
+    <span class="n">datacube</span> <span class="o">=</span> <span class="n">cube_temporal_subset</span><span class="p">(</span><span class="n">xr_data</span><span class="o">=</span><span class="n">datacube</span><span class="p">,</span> <span class="n">period</span><span class="o">=</span><span class="n">period</span><span class="p">)</span>
+
+    <span class="c1"># get datacubes</span>
+    <span class="n">reference_cube_df</span> <span class="o">=</span> <span class="n">get_reference_cube</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">datacube</span><span class="p">)</span>
+
+    <span class="c1"># get density cubes</span>
+    <span class="n">density_cube_df</span> <span class="o">=</span> <span class="n">get_density_cubes</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">datacube</span><span class="p">,</span> 
+        <span class="n">spatial</span><span class="o">=</span><span class="n">spatial</span><span class="p">,</span> 
+        <span class="n">temporal</span><span class="o">=</span><span class="n">temporal</span>
+    <span class="p">)</span>
+
+    <span class="c1"># get reference dataframe</span>
+    <span class="n">dfs</span> <span class="o">=</span> <span class="n">get_common_indices</span><span class="p">(</span>
+        <span class="n">reference_df</span><span class="o">=</span><span class="n">reference_cube_df</span><span class="p">,</span> 
+        <span class="n">density_df</span><span class="o">=</span><span class="n">density_cube_df</span>
+    <span class="p">)</span>
+
+    <span class="c1"># standardize data</span>
+    <span class="n">dfs</span> <span class="o">=</span> <span class="n">standardizer_data</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">dfs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Y</span><span class="o">=</span><span class="n">dfs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># ======================</span>
+    <span class="c1"># experiment - Methods</span>
+    <span class="c1"># ======================</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">get_similarity_scores</span><span class="p">(</span><span class="n">X_ref</span><span class="o">=</span><span class="n">dfs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">Y_compare</span><span class="o">=</span><span class="n">dfs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</code></pre></div>
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="n">state</span> <span class="o">=</span> <span class="n">flow</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div>
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>[2020-05-01 10:16:21] INFO - prefect.FlowRunner | Beginning Flow run for &#39;Experiment-Step&#39;
+2020-05-01 12:16:21,361:INFO:Beginning Flow run for &#39;Experiment-Step&#39;
+[2020-05-01 10:16:21] INFO - prefect.FlowRunner | Starting flow run.
+2020-05-01 12:16:21,372:INFO:Starting flow run.
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;variable&#39;: Starting task run...
+2020-05-01 12:16:21,411:INFO:Task &#39;variable&#39;: Starting task run...
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;variable&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:21,424:INFO:Task &#39;variable&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;region&#39;: Starting task run...
+2020-05-01 12:16:21,454:INFO:Task &#39;region&#39;: Starting task run...
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;region&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:21,467:INFO:Task &#39;region&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;period&#39;: Starting task run...
+2020-05-01 12:16:21,496:INFO:Task &#39;period&#39;: Starting task run...
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;period&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:21,509:INFO:Task &#39;period&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;temporal&#39;: Starting task run...
+2020-05-01 12:16:21,539:INFO:Task &#39;temporal&#39;: Starting task run...
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;temporal&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:21,551:INFO:Task &#39;temporal&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:21] INFO - prefect.TaskRunner | Task &#39;get_dataset&#39;: Starting task run...
+2020-05-01 12:16:21,581:INFO:Task &#39;get_dataset&#39;: Starting task run...
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;get_dataset&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:22,485:INFO:Task &#39;get_dataset&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;cube_spatial_subset&#39;: Starting task run...
+2020-05-01 12:16:22,505:INFO:Task &#39;cube_spatial_subset&#39;: Starting task run...
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;cube_spatial_subset&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:22,525:INFO:Task &#39;cube_spatial_subset&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: Starting task run...
+2020-05-01 12:16:22,545:INFO:Task &#39;GetItem&#39;: Starting task run...
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:22,554:INFO:Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;cube_temporal_subset&#39;: Starting task run...
+2020-05-01 12:16:22,574:INFO:Task &#39;cube_temporal_subset&#39;: Starting task run...
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;cube_temporal_subset&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:22,585:INFO:Task &#39;cube_temporal_subset&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;get_reference_cube&#39;: Starting task run...
+2020-05-01 12:16:22,605:INFO:Task &#39;get_reference_cube&#39;: Starting task run...
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;get_reference_cube&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:22,653:INFO:Task &#39;get_reference_cube&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;spatial&#39;: Starting task run...
+2020-05-01 12:16:22,687:INFO:Task &#39;spatial&#39;: Starting task run...
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;spatial&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:22,700:INFO:Task &#39;spatial&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;get_density_cubes&#39;: Starting task run...
+2020-05-01 12:16:22,729:INFO:Task &#39;get_density_cubes&#39;: Starting task run...
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;get_density_cubes&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:22,769:INFO:Task &#39;get_density_cubes&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:22] INFO - prefect.TaskRunner | Task &#39;get_common_indices&#39;: Starting task run...
+2020-05-01 12:16:22,799:INFO:Task &#39;get_common_indices&#39;: Starting task run...
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;get_common_indices&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:23,766:INFO:Task &#39;get_common_indices&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: Starting task run...
+2020-05-01 12:16:23,786:INFO:Task &#39;GetItem&#39;: Starting task run...
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:23,795:INFO:Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: Starting task run...
+2020-05-01 12:16:23,815:INFO:Task &#39;GetItem&#39;: Starting task run...
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:23,824:INFO:Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;standardizer_data&#39;: Starting task run...
+2020-05-01 12:16:23,843:INFO:Task &#39;standardizer_data&#39;: Starting task run...
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;standardizer_data&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:23,855:INFO:Task &#39;standardizer_data&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: Starting task run...
+2020-05-01 12:16:23,874:INFO:Task &#39;GetItem&#39;: Starting task run...
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:23,883:INFO:Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: Starting task run...
+2020-05-01 12:16:23,903:INFO:Task &#39;GetItem&#39;: Starting task run...
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:23,912:INFO:Task &#39;GetItem&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:23] INFO - prefect.TaskRunner | Task &#39;get_similarity_scores&#39;: Starting task run...
+2020-05-01 12:16:23,931:INFO:Task &#39;get_similarity_scores&#39;: Starting task run...
+[2020-05-01 10:16:50] INFO - prefect.TaskRunner | Task &#39;get_similarity_scores&#39;: finished task run for task with final state: &#39;Success&#39;
+2020-05-01 12:16:50,094:INFO:Task &#39;get_similarity_scores&#39;: finished task run for task with final state: &#39;Success&#39;
+[2020-05-01 10:16:50] INFO - prefect.FlowRunner | Flow run SUCCESS: all reference tasks succeeded
+2020-05-01 12:16:50,097:INFO:Flow run SUCCESS: all reference tasks succeeded
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+</div>
+</div>
+<div class="highlight"><pre><span></span><code><span class="n">state</span><span class="o">.</span><span class="n">result</span><span class="p">[</span><span class="n">res</span><span class="p">]</span><span class="o">.</span><span class="n">result</span>
+</code></pre></div>
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+
+
+<div class="output_text output_subarea output_execute_result">
+<pre>{&#39;rv_coeff&#39;: 0.9697258,
+ &#39;rv_x_norm&#39;: 26692.072,
+ &#39;rv_y_norm&#39;: 77907.49,
+ &#39;rv_xy_norm&#39;: 2016556900.0,
+ &#39;rbig_H_x&#39;: 1.855240533094599,
+ &#39;rbig_H_y&#39;: 1.1286197933913034,
+ &#39;rbig_I_xy&#39;: 5.499353957238775,
+ &#39;rbig_vi_coeff&#39;: 3.8004736863738287}</pre>
+</div>
+
+</div>
+
+</div>
+</div>
+
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code>
+</code></pre></div>
+
+</div>
+
+</div>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
+        
+          <a href="../3.0_exp1_walkthrough/" title="3.0 exp1 walkthrough" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+            </div>
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                3.0 exp1 walkthrough
+              </div>
+            </div>
+          </a>
+        
+        
+          <a href="../Untitled/" title="Untitled" class="md-footer-nav__link md-footer-nav__link--next" rel="next">
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  Next
+                </span>
+                Untitled
+              </div>
+            </div>
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright &copy; 2020 J. Emmanuel Johnson
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+  <div class="md-footer-social">
+    
+      
+      
+      <a href="https://github.com/jejjohnson" target="_blank" rel="noopener" title="github.com" class="md-footer-social__link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+      </a>
+    
+      
+      
+      <a href="https://twitter.com/jejjohnson" target="_blank" rel="noopener" title="twitter.com" class="md-footer-social__link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+      </a>
+    
+      
+      
+      <a href="https://linkedin.com/in/jejjohnson" target="_blank" rel="noopener" title="linkedin.com" class="md-footer-social__link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
+      </a>
+    
+      
+      
+      <a href="https://jejjohnson.netlify.com" target="_blank" rel="noopener" title="jejjohnson.netlify.com" class="md-footer-social__link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M336.5 160C322 70.7 287.8 8 248 8s-74 62.7-88.5 152h177zM152 256c0 22.2 1.2 43.5 3.3 64h185.3c2.1-20.5 3.3-41.8 3.3-64s-1.2-43.5-3.3-64H155.3c-2.1 20.5-3.3 41.8-3.3 64zm324.7-96c-28.6-67.9-86.5-120.4-158-141.6 24.4 33.8 41.2 84.7 50 141.6h108zM177.2 18.4C105.8 39.6 47.8 92.1 19.3 160h108c8.7-56.9 25.5-107.8 49.9-141.6zM487.4 192H372.7c2.1 21 3.3 42.5 3.3 64s-1.2 43-3.3 64h114.6c5.5-20.5 8.6-41.8 8.6-64s-3.1-43.5-8.5-64zM120 256c0-21.5 1.2-43 3.3-64H8.6C3.2 212.5 0 233.8 0 256s3.2 43.5 8.6 64h114.6c-2-21-3.2-42.5-3.2-64zm39.5 96c14.5 89.3 48.7 152 88.5 152s74-62.7 88.5-152h-177zm159.3 141.6c71.4-21.2 129.4-73.7 158-141.6h-108c-8.8 56.9-25.6 107.8-50 141.6zM19.3 352c28.6 67.9 86.5 120.4 158 141.6-24.4-33.8-41.2-84.7-50-141.6h-108z"/></svg>
+      </a>
+    
+  </div>
+
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../../assets/javascripts/vendor.83fe6e3c.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.7e1cb91c.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../../..",
+          features: [],
+          search: Object.assign({
+            worker: "../../../assets/javascripts/worker/search.37585f48.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+        <script src="../../../javascripts/extra.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+      
+    
+  </body>
+</html>
