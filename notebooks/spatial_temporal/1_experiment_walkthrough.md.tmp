@@ -697,10 +697,10 @@ sgp_model.fit(xtrain_norm, ytrain_norm)
 
 
 
-<div id="e20c4c61-70b6-481a-b543-c7d739756fc3"></div>
+<div id="66959e48-372f-4f04-bf99-1de60dc13389"></div>
 <div class="output_subarea output_widget_view ">
 <script type="text/javascript">
-var element = $('#e20c4c61-70b6-481a-b543-c7d739756fc3');
+var element = $('#66959e48-372f-4f04-bf99-1de60dc13389');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "5177959d6e784819826fd52f757d39ae", "version_major": 2, "version_minor": 0}
