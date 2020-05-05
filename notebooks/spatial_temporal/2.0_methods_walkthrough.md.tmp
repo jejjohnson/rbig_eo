@@ -49,13 +49,28 @@ import pathlib
 import xarray as xr
 import pandas as pd
 import numpy as np
-from xcube.core.geom import clip_dataset_by_geometry
 
 # 
+# Experiment Functions
 from src.data.esdc import get_dataset
 from src.features import Metrics
-from src.features.temporal import select_period
-from src.features.spatial import select_region, get_europe
+from src.features.temporal import select_period, get_smoke_test_time, TimePeriod
+from src.features.spatial import select_region, get_europe, get_spain
+from src.models.train_models import get_similarity_scores
+from src.experiments.utils import dict_product, run_parallel_step
+
+from src.features import Metrics
+from src.features.density import get_density_cubes
+from src.features.preprocessing import standardizer_data, get_reference_cube, get_common_indices
+from src.models.similarity import cka_coefficient, rv_coefficient, rbig_it_measures
+
+# # esdc tools
+# from src.esdc.subset import select_pixel
+# from src.esdc.shape import ShapeFileExtract, rasterize
+# from esdc.transform import DensityCubes
+
+from typing import List, Dict
+import xarray as xr
 
 from tqdm import tqdm
 
@@ -98,21 +113,6 @@ logger = logging.getLogger()
 %autoreload 2
 ```
 
-</div>
-
-<div class="output_wrapper" markdown="1">
-<div class="output" markdown="1">
-
-
-<div class="output_area" markdown="1">
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>The autoreload extension is already loaded. To reload it, use:
-  %reload_ext autoreload
-</pre>
-</div>
-</div>
-
-</div>
 </div>
 
 </div>
@@ -5107,10 +5107,10 @@ gp_model.optimize(
 
 
 
-<div id="30bc8b5e-8490-44b5-8a1f-c74cbf19e13d"></div>
+<div id="fe408279-a8a8-45cb-9b50-321cd82d48cf"></div>
 <div class="output_subarea output_widget_view ">
 <script type="text/javascript">
-var element = $('#30bc8b5e-8490-44b5-8a1f-c74cbf19e13d');
+var element = $('#fe408279-a8a8-45cb-9b50-321cd82d48cf');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "9d0ea3598cb24f87bd592c6260c61c8c", "version_major": 2, "version_minor": 0}

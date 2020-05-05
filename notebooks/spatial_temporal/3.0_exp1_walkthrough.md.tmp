@@ -160,7 +160,8 @@ Region = namedtuple("Region", ["name", "lonmin", "lonmax", "latmin", "latmax"])
 TimePeriod = namedtuple("TimePeriod", ["name", "start", "end"])
 
 def get_test_time() -> TimePeriod:
-    return TimePeriod(name='test_201007', start='July-2010', end='July-2010')
+    return TimePeriod(name="201001_201012", start="Jan-2010", end="Dec-2010")
+#     return TimePeriod(name='test_201007', start='July-2010', end='July-2010')
 
 def get_europe() -> Region:
     """As an example, I often choose Europe. This is a decent bounding box."""
