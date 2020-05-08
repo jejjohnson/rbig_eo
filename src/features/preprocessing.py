@@ -26,12 +26,12 @@ def standardizer_data(
     normalizer = StandardScaler(with_mean=True, with_std=True)
 
     # standardize X values
-    X_values = normalizer.fit_transform(X.values)
-    X = pd.DataFrame(data=X_values, index=X.index, columns=X.columns)
+    X = normalizer.fit_transform(X)
+    # X = pd.DataFrame(data=X_values, index=X.index, columns=X.columns)
 
     # standardize Y Values
-    Y_values = normalizer.fit_transform(Y.values)
-    Y = pd.DataFrame(data=Y_values, index=Y.index, columns=Y.columns)
+    Y = normalizer.fit_transform(Y)
+    # Y = pd.DataFrame(data=Y_values, index=Y.index, columns=Y.columns)
 
     return X, Y
 

@@ -20,14 +20,14 @@ class Metrics:
     def get_rmse(ypred, ytest):
         return np.sqrt(mean_squared_error(ytest, ypred))
 
-    def get_all(self, ypred, ytest):
+    def get_all(self, ypred, ytest, name: str = "stats"):
 
         return pd.DataFrame(
             {
-                "mae": Metrics().get_mae(ypred, ytest),
-                "mse": Metrics().get_mse(ypred, ytest),
-                "rmse": Metrics().get_rmse(ypred, ytest),
-                "r2": Metrics().get_r2(ypred, ytest),
+                f"{name}_mae": Metrics().get_mae(ytest, ypred),
+                f"{name}_mse": Metrics().get_mse(ytest, ypred),
+                f"{name}_rmse": Metrics().get_rmse(ytest, ypred),
+                f"{name}_r2": Metrics().get_r2(ytest, ypred),
             },
             index=[0],
         )

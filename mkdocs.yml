@@ -25,14 +25,14 @@ plugins:
       execute: false
       write_markdown: true
       timeout: 600
-  - mkdocstrings:
-      default_handler: python
-      handlers:
-        python:
-          rendering:
-            show_source: true
-      watch:
-        - src/
+  # - mkdocstrings:
+  #     default_handler: python
+  #     handlers:
+  #       python:
+  #         rendering:
+  #           show_source: true
+  #     watch:
+  #       - src/
 # Copyright
 copyright: Copyright &copy; 2020 J. Emmanuel Johnson
 

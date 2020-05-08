@@ -1,5 +1,6 @@
 #!/bin/bash
 #SBATCH --nodes=3
+#SBATCH --ntasks=3
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=28
 #SBATCH --exclude=nodo17
@@ -11,6 +12,6 @@ module load Anaconda3
 source activate rbig_eo
 
 
-srun --nodes 1 --ntasks 1 python -u src/experiments/spatemp/europe.py --dataset gpp --verbose 1 --save v1 --njobs $SLURM_CPUS_PER_TASK &
-srun --nodes 1 --ntasks 1 python -u src/experiments/spatemp/europe.py --dataset rm --verbose 1 --save v1 --njobs $SLURM_CPUS_PER_TASK &
-srun --nodes 1 --ntasks 1 python -u src/experiments/spatemp/europe.py --dataset lst --verbose 1 --save v1 --njobs $SLURM_CPUS_PER_TASK 
+srun --nodes 1 --ntasks 1 python -u src/experiments/spatemp/europe.py --dataset gpp --verbose 1 --save v2 &
+srun --nodes 1 --ntasks 1 python -u src/experiments/spatemp/europe.py --dataset rm --verbose 1 --save v2 &
+srun --nodes 1 --ntasks 1 python -u src/experiments/spatemp/europe.py --dataset lst --verbose 1 --save v2 

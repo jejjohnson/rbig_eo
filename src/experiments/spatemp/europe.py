@@ -42,6 +42,8 @@ def get_parameters(variable: str) -> Dict:
         parameters["variable"] = ["gross_primary_productivity"]
     elif variable == "rm":
         parameters["variable"] = ["root_moisture"]
+    elif variable == "sm":
+        parameters["variable"] = ["soil_moisture"]
     elif variable == "lst":
         parameters["variable"] = ["land_surface_temperature"]
     else:

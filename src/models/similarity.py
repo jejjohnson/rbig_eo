@@ -10,7 +10,7 @@ from typing import Dict
 from sklearn.preprocessing import KernelCenterer
 from sklearn.gaussian_process.kernels import RBF
 import time
-
+from src.models.utils import subset_indices
 from rbig.rbig import RBIGMI, RBIG
 
 
@@ -22,34 +22,30 @@ def rv_coefficient(
 ) -> Dict:
     """simple function to calculate the rv coefficient"""
     t0 = time.time()
-    if subsample is not None:
-        rng = check_random_state(random_state)
-        X = rng.permutation(X)[:subsample, :]
-        Y = rng.permutation(Y)[:subsample, :]
+    X, Y = subset_indices(X, Y, subsample, random_state)
+
     # calculate the kernel matrices
     X_gram = linear_kernel(X)
     Y_gram = linear_kernel(Y)
 
     # center the kernels
-    X_gram = KernelCenterer().fit_transform(X_gram)
-    Y_gram = KernelCenterer().fit_transform(Y_gram)
+    X_gramc = KernelCenterer().fit_transform(X_gram)
+    Y_gramc = KernelCenterer().fit_transform(Y_gram)
 
     # normalizing coefficients (denomenator)
-    x_norm = np.linalg.norm(X_gram)
-    y_norm = np.linalg.norm(Y_gram)
+    x_norm = np.linalg.norm(X_gramc)
+    y_norm = np.linalg.norm(Y_gramc)
 
     # frobenius norm of the cross terms (numerator)
-    xy_norm = np.sum(X_gram * Y_gram)
-
+    xy_norm = np.sum(X_gramc * Y_gramc)
     # rv coefficient
     pv_coeff = xy_norm / x_norm / y_norm
 
     return {
-        "rv_coeff": pv_coeff,
-        "rv_x_norm": x_norm,
-        "rv_y_norm": y_norm,
-        "rv_xy_norm": xy_norm,
-        "rv_time": time.time() - t0,
+        "rv_coef": pv_coeff,
+        "x_norm": x_norm,
+        "y_norm": y_norm,
+        "xy_norm": xy_norm,
     }
 
 
@@ -75,14 +71,12 @@ def cka_coefficient(
 ) -> Dict:
     """simple function to calculate the rv coefficient"""
 
-    if subsample is not None:
-        rng = check_random_state(random_state)
-        X = rng.permutation(X)[:subsample, :]
-        Y = rng.permutation(Y)[:subsample, :]
+    X, Y = subset_indices(X, Y, subsample, random_state)
 
     # estimate sigmas
     sigma_X = estimate_sigma(X, percent=50)
     sigma_Y = estimate_sigma(Y, percent=50)
+
     # calculate the kernel matrices
     X_gram = RBF(sigma_X)(X)
     Y_gram = RBF(sigma_Y)(Y)
@@ -97,14 +91,13 @@ def cka_coefficient(
 
     # frobenius norm of the cross terms (numerator)
     xy_norm = np.sum(X_gram * Y_gram)
-
     # rv coefficient
     pv_coeff = xy_norm / x_norm / y_norm
 
     return {
         "cka_coeff": pv_coeff,
-        "cka_x_norm": x_norm,
         "cka_y_norm": y_norm,
+        "cka_x_norm": x_norm,
         "cka_xy_norm": xy_norm,
     }
 
@@ -115,10 +108,7 @@ def rbig_it_measures(
     subsample: Optional[int] = 100_000,
     random_state: int = 123,
 ) -> Dict:
-    if subsample is not None:
-        rng = check_random_state(random_state)
-        X = rng.permutation(X)[:subsample, :]
-        Y = rng.permutation(Y)[:subsample, :]
+    X, Y = subset_indices(X, Y, subsample, random_state)
     n_layers = 10000
     rotation_type = "PCA"
     random_state = 0
@@ -157,38 +147,16 @@ def rbig_it_measures(
     rbig_results["rbig_I_xy"] = I_rbig_model.fit(X, Y).mutual_information()
     rbig_results["rbig_I_time"] = time.time() - t0
 
-    # calculate the variation of information coefficient
-    rbig_results["rbig_vi_coeff"] = variation_of_info(
-        rbig_results["rbig_H_x"], rbig_results["rbig_H_y"], rbig_results["rbig_I_xy"]
-    )
+    t0 = time.time()
+    rbig_results["rbig_I_xx"] = I_rbig_model.fit(X, X).mutual_information()
+    rbig_results["rbig_Ixx_time"] = time.time() - t0
+
+    # # calculate the variation of information coefficient
+    # rbig_results["rbig_vi_coeff"] = variation_of_info(
+    #     rbig_results["rbig_H_x"], rbig_results["rbig_H_y"], rbig_results["rbig_I_xy"]
+    # )
     return rbig_results
 
 
 def variation_of_info(H_X, H_Y, I_XY):
     return I_XY / np.sqrt(H_X) / np.sqrt(H_Y)
-
-
-def get_similarity_scores(
-    X_ref: pd.DataFrame, Y_compare: pd.DataFrame, smoke_test: bool = False
-) -> Dict:
-
-    if smoke_test is True:
-        X_ref = X_ref[:500]
-        Y_compare = Y_compare[:500]
-
-    # RV Coefficient
-    rv_results = rv_coefficient(X_ref, Y_compare)
-
-    #     # CKA Coefficient
-    #     cka_results = cka_coefficient(X_ref, Y_compare)
-
-    # RBIG Coefficient
-    rbig_results = rbig_it_measures(X_ref, Y_compare)
-
-    results = {
-        **rv_results,
-        #         **cka_results,
-        **rbig_results,
-    }
-
-    return results
