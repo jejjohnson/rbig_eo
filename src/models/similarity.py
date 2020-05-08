@@ -2,6 +2,7 @@ from typing import Dict, Optional
 
 import numpy as np
 import pandas as pd
+from scipy import stats
 from scipy.spatial.distance import pdist, squareform
 from sklearn.metrics.pairwise import linear_kernel
 from sklearn.preprocessing import KernelCenterer
@@ -12,6 +13,44 @@ from sklearn.gaussian_process.kernels import RBF
 import time
 from src.models.utils import subset_indices
 from rbig.rbig import RBIGMI, RBIG
+
+
+def univariate_stats(X: np.ndarray, Y: np.ndarray) -> Dict[str, float]:
+    """Calculates some univariate statistics
+    
+    Calculates some standard univeriate statistics such as
+    Pearson, Spearman and KendallTau. Ravels the dataset to
+    ensure that we get a single value instead of one value per
+    feature.
+
+    Parameters
+    ----------
+    X : np.ndarray, (n_samples, n_features)
+        dataset 1 to be compared
+    
+    Y : np.ndarray, (n_samples, n_features)
+        dataset 2 to be compared
+    
+    Returns
+    -------
+    results : Dict[str, float]
+        a dictionary with the following entries
+        * 'pearson' - pearson correlation coefficient
+        * 'spearman' - spearman correlation coefficient
+        * 'kendalltau' - kendall's tau correlation coefficient
+    """
+    results = {}
+
+    # Pearson Correlation Coefficient
+    results["pearson"] = stats.pearsonr(X.ravel(), Y.ravel())[0]
+
+    # Spearman Correlation Coefficient
+    results["spearman"] = stats.spearmanr(X.ravel(), Y.ravel())[0]
+
+    # Kendall-Tau Correlation Coefficient
+    results["kendall"] = stats.kendalltau(X.ravel(), Y.ravel())[0]
+
+    return results
 
 
 def rv_coefficient(
@@ -160,3 +199,26 @@ def rbig_it_measures(
 
 def variation_of_info(H_X, H_Y, I_XY):
     return I_XY / np.sqrt(H_X) / np.sqrt(H_Y)
+
+
+def rbig_h_measures(
+    X: np.ndarray, subsample: Optional[int] = 100_000, random_state: int = 123,
+) -> Dict:
+    n_layers = 10000
+    rotation_type = "PCA"
+    random_state = 0
+    zero_tolerance = 60
+    pdf_extension = 10
+
+    t0 = time.time()
+    # Initialize RBIG class
+    H_rbig_model = RBIG(
+        n_layers=n_layers,
+        rotation_type=rotation_type,
+        random_state=random_state,
+        pdf_extension=pdf_extension,
+        zero_tolerance=zero_tolerance,
+    )
+
+    # fit model to the data
+    return H_rbig_model.fit(X).entropy(correction=True)

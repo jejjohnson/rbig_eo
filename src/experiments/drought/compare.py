@@ -1,4 +1,18 @@
+import sys, os
+from pyprojroot import here
+import logging
+import pathlib
+
+logging.basicConfig(stream=sys.stdout, level=logging.INFO)
+logger = logging.getLogger()
+
+PATH = pathlib.Path(str(here()))
+# root = here(project_files=[".here"])
+sys.path.append(str(here()))
+
+
 import argparse
+import numpy as np
 
 # drought tools
 from src.data.drought.loader import DataLoader
@@ -14,9 +28,12 @@ from src.features.drought.build_features import (
 )
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
-from src.models.train_models import run_rbig_models
+from src.models.train_models import get_similarity_scores
+from src.models.similarity import univariate_stats
 from tqdm import tqdm
 from scipy import stats
+from src.experiments.utils import dict_product
+import itertools
 
 DATA_PATH = "/home/emmanuel/projects/2020_rbig_rs/data/drought/results/"
 
@@ -24,18 +41,26 @@ DATA_PATH = "/home/emmanuel/projects/2020_rbig_rs/data/drought/results/"
 def main(args):
 
     # Load data
+    logger.info("Loading datacube...")
     drought_cube = DataLoader().load_data(args.region, args.sampling)
 
     # get cali geometry
-    cali_geoms = get_cali_geometry()
+    logger.info("Getting shapefile...")
+    if args.region in ["conus"]:
+        shape_file = get_cali_geometry()
+    else:
+        raise ValueError("Unrecognized region.")
 
     # subset datacube with cali
-    drought_cube = mask_datacube(drought_cube, cali_geoms)
+    logger.info(f"Masking dataset with {args.region} shapefile.")
+    drought_cube = mask_datacube(drought_cube, shape_file)
 
     # do interpolation
+    logger.info(f"Interpolating time dims with {args.interp_method} method")
     drought_cube = drought_cube.interpolate_na(dim="time", method=args.interp_method)
 
     # Remove climatology
+    logger.info(f"Removing climatology")
     drought_cube, _ = remove_climatology(drought_cube)
 
     # drought_years
@@ -47,87 +72,74 @@ def main(args):
         "2014": True,
         "2015": True,
     }
-    # MI elements
-    common_vars = [
-        ("VOD", "NDVI"),
-        ("VOD", "LST"),
-        ("VOD", "SM"),
-        ("NDVI", "LST"),
-        ("NDVI", "SM"),
-        ("LST", "SM"),
-    ]
+    # # MI elements
+    # variables_names = ["VOD", "NDVI", "LST", "SM"]
 
-    time_steps = range(1, 12)
-    spatial = 1
+    # ========================
+    # Experimental Parameters
+    # ========================
+    parameters = {}
+    parameters["cubes"] = list(drought_cube.groupby("time.year"))
+    parameters["temporal"] = np.arange(1, 12)
+    parameters["spatial"] = [1]
+
+    parameters = list(dict_product(parameters))
+
     results_df_single = pd.DataFrame()
 
-    with tqdm(drought_cube.groupby("time.year")) as years_bar:
-        # group datacube by years
-        for iyear, icube in years_bar:
+    with tqdm(parameters) as params:
+        for iparams in params:
 
-            # Loop through time steps
-            for itime_step in time_steps:
+            # extract density cubes
+            vod_df, lst_df, ndvi_df, sm_df = get_density_cubes(
+                iparams["cubes"][1], iparams["spatial"], iparams["temporal"]
+            )
 
-                # extract density cubes
-                vod_df, lst_df, ndvi_df, sm_df = get_density_cubes(
-                    icube, spatial, itime_step
+            # get common elements
+            dfs = get_common_elements_many([vod_df, lst_df, ndvi_df, sm_df])
+
+            variables = {"VOD": dfs[0], "NDVI": dfs[1], "SM": dfs[2], "LST": dfs[3]}
+
+            # do calculations for H, TC
+            for (ivar, jvar) in itertools.permutations(variables.keys(), 2):
+
+                # standardize data
+                X_norm = StandardScaler().fit_transform(variables[ivar])
+                Y_norm = StandardScaler().fit_transform(variables[jvar])
+
+                # Univariate statistics (pearson, spearman, kendall's tau)
+                uni_stats = univariate_stats(X_norm, Y_norm)
+
+                # entropy, total correlation
+                multivar_stats = get_similarity_scores(
+                    X_norm, Y_norm, subsample=args.subsample,
                 )
 
-                # get common elements
-                dfs = get_common_elements_many([vod_df, lst_df, ndvi_df, sm_df])
-                vod_df, lst_df, ndvi_df, sm_df = dfs[0], dfs[1], dfs[2], dfs[3]
+                # get H and TC
+                results_df_single = results_df_single.append(
+                    {
+                        "year": iparams["cubes"][0],
+                        "drought": drought_years[str(iparams["cubes"][0])],
+                        "samples": X_norm.shape[0],
+                        "temporal": iparams["temporal"],
+                        "variable1": ivar,
+                        "variable2": jvar,
+                        **multivar_stats,
+                        **uni_stats,
+                    },
+                    ignore_index=True,
+                )
 
-                variables = {"VOD": vod_df, "NDVI": ndvi_df, "SM": sm_df, "LST": lst_df}
+                results_df_single.to_csv(DATA_PATH + args.save)
 
-                # do calculations for H, TC
-                for (ivar, jvar) in common_vars:
-
-                    # Pearson coeffcient
-                    pears = stats.pearsonr(
-                        variables[ivar].values.ravel(), variables[jvar].values.ravel()
-                    )[0]
-
-                    # Spearman Coefficient
-                    spears = stats.spearmanr(
-                        variables[ivar].values.ravel(), variables[jvar].values.ravel()
-                    )[0]
-
-                    # normalize data
-                    X_norm = StandardScaler().fit_transform(variables[ivar])
-                    Y_norm = StandardScaler().fit_transform(variables[jvar])
-
-                    # entropy, total correlation
-                    mi, t_ = run_rbig_models(
-                        X_norm, Y_norm, measure="mi", random_state=123
-                    )
-
-                    # get H and TC
-                    results_df_single = results_df_single.append(
-                        {
-                            "year": iyear,
-                            "drought": drought_years[str(iyear)],
-                            "samples": X_norm.shape[0],
-                            "temporal": itime_step,
-                            "variable1": ivar,
-                            "variable2": jvar,
-                            "mi": mi,
-                            "pearson": pears,
-                            "spearman": spears,
-                            "time": t_,
-                        },
-                        ignore_index=True,
-                    )
-
-                    results_df_single.to_csv(DATA_PATH + args.save)
-
-                    postfix = dict(
-                        Dims=f"{itime_step}",
-                        Variable1=f"{ivar}",
-                        Variable2=f"{jvar}",
-                        MI=f"{mi:.3f}",
-                        time=f"{t_:.2f}",
-                    )
-                    years_bar.set_postfix(postfix)
+                postfix = dict(
+                    Year=f"{iparams['cubes'][0]}",
+                    Temporal=f"{iparams['temporal']}",
+                    Spatial=f"{iparams['spatial']}",
+                    Variable1=f"{ivar}",
+                    Variable2=f"{jvar}",
+                )
+                params.set_postfix(postfix)
 
 
 if __name__ == "__main__":
@@ -156,11 +168,13 @@ if __name__ == "__main__":
         type=int,
         help="Window length for climatology.",
     )
-
+    parser.add_argument(
+        "--subsample", type=int, default=10_000, help="subset points to take"
+    )
     # logistics
     parser.add_argument(
         "--save",
-        default="group_trial_v1.csv",
+        default="exp_group_v0.csv",
         type=str,
         help="Save Name for data results.",
     )
