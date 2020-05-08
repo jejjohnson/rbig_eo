@@ -19,14 +19,11 @@ from tqdm import tqdm
 from src.data.drought.loader import DataLoader
 from src.experiments.utils import dict_product
 from src.features.drought.build_features import (
-    get_cali_emdata,
     get_cali_geometry,
     get_common_elements_many,
     get_density_cubes,
-    get_drought_years,
     mask_datacube,
     remove_climatology,
-    smooth_vod_signal,
 )
 from src.models.similarity import rbig_h_measures
 

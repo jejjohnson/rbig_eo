@@ -19,10 +19,7 @@ from src.data.drought.loader import DataLoader
 from src.features.drought.build_features import (
     get_cali_geometry,
     mask_datacube,
-    smooth_vod_signal,
     remove_climatology,
-    get_cali_emdata,
-    get_drought_years,
     get_density_cubes,
     get_common_elements_many,
 )
