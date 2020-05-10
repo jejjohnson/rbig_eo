@@ -1,159 +1,183 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url>
      <loc>https://jejjohnson.github.io/rbig_eo/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/0_visualize/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/1.1_compare_similar/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/1.2_compare_all/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/2.1_regridding/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/amip/0_data_download/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/amip/1.1_compare_similar-Copy1/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/amip/1_regridding/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/amip/2_time_overlap/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/amip/3.1_demo_exp_global/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/amip/3.2_demo_exp_spatial/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/amip/3.2_demo_it_measures/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/amip/4.1_visualize_global/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/amip/4.2_visualize_spatial/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/amip/4.3_visualize_local_indi/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/amip/4.4_visualize_local_compare/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/rcp/0_data_download/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/climate/rcp/3.2_demo_it_measures-Copy1/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/drought/1.1_drought_features/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/drought/1_drought_features/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/drought/2_experiment_example/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://jejjohnson.github.io/rbig_eo/notebooks/drought/3.0_viz_entropy/</loc>
+     <lastmod>2020-05-10</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://jejjohnson.github.io/rbig_eo/notebooks/drought/3.1_viz_similarity/</loc>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/drought/visualization/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/explore/kernel_alignment/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/explore/variation_of_information/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/spatial_temporal/1.0_load_esdc/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/spatial_temporal/1_experiment_walkthrough/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/spatial_temporal/2.0_methods_walkthrough/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/spatial_temporal/2.1_model_walkthrough/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/spatial_temporal/3.0_exp1_walkthrough/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/spatial_temporal/3.1_exp1_walkthrough_dask/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/spatial_temporal/3.1_exp2_results/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/spatial_temporal/3.1_exp2_results_prelim/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/spatial_temporal/3.1_exp2_results_prelim_models/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/spatial_temporal/3.2_exp1_results/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://jejjohnson.github.io/rbig_eo/notebooks/spatial_temporal/4.0_infoearth_walkthrough/</loc>
+     <lastmod>2020-05-10</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://jejjohnson.github.io/rbig_eo/notebooks/spatial_temporal/4.1_infoearth_viz_entropy/</loc>
+     <lastmod>2020-05-10</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://jejjohnson.github.io/rbig_eo/notebooks/spatial_temporal/4.2_infoearth_viz_info/</loc>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notebooks/spatial_temporal/Untitled/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
+     <changefreq>daily</changefreq>
+    </url><url>
+     <loc>https://jejjohnson.github.io/rbig_eo/notebooks/spatial_temporal/toy_example/</loc>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notes/experiments/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notes/ideas/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notes/paper/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url><url>
      <loc>https://jejjohnson.github.io/rbig_eo/notes/todo/</loc>
-     <lastmod>2020-05-05</lastmod>
+     <lastmod>2020-05-10</lastmod>
      <changefreq>daily</changefreq>
     </url>
 </urlset>

@@ -590,6 +590,30 @@
 
 
   <li class="md-nav__item">
+    <a href="../../drought/3.0_viz_entropy/" title="3.0 viz entropy" class="md-nav__link">
+      3.0 viz entropy
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../drought/3.1_viz_similarity/" title="3.1 viz similarity" class="md-nav__link">
+      3.1 viz similarity
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../../drought/visualization/" title="Visualization" class="md-nav__link">
       Visualization
     </a>
@@ -884,8 +908,56 @@
 
 
   <li class="md-nav__item">
+    <a href="../4.0_infoearth_walkthrough/" title="4.0 infoearth walkthrough" class="md-nav__link">
+      4.0 infoearth walkthrough
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../4.1_infoearth_viz_entropy/" title="4.1 infoearth viz entropy" class="md-nav__link">
+      4.1 infoearth viz entropy
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../4.2_infoearth_viz_info/" title="4.2 infoearth viz info" class="md-nav__link">
+      4.2 infoearth viz info
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
     <a href="../Untitled/" title="Untitled" class="md-nav__link">
       Untitled
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../toy_example/" title="Toy example" class="md-nav__link">
+      Toy example
     </a>
   </li>
 
@@ -1181,28 +1253,13 @@
 
 </div>
 
-<div class="output_wrapper" markdown="1">
-<div class="output" markdown="1">
-
-
-<div class="output_area" markdown="1">
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>The autoreload extension is already loaded. To reload it, use:
-  %reload_ext autoreload
-</pre>
 </div>
-</div>
-
-</div>
-</div>
-
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
 <div class="text_cell_render border-box-sizing rendered_html" markdown="1"></p>
 <h2 id="experiment-steps">Experiment Steps<a class="headerlink" href="#experiment-steps" title="Permanent link">&para;</a></h2>
 <p></div>
 </div></p>
-</div>
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <p><div class="inner_cell" markdown="1">
@@ -1246,7 +1303,7 @@
 
 <div class="output_area" markdown="1">
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>72
+<pre>2
 </pre>
 </div>
 </div>
@@ -1330,69 +1387,6 @@
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">xcube.core.geom</span> <span class="kn">import</span> <span class="n">clip_dataset_by_geometry</span>
-</code></pre></div>
-
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="highlight"><pre><span></span><code><span class="n">clip_dataset_by_geometry</span><span class="p">(</span><span class="n">datacube</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
-</code></pre></div>
-
-</div>
-
-<div class="output_wrapper" markdown="1">
-<div class="output" markdown="1">
-
-
-<div class="output_area" markdown="1">
-<div class="output_subarea output_text output_error">
-<pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
-<span class="ansi-green-fg">&lt;ipython-input-46-ca6db0fe9704&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
-<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>clip_dataset_by_geometry<span class="ansi-blue-fg">(</span>datacube<span class="ansi-blue-fg">,</span> t<span class="ansi-blue-fg">)</span>
-
-<span class="ansi-red-fg">NameError</span>: name &#39;datacube&#39; is not defined</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="highlight"><pre><span></span><code><span class="n">t</span> <span class="o">=</span> <span class="n">get_spain</span><span class="p">()</span>
-<span class="nb">type</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
-</code></pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper" markdown="1">
-<div class="output" markdown="1">
-
-
-<div class="output_area" markdown="1">
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>src.features.spatial.RegionShape</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
 <div class="highlight"><pre><span></span><code><span class="n">results</span> <span class="o">=</span> <span class="n">step</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">smoke_test</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 
@@ -1437,17 +1431,21 @@
       <th>variable</th>
       <th>spatial</th>
       <th>temporal</th>
-      <th>rv_coeff</th>
-      <th>rv_x_norm</th>
-      <th>rv_y_norm</th>
-      <th>rv_xy_norm</th>
-      <th>rv_time</th>
+      <th>rv_coef</th>
+      <th>x_norm</th>
+      <th>y_norm</th>
+      <th>xy_norm</th>
+      <th>cka_coeff</th>
+      <th>cka_y_norm</th>
+      <th>cka_x_norm</th>
+      <th>cka_xy_norm</th>
       <th>rbig_H_x</th>
       <th>rbig_H_y</th>
       <th>rbig_H_time</th>
       <th>rbig_I_xy</th>
       <th>rbig_I_time</th>
-      <th>rbig_vi_coeff</th>
+      <th>rbig_I_xx</th>
+      <th>rbig_Ixx_time</th>
     </tr>
   </thead>
   <tbody>
@@ -1458,17 +1456,21 @@
       <td>root_moisture</td>
       <td>1</td>
       <td>1</td>
-      <td>0.008708</td>
-      <td>99.076675</td>
-      <td>98.467598</td>
-      <td>84.950752</td>
-      <td>0.004481</td>
-      <td>1.957902</td>
-      <td>1.929358</td>
-      <td>0.172222</td>
-      <td>0.030747</td>
-      <td>0.482542</td>
-      <td>0.01582</td>
+      <td>1.0</td>
+      <td>78.507996</td>
+      <td>78.507996</td>
+      <td>6163.505371</td>
+      <td>1.0</td>
+      <td>33.539061</td>
+      <td>33.539061</td>
+      <td>1124.868597</td>
+      <td>1.957913</td>
+      <td>1.957913</td>
+      <td>0.27093</td>
+      <td>24.79073</td>
+      <td>0.719313</td>
+      <td>24.79073</td>
+      <td>0.602488</td>
     </tr>
   </tbody>
 </table>
