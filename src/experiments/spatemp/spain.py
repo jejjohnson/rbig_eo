@@ -150,7 +150,7 @@ def experiment_step(
     # experiment - Data
     # ======================
     # Get DataCube
-    datacube = get_dataset(params["variable"])
+    datacube = get_dataset(params["variable"])[params["variable"]]
 
     # subset datacube (spatially)
     datacube = select_region(xr_data=datacube, bbox=params["region"])[

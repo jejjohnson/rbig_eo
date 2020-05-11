@@ -115,21 +115,6 @@ logger = logging.getLogger()
 
 </div>
 
-<div class="output_wrapper" markdown="1">
-<div class="output" markdown="1">
-
-
-<div class="output_area" markdown="1">
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>The autoreload extension is already loaded. To reload it, use:
-  %reload_ext autoreload
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered" markdown="1">
 <div class="inner_cell" markdown="1">
@@ -181,7 +166,7 @@ smoke_test = True
 
 <div class="output_area" markdown="1">
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>72
+<pre>2
 </pre>
 </div>
 </div>
@@ -268,72 +253,6 @@ def step(params: Dict, smoke_test: bool=False):
 <div class="input">
 
 ```python
-from xcube.core.geom import clip_dataset_by_geometry
-```
-
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered" markdown="1">
-<div class="input">
-
-```python
-clip_dataset_by_geometry(datacube, t)
-```
-
-</div>
-
-<div class="output_wrapper" markdown="1">
-<div class="output" markdown="1">
-
-
-<div class="output_area" markdown="1">
-<div class="output_subarea output_text output_error">
-<pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
-<span class="ansi-green-fg">&lt;ipython-input-46-ca6db0fe9704&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
-<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>clip_dataset_by_geometry<span class="ansi-blue-fg">(</span>datacube<span class="ansi-blue-fg">,</span> t<span class="ansi-blue-fg">)</span>
-
-<span class="ansi-red-fg">NameError</span>: name &#39;datacube&#39; is not defined</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered" markdown="1">
-<div class="input">
-
-```python
-t = get_spain()
-type(t)
-```
-
-</div>
-
-<div class="output_wrapper" markdown="1">
-<div class="output" markdown="1">
-
-
-<div class="output_area" markdown="1">
-
-
-<div class="output_text output_subarea output_execute_result">
-<pre>src.features.spatial.RegionShape</pre>
-</div>
-
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered" markdown="1">
-<div class="input">
-
-```python
 results = step(params[0], smoke_test=True)
 ```
 
@@ -379,17 +298,21 @@ results
       <th>variable</th>
       <th>spatial</th>
       <th>temporal</th>
-      <th>rv_coeff</th>
-      <th>rv_x_norm</th>
-      <th>rv_y_norm</th>
-      <th>rv_xy_norm</th>
-      <th>rv_time</th>
+      <th>rv_coef</th>
+      <th>x_norm</th>
+      <th>y_norm</th>
+      <th>xy_norm</th>
+      <th>cka_coeff</th>
+      <th>cka_y_norm</th>
+      <th>cka_x_norm</th>
+      <th>cka_xy_norm</th>
       <th>rbig_H_x</th>
       <th>rbig_H_y</th>
       <th>rbig_H_time</th>
       <th>rbig_I_xy</th>
       <th>rbig_I_time</th>
-      <th>rbig_vi_coeff</th>
+      <th>rbig_I_xx</th>
+      <th>rbig_Ixx_time</th>
     </tr>
   </thead>
   <tbody>
@@ -400,17 +323,21 @@ results
       <td>root_moisture</td>
       <td>1</td>
       <td>1</td>
-      <td>0.008708</td>
-      <td>99.076675</td>
-      <td>98.467598</td>
-      <td>84.950752</td>
-      <td>0.004481</td>
-      <td>1.957902</td>
-      <td>1.929358</td>
-      <td>0.172222</td>
-      <td>0.030747</td>
-      <td>0.482542</td>
-      <td>0.01582</td>
+      <td>1.0</td>
+      <td>78.507996</td>
+      <td>78.507996</td>
+      <td>6163.505371</td>
+      <td>1.0</td>
+      <td>33.539061</td>
+      <td>33.539061</td>
+      <td>1124.868597</td>
+      <td>1.957913</td>
+      <td>1.957913</td>
+      <td>0.27093</td>
+      <td>24.79073</td>
+      <td>0.719313</td>
+      <td>24.79073</td>
+      <td>0.602488</td>
     </tr>
   </tbody>
 </table>

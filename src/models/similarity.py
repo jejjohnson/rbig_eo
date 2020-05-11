@@ -61,7 +61,8 @@ def rv_coefficient(
 ) -> Dict:
     """simple function to calculate the rv coefficient"""
     t0 = time.time()
-    X, Y = subset_indices(X, Y, subsample, random_state)
+    X = subset_indices(X, subsample=subsample, random_state=random_state)
+    Y = subset_indices(Y, subsample=subsample, random_state=random_state)
 
     # calculate the kernel matrices
     X_gram = linear_kernel(X)
@@ -110,7 +111,8 @@ def cka_coefficient(
 ) -> Dict:
     """simple function to calculate the rv coefficient"""
 
-    X, Y = subset_indices(X, Y, subsample, random_state)
+    X = subset_indices(X, subsample=subsample, random_state=random_state)
+    Y = subset_indices(Y, subsample=subsample, random_state=random_state)
 
     # estimate sigmas
     sigma_X = estimate_sigma(X, percent=50)
@@ -147,7 +149,8 @@ def rbig_it_measures(
     subsample: Optional[int] = 100_000,
     random_state: int = 123,
 ) -> Dict:
-    X, Y = subset_indices(X, Y, subsample, random_state)
+    X = subset_indices(X, subsample=subsample, random_state=random_state)
+    Y = subset_indices(Y, subsample=subsample, random_state=random_state)
     n_layers = 10000
     rotation_type = "PCA"
     random_state = 0
@@ -210,6 +213,7 @@ def rbig_h_measures(
     zero_tolerance = 60
     pdf_extension = 10
 
+    X = subset_indices(X, subsample=subsample, random_state=random_state)
     t0 = time.time()
     # Initialize RBIG class
     H_rbig_model = RBIG(

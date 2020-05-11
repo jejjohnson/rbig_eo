@@ -22,7 +22,7 @@ dependencies:
 - conda-forge::cartopy
 - datashader
 # GEOSPATIAL PACKAGES
-- geopandas
+- geopandas==0.7
 - conda-forge::regionmask
 - conda-forge::xesmf
 - conda-forge::xcube

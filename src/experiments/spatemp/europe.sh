@@ -1,7 +1,6 @@
 #!/bin/bash
-#SBATCH --nodes=3
-#SBATCH --ntasks=3
-#SBATCH --ntasks-per-node=1
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
 #SBATCH --cpus-per-task=28
 #SBATCH --exclude=nodo17
 #SBATCH --workdir=/home/emmanuel/projects/2020_rbig_rs/
@@ -11,7 +10,8 @@
 module load Anaconda3
 source activate rbig_eo
 
-
-srun --nodes 1 --ntasks 1 python -u src/experiments/spatemp/europe.py --dataset gpp --verbose 1 --save v2 &
-srun --nodes 1 --ntasks 1 python -u src/experiments/spatemp/europe.py --dataset rm --verbose 1 --save v2 &
-srun --nodes 1 --ntasks 1 python -u src/experiments/spatemp/europe.py --dataset lst --verbose 1 --save v2 
+for VARIABLE in gpp rm lst
+do 
+    srun --nodes 1 --ntasks 1 python -u src/experiments/spatemp/info_earth.py --dataset gpp --verbose 1 --save v2
+    wait
+done

@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Optional
 
 import pandas as pd
 import xarray as xr
@@ -20,7 +20,7 @@ def get_common_indices(
 
 
 def standardizer_data(
-    X: pd.DataFrame, Y: pd.DataFrame
+    X: pd.DataFrame, Y: Optional[pd.DataFrame] = None
 ) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Standardize the data"""
     normalizer = StandardScaler(with_mean=True, with_std=True)

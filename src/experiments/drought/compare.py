@@ -32,10 +32,15 @@ from scipy import stats
 from src.experiments.utils import dict_product
 import itertools
 
-DATA_PATH = "/home/emmanuel/projects/2020_rbig_rs/data/drought/results/"
+RES_PATH = PATH.joinpath("data/drought/results/")
 
 
 def main(args):
+
+    # get save name
+    SAVE_NAME = RES_PATH.joinpath(
+        args.save + f"_t{args.temporal}_s{args.spatial}_c{args.compare}.csv"
+    )
 
     # Load data
     logger.info("Loading datacube...")
@@ -77,8 +82,8 @@ def main(args):
     # ========================
     parameters = {}
     parameters["cubes"] = list(drought_cube.groupby("time.year"))
-    parameters["temporal"] = np.arange(1, 12)
-    parameters["spatial"] = [1]
+    parameters["temporal"] = np.arange(1, args.temporal + 1)
+    parameters["spatial"] = np.arange(1, args.spatial + 1)
 
     parameters = list(dict_product(parameters))
 
@@ -86,6 +91,13 @@ def main(args):
 
     with tqdm(parameters) as params:
         for iparams in params:
+            # Update progress bar
+            postfix = dict(
+                Year=f"{iparams['cubes'][0]}",
+                Temporal=f"{iparams['temporal']}",
+                Spatial=f"{iparams['spatial']}",
+            )
+            params.set_postfix(postfix)
 
             # extract density cubes
             vod_df, lst_df, ndvi_df, sm_df = get_density_cubes(
@@ -97,46 +109,50 @@ def main(args):
 
             variables = {"VOD": dfs[0], "NDVI": dfs[1], "SM": dfs[2], "LST": dfs[3]}
 
+            # get unique permutations
+            res = set(
+                tuple(
+                    frozenset(sub)
+                    for sub in set(
+                        list(itertools.permutations(variables.keys(), args.compare))
+                    )
+                )
+            )
             # do calculations for H, TC
-            for (ivar, jvar) in itertools.permutations(variables.keys(), 2):
+            with tqdm(res) as iter_vars:
+                for (ivar, jvar) in iter_vars:
 
-                # standardize data
-                X_norm = StandardScaler().fit_transform(variables[ivar])
-                Y_norm = StandardScaler().fit_transform(variables[jvar])
+                    prefix = dict(Variable1=f"{ivar}", Variable2=f"{jvar}",)
+                    iter_vars.set_postfix(prefix)
 
-                # Univariate statistics (pearson, spearman, kendall's tau)
-                uni_stats = univariate_stats(X_norm, Y_norm)
+                    # standardize data
+                    X_norm = StandardScaler().fit_transform(variables[ivar])
+                    Y_norm = StandardScaler().fit_transform(variables[jvar])
 
-                # entropy, total correlation
-                multivar_stats = get_similarity_scores(
-                    X_norm, Y_norm, subsample=args.subsample,
-                )
+                    # Univariate statistics (pearson, spearman, kendall's tau)
+                    uni_stats = univariate_stats(X_norm, Y_norm)
 
-                # get H and TC
-                results_df_single = results_df_single.append(
-                    {
-                        "year": iparams["cubes"][0],
-                        "drought": drought_years[str(iparams["cubes"][0])],
-                        "samples": X_norm.shape[0],
-                        "temporal": iparams["temporal"],
-                        "variable1": ivar,
-                        "variable2": jvar,
-                        **multivar_stats,
-                        **uni_stats,
-                    },
-                    ignore_index=True,
-                )
+                    # entropy, total correlation
+                    multivar_stats = get_similarity_scores(
+                        X_norm, Y_norm, subsample=args.subsample,
+                    )
 
-                results_df_single.to_csv(DATA_PATH + args.save)
+                    # get H and TC
+                    results_df_single = results_df_single.append(
+                        {
+                            "year": iparams["cubes"][0],
+                            "drought": drought_years[str(iparams["cubes"][0])],
+                            "samples": X_norm.shape[0],
+                            "temporal": iparams["temporal"],
+                            "variable1": ivar,
+                            "variable2": jvar,
+                            **multivar_stats,
+                            **uni_stats,
+                        },
+                        ignore_index=True,
+                    )
 
-                postfix = dict(
-                    Year=f"{iparams['cubes'][0]}",
-                    Temporal=f"{iparams['temporal']}",
-                    Spatial=f"{iparams['spatial']}",
-                    Variable1=f"{ivar}",
-                    Variable2=f"{jvar}",
-                )
-                params.set_postfix(postfix)
+                    results_df_single.to_csv(SAVE_NAME)
 
 
 if __name__ == "__main__":
@@ -168,11 +184,21 @@ if __name__ == "__main__":
     parser.add_argument(
         "--subsample", type=int, default=10_000, help="subset points to take"
     )
+    parser.add_argument(
+        "-c", "--compare", type=int, default=2, help="variables to compare"
+    )
+    parser.add_argument(
+        "-t",
+        "--temporal",
+        type=int,
+        default=12,
+        help="Max number of temporal dimensions",
+    )
+    parser.add_argument(
+        "-s", "--spatial", type=int, default=1, help="Max number of spatial dimensions"
+    )
     # logistics
     parser.add_argument(
-        "--save",
-        default="exp_group_v0.csv",
-        type=str,
-        help="Save Name for data results.",
+        "--save", default="drought_v0", type=str, help="Save Name for data results.",
     )
     main(parser.parse_args())

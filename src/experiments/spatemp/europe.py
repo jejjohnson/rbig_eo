@@ -35,20 +35,21 @@ from src.features.preprocessing import (
 RES_PATH = pathlib.Path(str(root)).joinpath("data/spa_temp/trial_experiment")
 
 
-def get_parameters(variable: str) -> Dict:
+def get_parameters(args) -> Dict:
 
     parameters = {}
-    if variable == "gpp":
+    if args.variable == "gpp":
         parameters["variable"] = ["gross_primary_productivity"]
-    elif variable == "rm":
+    elif args.variable == "rm":
         parameters["variable"] = ["root_moisture"]
-    elif variable == "sm":
+    elif args.variable == "sm":
         parameters["variable"] = ["soil_moisture"]
-    elif variable == "lst":
+    elif args.variable == "lst":
         parameters["variable"] = ["land_surface_temperature"]
     else:
         raise ValueError("Unrecognized variable")
-
+    
+    if args.region == 'spain':
     parameters["region"] = [get_europe()]
     parameters["period"] = [
         get_winter_time(),

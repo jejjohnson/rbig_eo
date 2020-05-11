@@ -79,7 +79,7 @@ test:  ## Test code using pytest.
 ##@ Notebooks
 
 notebooks: notebooks/* # Convert notebooks to html files
-		jupyter nbconvert --config nbconfig.py --execute --ExecutePreprocessor.kernel_name="pymc4-dev" --ExecutePreprocessor.timeout=1200
+		jupyter nbconvert --config nbconfig.py --execute --ExecutePreprocessor.kernel_name="pymc4-dev" --ExecutePreprocessor.timeout=1200 --TagRemovePreprocessor.remove_cell_tags='{"remove_cell"}'
 		rm notebooks/*.html
 
 
