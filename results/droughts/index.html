@@ -1255,6 +1255,7 @@
 <p>We have a spatial resolution of ... and a temporal resolution of 14 days.</p>
 <hr />
 <h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
+<p><strong>Entropy</strong></p>
 <p>For this first experiment, we only want to classify the expected uncertainty that each variable has with different temporal representations. So for example, we can do self-comparisons like what's the expected uncertainty of VOD with 1 temporal dimension versus 3 temporal dimensions? We will do this for all 4 variables individually. We will use RBIG to measure the expected uncertainty (aka Entropy)</p>
 <div>
 <div class="MathJax_Preview">
@@ -1264,6 +1265,23 @@ H(\mathbf{X}) = \mathbb{E}_\mathbf{x} \left[ -\log p(\mathbf{x}) \right]
 H(\mathbf{X}) = \mathbb{E}_\mathbf{x} \left[ -\log p(\mathbf{x}) \right]
 </script>
 </div>
+<p><strong>Similarity</strong></p>
+<p>For this second experiment, we want to see how <strong>similar</strong> VOD is to the other variables under different spatial-temporal representations. E.g. VOD vs. SM, VOD vs. NDVI, etc. So there are a few ways to do this. We want to show that we can do it with Mutual Information (MI) because it uses probability distributions:</p>
+<div>
+<div class="MathJax_Preview">
+I(\mathbf{X,Y}) = H(\mathbf{X}) + H(\mathbf{Y}) - 2 H(\mathbf{X,Y})
+</div>
+<script type="math/tex; mode=display">
+I(\mathbf{X,Y}) = H(\mathbf{X}) + H(\mathbf{Y}) - 2 H(\mathbf{X,Y})
+</script>
+</div>
+<p>We also have some of the standard measures like</p>
+<ul>
+<li>Pearson correlation coefficient</li>
+<li>Spearman correlation coefficient</li>
+<li>RV-Coefficient (Multivariate extension of pearson)</li>
+<li>centered kernel alignment (CKA)</li>
+</ul>
 <hr />
 <h4 id="hypothesis">Hypothesis<a class="headerlink" href="#hypothesis" title="Permanent link">&para;</a></h4>
 <p>Adding temporal features will definitely increase the amount of entropy within a variable. We also expect to see some differences in the entropy value obtained from the different variables. However, there should be a point where adding more temporal dimensions may not add much more information.</p>
