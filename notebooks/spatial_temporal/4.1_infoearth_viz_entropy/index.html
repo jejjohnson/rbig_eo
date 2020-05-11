@@ -1388,11 +1388,12 @@
 
 <div class="output_area" markdown="1">
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>v0_spain_gpp_2002_2010.csv     v0_spain_precip_2010.csv
-v0_spain_gpp_2010.csv          v0_spain_rm_2002_2010.csv
-v0_spain_lst_2002_2010.csv     v0_spain_rm_2010.csv
-v0_spain_lst_2010.csv          v0_spain_sm_2002_2010.csv
-v0_spain_precip_2002_2010.csv  v0_spain_sm_2010.csv
+<pre>v0_europe_rm_2002_2010.csv  v0_spain_precip_2002_2010.csv
+v0_europe_rm_2010.csv       v0_spain_precip_2010.csv
+v0_spain_gpp_2002_2010.csv  v0_spain_rm_2002_2010.csv
+v0_spain_gpp_2010.csv       v0_spain_rm_2010.csv
+v0_spain_lst_2002_2010.csv  v0_spain_sm_2002_2010.csv
+v0_spain_lst_2010.csv       v0_spain_sm_2010.csv
 </pre>
 </div>
 </div>
@@ -1405,9 +1406,9 @@ v0_spain_precip_2002_2010.csv  v0_spain_sm_2010.csv
 
 </div>
 </div>
-<div class="highlight"><pre><span></span><code><span class="n">region</span> <span class="o">=</span> <span class="s2">&quot;spain&quot;</span>
-<span class="n">period</span> <span class="o">=</span> <span class="s2">&quot;2010&quot;</span>
-<span class="n">variable</span> <span class="o">=</span> <span class="s2">&quot;gpp&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="n">region</span> <span class="o">=</span> <span class="s2">&quot;europe&quot;</span>
+<span class="n">period</span> <span class="o">=</span> <span class="s2">&quot;2002_2010&quot;</span>
+<span class="n">variable</span> <span class="o">=</span> <span class="s2">&quot;rm&quot;</span>
 <span class="n">save_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">region</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">variable</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">period</span><span class="si">}</span><span class="s2">&quot;</span>
 
 <span class="c1"># read csv file</span>
@@ -1457,69 +1458,17 @@ v0_spain_precip_2002_2010.csv  v0_spain_sm_2010.csv
   </thead>
   <tbody>
     <tr>
-      <th>19</th>
+      <th>0</th>
       <td>0</td>
-      <td>spain</td>
-      <td>2010</td>
-      <td>gross_primary_productivity</td>
-      <td>5</td>
+      <td>europe</td>
+      <td>2002_2010</td>
+      <td>root_moisture</td>
       <td>2</td>
-      <td>49</td>
-      <td>25515</td>
-      <td>-34.295229</td>
-      <td>34.543294</td>
-    </tr>
-    <tr>
-      <th>20</th>
-      <td>0</td>
-      <td>spain</td>
-      <td>2010</td>
-      <td>gross_primary_productivity</td>
-      <td>4</td>
-      <td>3</td>
-      <td>49</td>
-      <td>28204</td>
-      <td>-43.380595</td>
-      <td>32.385672</td>
-    </tr>
-    <tr>
-      <th>21</th>
-      <td>0</td>
-      <td>spain</td>
-      <td>2010</td>
-      <td>gross_primary_productivity</td>
-      <td>3</td>
-      <td>5</td>
-      <td>49</td>
-      <td>30240</td>
-      <td>-46.554090</td>
-      <td>32.611567</td>
-    </tr>
-    <tr>
-      <th>22</th>
-      <td>0</td>
-      <td>spain</td>
-      <td>2010</td>
-      <td>gross_primary_productivity</td>
-      <td>2</td>
-      <td>12</td>
-      <td>49</td>
-      <td>28245</td>
-      <td>-47.984638</td>
-      <td>41.864372</td>
-    </tr>
-    <tr>
-      <th>23</th>
-      <td>0</td>
-      <td>spain</td>
-      <td>2010</td>
-      <td>gross_primary_productivity</td>
       <td>1</td>
-      <td>46</td>
-      <td>49</td>
-      <td>899</td>
-      <td>-42.540205</td>
-      <td>13.894681</td>
+      <td>4</td>
+      <td>5847520</td>
+      <td>2.493516</td>
+      <td>64.356101</td>
     </tr>
   </tbody>
 </table>
