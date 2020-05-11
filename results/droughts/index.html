@@ -1,0 +1,1687 @@
+
+
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="RBIG for Earth Observation">
+      
+      
+        <link rel="canonical" href="https://jejjohnson.github.io/rbig_eo/results/droughts/">
+      
+      
+        <meta name="author" content="J. Emmanuel Johnson">
+      
+      <link rel="shortcut icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.1, mkdocs-material-5.1.4">
+    
+    
+      
+        <title>Results for Droughts - RBIG4EO</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.c4007cdc.min.css">
+      
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.8435c73a.min.css">
+      
+      
+        
+        
+        <meta name="theme-color" content="">
+      
+    
+    
+    
+      
+        <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CSource+Code+Pro&display=fallback">
+        <style>body,input{font-family:"Roboto",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif}code,kbd,pre{font-family:"Source Code Pro",SFMono-Regular,Consolas,Menlo,monospace}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="../../css/ansi-colours.css">
+    
+      <link rel="stylesheet" href="../../css/jupyter-cells.css">
+    
+      <link rel="stylesheet" href="../../css/pandas-dataframe.css">
+    
+    
+      
+    
+    
+  </head>
+  
+  
+    
+    
+    <body dir="ltr" data-md-color-primary="black" data-md-color-accent="gray">
+  
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#results-for-droughts" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid" aria-label="Header">
+    <a href="https://jejjohnson.github.io/rbig_eo" title="RBIG4EO" class="md-header-nav__button md-logo" aria-label="RBIG4EO">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header-nav__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header-nav__title" data-md-component="header-title">
+      
+        <div class="md-header-nav__ellipsis">
+          <span class="md-header-nav__topic md-ellipsis">
+            RBIG4EO
+          </span>
+          <span class="md-header-nav__topic md-ellipsis">
+            
+              Results for Droughts
+            
+          </span>
+        </div>
+      
+    </div>
+    
+      <label class="md-header-nav__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active">
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" data-md-component="search-reset" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header-nav__source">
+        
+<a href="https://github.com/jejjohnson/rbig_eo/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jejjohnson/rbig_eo
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+        
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="https://jejjohnson.github.io/rbig_eo" title="RBIG4EO" class="md-nav__button md-logo" aria-label="RBIG4EO">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    RBIG4EO
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/jejjohnson/rbig_eo/" title="Go to repository" class="md-source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05L244 40.45a28.87 28.87 0 00-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 01-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 000 40.81l195.61 195.6a28.86 28.86 0 0040.8 0l194.69-194.69a28.86 28.86 0 000-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    jejjohnson/rbig_eo
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+
+  <li class="md-nav__item">
+    <a href="../.." title="RBIG4EO" class="md-nav__link">
+      RBIG4EO
+    </a>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2" type="checkbox" id="nav-2">
+    
+    <label class="md-nav__link" for="nav-2">
+      Notebooks
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Notebooks" data-md-level="1">
+      <label class="md-nav__title" for="nav-2">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Notebooks
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-1" type="checkbox" id="nav-2-1">
+    
+    <label class="md-nav__link" for="nav-2-1">
+      Climate
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Climate" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-1">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Climate
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/0_visualize/" title="0 visualize" class="md-nav__link">
+      0 visualize
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/1.1_compare_similar/" title="1.1 compare similar" class="md-nav__link">
+      1.1 compare similar
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/1.2_compare_all/" title="1.2 compare all" class="md-nav__link">
+      1.2 compare all
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/2.1_regridding/" title="2.1 regridding" class="md-nav__link">
+      2.1 regridding
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-1-5" type="checkbox" id="nav-2-1-5">
+    
+    <label class="md-nav__link" for="nav-2-1-5">
+      Amip
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Amip" data-md-level="3">
+      <label class="md-nav__title" for="nav-2-1-5">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Amip
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/amip/0_data_download/" title="0 data download" class="md-nav__link">
+      0 data download
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/amip/1.1_compare_similar-Copy1/" title="1.1 compare similar Copy1" class="md-nav__link">
+      1.1 compare similar Copy1
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/amip/1_regridding/" title="1 regridding" class="md-nav__link">
+      1 regridding
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/amip/2_time_overlap/" title="2 time overlap" class="md-nav__link">
+      2 time overlap
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/amip/3.1_demo_exp_global/" title="3.1 demo exp global" class="md-nav__link">
+      3.1 demo exp global
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/amip/3.2_demo_exp_spatial/" title="3.2 demo exp spatial" class="md-nav__link">
+      3.2 demo exp spatial
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/amip/3.2_demo_it_measures/" title="3.2 demo it measures" class="md-nav__link">
+      3.2 demo it measures
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/amip/4.1_visualize_global/" title="4.1 visualize global" class="md-nav__link">
+      4.1 visualize global
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/amip/4.2_visualize_spatial/" title="4.2 visualize spatial" class="md-nav__link">
+      4.2 visualize spatial
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/amip/4.3_visualize_local_indi/" title="4.3 visualize local indi" class="md-nav__link">
+      4.3 visualize local indi
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/amip/4.4_visualize_local_compare/" title="4.4 visualize local compare" class="md-nav__link">
+      4.4 visualize local compare
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-1-6" type="checkbox" id="nav-2-1-6">
+    
+    <label class="md-nav__link" for="nav-2-1-6">
+      Rcp
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Rcp" data-md-level="3">
+      <label class="md-nav__title" for="nav-2-1-6">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Rcp
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/rcp/0_data_download/" title="0 data download" class="md-nav__link">
+      0 data download
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/climate/rcp/3.2_demo_it_measures-Copy1/" title="3.2 demo it measures Copy1" class="md-nav__link">
+      3.2 demo it measures Copy1
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-2" type="checkbox" id="nav-2-2">
+    
+    <label class="md-nav__link" for="nav-2-2">
+      Drought
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Drought" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-2">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Drought
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/drought/1.1_drought_features/" title="1.1 drought features" class="md-nav__link">
+      1.1 drought features
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/drought/1_drought_features/" title="1 drought features" class="md-nav__link">
+      1 drought features
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/drought/2_experiment_example/" title="2 experiment example" class="md-nav__link">
+      2 experiment example
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/drought/3.0_viz_entropy/" title="3.0 viz entropy" class="md-nav__link">
+      3.0 viz entropy
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/drought/3.1_viz_similarity/" title="3.1 viz similarity" class="md-nav__link">
+      3.1 viz similarity
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/drought/3.2_viz_similarity_taylor/" title="3.2 viz similarity taylor" class="md-nav__link">
+      3.2 viz similarity taylor
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/drought/visualization/" title="Visualization" class="md-nav__link">
+      Visualization
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-3" type="checkbox" id="nav-2-3">
+    
+    <label class="md-nav__link" for="nav-2-3">
+      Explore
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Explore" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-3">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Explore
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/explore/kernel_alignment/" title="Kernel alignment" class="md-nav__link">
+      Kernel alignment
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/explore/variation_of_information/" title="Variation of information" class="md-nav__link">
+      Variation of information
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-2-4" type="checkbox" id="nav-2-4">
+    
+    <label class="md-nav__link" for="nav-2-4">
+      Spatial temporal
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Spatial temporal" data-md-level="2">
+      <label class="md-nav__title" for="nav-2-4">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Spatial temporal
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/spatial_temporal/1.0_load_esdc/" title="1.0 load esdc" class="md-nav__link">
+      1.0 load esdc
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/spatial_temporal/1_experiment_walkthrough/" title="1 experiment walkthrough" class="md-nav__link">
+      1 experiment walkthrough
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/spatial_temporal/2.0_methods_walkthrough/" title="2.0 methods walkthrough" class="md-nav__link">
+      2.0 methods walkthrough
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/spatial_temporal/2.1_model_walkthrough/" title="2.1 model walkthrough" class="md-nav__link">
+      2.1 model walkthrough
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/spatial_temporal/3.0_exp1_walkthrough/" title="3.0 exp1 walkthrough" class="md-nav__link">
+      3.0 exp1 walkthrough
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/spatial_temporal/3.1_exp1_walkthrough_dask/" title="3.1 exp1 walkthrough dask" class="md-nav__link">
+      3.1 exp1 walkthrough dask
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/spatial_temporal/3.1_exp2_results/" title="3.1 exp2 results" class="md-nav__link">
+      3.1 exp2 results
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/spatial_temporal/3.1_exp2_results_prelim/" title="3.1 exp2 results prelim" class="md-nav__link">
+      3.1 exp2 results prelim
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/spatial_temporal/3.1_exp2_results_prelim_models/" title="3.1 exp2 results prelim models" class="md-nav__link">
+      3.1 exp2 results prelim models
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/spatial_temporal/3.2_exp1_results/" title="3.2 exp1 results" class="md-nav__link">
+      3.2 exp1 results
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/spatial_temporal/4.0_infoearth_walkthrough/" title="4.0 infoearth walkthrough" class="md-nav__link">
+      4.0 infoearth walkthrough
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/spatial_temporal/4.1_infoearth_viz_entropy/" title="4.1 infoearth viz entropy" class="md-nav__link">
+      4.1 infoearth viz entropy
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/spatial_temporal/4.2_infoearth_viz_info/" title="4.2 infoearth viz info" class="md-nav__link">
+      4.2 infoearth viz info
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/spatial_temporal/Untitled/" title="Untitled" class="md-nav__link">
+      Untitled
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notebooks/spatial_temporal/toy_example/" title="Toy example" class="md-nav__link">
+      Toy example
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+
+  <li class="md-nav__item md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-3" type="checkbox" id="nav-3">
+    
+    <label class="md-nav__link" for="nav-3">
+      Notes
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Notes" data-md-level="1">
+      <label class="md-nav__title" for="nav-3">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Notes
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notes/experiments/" title="Experiments" class="md-nav__link">
+      Experiments
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notes/ideas/" title="Ideas" class="md-nav__link">
+      Ideas
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notes/paper/" title="Paper Outline" class="md-nav__link">
+      Paper Outline
+    </a>
+  </li>
+
+        
+          
+          
+          
+
+
+  <li class="md-nav__item">
+    <a href="../../notes/todo/" title="TODO" class="md-nav__link">
+      TODO
+    </a>
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+      
+      
+      
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    
+      <input class="md-nav__toggle md-toggle" data-md-toggle="nav-4" type="checkbox" id="nav-4" checked>
+    
+    <label class="md-nav__link" for="nav-4">
+      Results
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.58L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.42z"/></svg>
+      </span>
+    </label>
+    <nav class="md-nav" aria-label="Results" data-md-level="1">
+      <label class="md-nav__title" for="nav-4">
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+        </span>
+        Results
+      </label>
+      <ul class="md-nav__list" data-md-scrollfix>
+        
+        
+          
+          
+          
+
+  
+
+
+  <li class="md-nav__item md-nav__item--active">
+    
+    <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    
+      
+    
+    
+      <label class="md-nav__link md-nav__link--active" for="__toc">
+        Results for Droughts
+        <span class="md-nav__icon md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 9h14V7H3v2m0 4h14v-2H3v2m0 4h14v-2H3v2m16 0h2v-2h-2v2m0-10v2h2V7h-2m0 6h2v-2h-2v2z"/></svg>
+        </span>
+      </label>
+    
+    <a href="./" title="Results for Droughts" class="md-nav__link md-nav__link--active">
+      Results for Droughts
+    </a>
+    
+      
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#recap" class="md-nav__link">
+    Recap
+  </a>
+  
+    <nav class="md-nav" aria-label="Recap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data" class="md-nav__link">
+    Data
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    Methods
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hypothesis" class="md-nav__link">
+    Hypothesis
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#preprocessing" class="md-nav__link">
+    Preprocessing
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entropy" class="md-nav__link">
+    Entropy
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mutual-information" class="md-nav__link">
+    Mutual Information
+  </a>
+  
+    <nav class="md-nav" aria-label="Mutual Information">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#taylor-diagram" class="md-nav__link">
+    Taylor Diagram
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+    
+  </li>
+
+        
+      </ul>
+    </nav>
+  </li>
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#recap" class="md-nav__link">
+    Recap
+  </a>
+  
+    <nav class="md-nav" aria-label="Recap">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#data" class="md-nav__link">
+    Data
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods" class="md-nav__link">
+    Methods
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hypothesis" class="md-nav__link">
+    Hypothesis
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#preprocessing" class="md-nav__link">
+    Preprocessing
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#entropy" class="md-nav__link">
+    Entropy
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mutual-information" class="md-nav__link">
+    Mutual Information
+  </a>
+  
+    <nav class="md-nav" aria-label="Mutual Information">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#taylor-diagram" class="md-nav__link">
+    Taylor Diagram
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/jejjohnson/rbig_eo/edit/master/docs/results/droughts.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  
+                
+                
+                <h1 id="results-for-droughts">Results for Droughts<a class="headerlink" href="#results-for-droughts" title="Permanent link">&para;</a></h1>
+<h2 id="recap">Recap<a class="headerlink" href="#recap" title="Permanent link">&para;</a></h2>
+<p>Recall that we are trying to investigate how a new variable called Vegetation Optical Depth (VOD) compares to some of the previously used variables Land Surface Temperature (LST), Soil Moisture (SM) and Normalized Vegetation Difference Index (NDVI). The previous variables were often used to recover droughts, but studies have shown that VOD will better characterize drought conditions. So, the objective is to see how these VOD compares to other variables via information theory and other similarity measures. In addition, the data representation could make a difference in how similar VOD is to the other variables. For example, many spatial dimension or many temporal dimensions. So, we are going to look at different representations and different combinations of VOD, LST, SM, and NDVI and do comparisons.</p>
+<hr />
+<h4 id="data">Data<a class="headerlink" href="#data" title="Permanent link">&para;</a></h4>
+<p>For this first set of results, we are looking at the CONUS dataset which is located in California. We have a period of 6 years where there were drought occurences and not drought occurences.</p>
+<ul>
+<li>Droughts - 2012, 2014, 2015)</li>
+<li>No Drought - 2010, 2011, 2013</li>
+</ul>
+<p>We have a spatial resolution of ... and a temporal resolution of 14 days.</p>
+<hr />
+<h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
+<p>For this first experiment, we only want to classify the expected uncertainty that each variable has with different temporal representations. So for example, we can do self-comparisons like what's the expected uncertainty of VOD with 1 temporal dimension versus 3 temporal dimensions? We will do this for all 4 variables individually. We will use RBIG to measure the expected uncertainty (aka Entropy)</p>
+<div>
+<div class="MathJax_Preview">
+H(\mathbf{X}) = \mathbb{E}_\mathbf{x} \left[ -\log p(\mathbf{x}) \right]
+</div>
+<script type="math/tex; mode=display">
+H(\mathbf{X}) = \mathbb{E}_\mathbf{x} \left[ -\log p(\mathbf{x}) \right]
+</script>
+</div>
+<hr />
+<h4 id="hypothesis">Hypothesis<a class="headerlink" href="#hypothesis" title="Permanent link">&para;</a></h4>
+<p>Adding temporal features will definitely increase the amount of entropy within a variable. We also expect to see some differences in the entropy value obtained from the different variables. However, there should be a point where adding more temporal dimensions may not add much more information.</p>
+<blockquote>
+<p>We see some trend that perhaps gives us intuition that there could be a 'sweet' spot for the amount of temporal dimensions to use.</p>
+</blockquote>
+<hr />
+<h4 id="preprocessing">Preprocessing<a class="headerlink" href="#preprocessing" title="Permanent link">&para;</a></h4>
+<ol>
+<li><strong>Climatology</strong></li>
+</ol>
+<p>I remove the climatology because we want to characterize the anomalies outside of the climate patterns.</p>
+<ol>
+<li><strong>Similar Data</strong></li>
+</ol>
+<p>I ensure that the lat-lon-time locations are consistent across variables. </p>
+<p><strong>Note</strong>: We will have less samples as we increase the number of features because of the boundaries.</p>
+<hr />
+<h2 id="entropy">Entropy<a class="headerlink" href="#entropy" title="Permanent link">&para;</a></h2>
+<div class="tabbed-set" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/H_individual_drought.png" /></p>
+</div>
+<input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><label for="__tabbed_1_2">Non-Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/H_individual_nondrought.png" /></p>
+</div>
+<input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><label for="__tabbed_1_3">Both</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/H_individual_both.png" /></p>
+</div>
+</div>
+<h2 id="mutual-information">Mutual Information<a class="headerlink" href="#mutual-information" title="Permanent link">&para;</a></h2>
+<details class="details"><summary>VOD</summary><div class="tabbed-set" data-tabs="2:3"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">Drought</label><div class="tabbed-content">
+<div class="tabbed-set" data-tabs="3:3"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><label for="__tabbed_3_1">MI</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/VOD_I_norm_drought.png" /></p>
+</div>
+<input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><label for="__tabbed_3_2">Pearson</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/VOD_rv_coef_drought.png" /></p>
+</div>
+<input id="__tabbed_3_3" name="__tabbed_3" type="radio" /><label for="__tabbed_3_3">Kernels</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/VOD_cka_coeff_drought.png" /></p>
+</div>
+</div>
+</div>
+<input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><label for="__tabbed_2_2">Not-Drought</label><div class="tabbed-content">
+<div class="tabbed-set" data-tabs="4:3"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><label for="__tabbed_4_1">MI</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/VOD_I_norm_nondrought.png" /></p>
+</div>
+<input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><label for="__tabbed_4_2">Pearson</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/VOD_rv_coef_nondrought.png" /></p>
+</div>
+<input id="__tabbed_4_3" name="__tabbed_4" type="radio" /><label for="__tabbed_4_3">Kernels</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/VOD_cka_coeff_nondrought.png" /></p>
+</div>
+</div>
+</div>
+<input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><label for="__tabbed_2_3">Both</label><div class="tabbed-content">
+<div class="tabbed-set" data-tabs="5:3"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><label for="__tabbed_5_1">MI</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/VOD_I_norm_both.png" /></p>
+</div>
+<input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><label for="__tabbed_5_2">Pearson</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/VOD_rv_coef_both.png" /></p>
+</div>
+<input id="__tabbed_5_3" name="__tabbed_5" type="radio" /><label for="__tabbed_5_3">Kernels</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/VOD_cka_coeff_both.png" /></p>
+</div>
+</div>
+</div>
+</div>
+</details>
+<details class="details"><summary>NDVI</summary><div class="tabbed-set" data-tabs="6:3"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><label for="__tabbed_6_1">Drought</label><div class="tabbed-content">
+<div class="tabbed-set" data-tabs="7:3"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><label for="__tabbed_7_1">MI</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/NDVI_I_norm_drought.png" /></p>
+</div>
+<input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><label for="__tabbed_7_2">Pearson</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/NDVI_rv_coef_drought.png" /></p>
+</div>
+<input id="__tabbed_7_3" name="__tabbed_7" type="radio" /><label for="__tabbed_7_3">Kernels</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/NDVI_cka_coeff_drought.png" /></p>
+</div>
+</div>
+</div>
+<input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><label for="__tabbed_6_2">Not-Drought</label><div class="tabbed-content">
+<div class="tabbed-set" data-tabs="8:3"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><label for="__tabbed_8_1">MI</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/NDVI_I_norm_nondrought.png" /></p>
+</div>
+<input id="__tabbed_8_2" name="__tabbed_8" type="radio" /><label for="__tabbed_8_2">Pearson</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/NDVI_rv_coef_nondrought.png" /></p>
+</div>
+<input id="__tabbed_8_3" name="__tabbed_8" type="radio" /><label for="__tabbed_8_3">Kernels</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/NDVI_cka_coeff_nondrought.png" /></p>
+</div>
+</div>
+</div>
+<input id="__tabbed_6_3" name="__tabbed_6" type="radio" /><label for="__tabbed_6_3">Both</label><div class="tabbed-content">
+<div class="tabbed-set" data-tabs="9:3"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><label for="__tabbed_9_1">MI</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/NDVI_I_norm_both.png" /></p>
+</div>
+<input id="__tabbed_9_2" name="__tabbed_9" type="radio" /><label for="__tabbed_9_2">Pearson</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/NDVI_rv_coef_both.png" /></p>
+</div>
+<input id="__tabbed_9_3" name="__tabbed_9" type="radio" /><label for="__tabbed_9_3">Kernels</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/NDVI_cka_coeff_both.png" /></p>
+</div>
+</div>
+</div>
+</div>
+</details>
+<details class="details"><summary>SM</summary><div class="tabbed-set" data-tabs="10:3"><input checked="checked" id="__tabbed_10_1" name="__tabbed_10" type="radio" /><label for="__tabbed_10_1">Drought</label><div class="tabbed-content">
+<div class="tabbed-set" data-tabs="11:3"><input checked="checked" id="__tabbed_11_1" name="__tabbed_11" type="radio" /><label for="__tabbed_11_1">MI</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/SM_I_norm_drought.png" /></p>
+</div>
+<input id="__tabbed_11_2" name="__tabbed_11" type="radio" /><label for="__tabbed_11_2">Pearson</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/SM_rv_coef_drought.png" /></p>
+</div>
+<input id="__tabbed_11_3" name="__tabbed_11" type="radio" /><label for="__tabbed_11_3">Kernels</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/SM_cka_coeff_drought.png" /></p>
+</div>
+</div>
+</div>
+<input id="__tabbed_10_2" name="__tabbed_10" type="radio" /><label for="__tabbed_10_2">Not-Drought</label><div class="tabbed-content">
+<div class="tabbed-set" data-tabs="12:3"><input checked="checked" id="__tabbed_12_1" name="__tabbed_12" type="radio" /><label for="__tabbed_12_1">MI</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/SM_I_norm_nondrought.png" /></p>
+</div>
+<input id="__tabbed_12_2" name="__tabbed_12" type="radio" /><label for="__tabbed_12_2">Pearson</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/SM_rv_coef_nondrought.png" /></p>
+</div>
+<input id="__tabbed_12_3" name="__tabbed_12" type="radio" /><label for="__tabbed_12_3">Kernels</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/SM_cka_coeff_nondrought.png" /></p>
+</div>
+</div>
+</div>
+<input id="__tabbed_10_3" name="__tabbed_10" type="radio" /><label for="__tabbed_10_3">Both</label><div class="tabbed-content">
+<div class="tabbed-set" data-tabs="13:3"><input checked="checked" id="__tabbed_13_1" name="__tabbed_13" type="radio" /><label for="__tabbed_13_1">MI</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/SM_I_norm_both.png" /></p>
+</div>
+<input id="__tabbed_13_2" name="__tabbed_13" type="radio" /><label for="__tabbed_13_2">Pearson</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/SM_rv_coef_both.png" /></p>
+</div>
+<input id="__tabbed_13_3" name="__tabbed_13" type="radio" /><label for="__tabbed_13_3">Kernels</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/SM_cka_coeff_both.png" /></p>
+</div>
+</div>
+</div>
+</div>
+</details>
+<details class="details"><summary>LST</summary><div class="tabbed-set" data-tabs="14:3"><input checked="checked" id="__tabbed_14_1" name="__tabbed_14" type="radio" /><label for="__tabbed_14_1">Drought</label><div class="tabbed-content">
+<div class="tabbed-set" data-tabs="15:3"><input checked="checked" id="__tabbed_15_1" name="__tabbed_15" type="radio" /><label for="__tabbed_15_1">MI</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/LST_I_norm_drought.png" /></p>
+</div>
+<input id="__tabbed_15_2" name="__tabbed_15" type="radio" /><label for="__tabbed_15_2">Pearson</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/LST_rv_coef_drought.png" /></p>
+</div>
+<input id="__tabbed_15_3" name="__tabbed_15" type="radio" /><label for="__tabbed_15_3">Kernels</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/LST_cka_coeff_drought.png" /></p>
+</div>
+</div>
+</div>
+<input id="__tabbed_14_2" name="__tabbed_14" type="radio" /><label for="__tabbed_14_2">Not-Drought</label><div class="tabbed-content">
+<div class="tabbed-set" data-tabs="16:3"><input checked="checked" id="__tabbed_16_1" name="__tabbed_16" type="radio" /><label for="__tabbed_16_1">MI</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/LST_I_norm_nondrought.png" /></p>
+</div>
+<input id="__tabbed_16_2" name="__tabbed_16" type="radio" /><label for="__tabbed_16_2">Pearson</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/LST_rv_coef_nondrought.png" /></p>
+</div>
+<input id="__tabbed_16_3" name="__tabbed_16" type="radio" /><label for="__tabbed_16_3">Kernels</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/LST_cka_coeff_nondrought.png" /></p>
+</div>
+</div>
+</div>
+<input id="__tabbed_14_3" name="__tabbed_14" type="radio" /><label for="__tabbed_14_3">Both</label><div class="tabbed-content">
+<div class="tabbed-set" data-tabs="17:3"><input checked="checked" id="__tabbed_17_1" name="__tabbed_17" type="radio" /><label for="__tabbed_17_1">MI</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/LST_I_norm_both.png" /></p>
+</div>
+<input id="__tabbed_17_2" name="__tabbed_17" type="radio" /><label for="__tabbed_17_2">Pearson</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/LST_rv_coef_both.png" /></p>
+</div>
+<input id="__tabbed_17_3" name="__tabbed_17" type="radio" /><label for="__tabbed_17_3">Kernels</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/lines/LST_cka_coeff_both.png" /></p>
+</div>
+</div>
+</div>
+</div>
+</details>
+<h3 id="taylor-diagram">Taylor Diagram<a class="headerlink" href="#taylor-diagram" title="Permanent link">&para;</a></h3>
+<details class="details"><summary>Temporal Dims: 1</summary><div class="tabbed-set" data-tabs="18:3"><input checked="checked" id="__tabbed_18_1" name="__tabbed_18" type="radio" /><label for="__tabbed_18_1">Both</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_both_1.png" /></p>
+</div>
+<input id="__tabbed_18_2" name="__tabbed_18" type="radio" /><label for="__tabbed_18_2">Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_True_1.png" /></p>
+</div>
+<input id="__tabbed_18_3" name="__tabbed_18" type="radio" /><label for="__tabbed_18_3">Non-Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_False_1.png" /></p>
+</div>
+</div>
+</details>
+<details class="details"><summary>Temporal Dims: 2</summary><div class="tabbed-set" data-tabs="19:3"><input checked="checked" id="__tabbed_19_1" name="__tabbed_19" type="radio" /><label for="__tabbed_19_1">Both</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_both_2.png" /></p>
+</div>
+<input id="__tabbed_19_2" name="__tabbed_19" type="radio" /><label for="__tabbed_19_2">Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_True_2.png" /></p>
+</div>
+<input id="__tabbed_19_3" name="__tabbed_19" type="radio" /><label for="__tabbed_19_3">Non-Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_False_2.png" /></p>
+</div>
+</div>
+</details>
+<details class="details"><summary>Temporal Dims: 3</summary><div class="tabbed-set" data-tabs="20:3"><input checked="checked" id="__tabbed_20_1" name="__tabbed_20" type="radio" /><label for="__tabbed_20_1">Both</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_both_3.png" /></p>
+</div>
+<input id="__tabbed_20_2" name="__tabbed_20" type="radio" /><label for="__tabbed_20_2">Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_True_3.png" /></p>
+</div>
+<input id="__tabbed_20_3" name="__tabbed_20" type="radio" /><label for="__tabbed_20_3">Non-Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_False_3.png" /></p>
+</div>
+</div>
+</details>
+<details class="details"><summary>Temporal Dims: 4</summary><div class="tabbed-set" data-tabs="21:3"><input checked="checked" id="__tabbed_21_1" name="__tabbed_21" type="radio" /><label for="__tabbed_21_1">Both</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_both_4.png" /></p>
+</div>
+<input id="__tabbed_21_2" name="__tabbed_21" type="radio" /><label for="__tabbed_21_2">Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_True_4.png" /></p>
+</div>
+<input id="__tabbed_21_3" name="__tabbed_21" type="radio" /><label for="__tabbed_21_3">Non-Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_False_4.png" /></p>
+</div>
+</div>
+</details>
+<details class="details"><summary>Temporal Dims: 5</summary><div class="tabbed-set" data-tabs="22:3"><input checked="checked" id="__tabbed_22_1" name="__tabbed_22" type="radio" /><label for="__tabbed_22_1">Both</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_both_5.png" /></p>
+</div>
+<input id="__tabbed_22_2" name="__tabbed_22" type="radio" /><label for="__tabbed_22_2">Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_True_5.png" /></p>
+</div>
+<input id="__tabbed_22_3" name="__tabbed_22" type="radio" /><label for="__tabbed_22_3">Non-Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_False_5.png" /></p>
+</div>
+</div>
+</details>
+<details class="details"><summary>Temporal Dims: 6</summary><div class="tabbed-set" data-tabs="23:3"><input checked="checked" id="__tabbed_23_1" name="__tabbed_23" type="radio" /><label for="__tabbed_23_1">Both</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_both_6.png" /></p>
+</div>
+<input id="__tabbed_23_2" name="__tabbed_23" type="radio" /><label for="__tabbed_23_2">Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_True_6.png" /></p>
+</div>
+<input id="__tabbed_23_3" name="__tabbed_23" type="radio" /><label for="__tabbed_23_3">Non-Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_False_6.png" /></p>
+</div>
+</div>
+</details>
+<details class="details"><summary>Temporal Dims: 7</summary><div class="tabbed-set" data-tabs="24:3"><input checked="checked" id="__tabbed_24_1" name="__tabbed_24" type="radio" /><label for="__tabbed_24_1">Both</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_both_7.png" /></p>
+</div>
+<input id="__tabbed_24_2" name="__tabbed_24" type="radio" /><label for="__tabbed_24_2">Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_True_7.png" /></p>
+</div>
+<input id="__tabbed_24_3" name="__tabbed_24" type="radio" /><label for="__tabbed_24_3">Non-Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_False_7.png" /></p>
+</div>
+</div>
+</details>
+<details class="details"><summary>Temporal Dims: 8</summary><div class="tabbed-set" data-tabs="25:3"><input checked="checked" id="__tabbed_25_1" name="__tabbed_25" type="radio" /><label for="__tabbed_25_1">Both</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_both_8.png" /></p>
+</div>
+<input id="__tabbed_25_2" name="__tabbed_25" type="radio" /><label for="__tabbed_25_2">Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_True_8.png" /></p>
+</div>
+<input id="__tabbed_25_3" name="__tabbed_25" type="radio" /><label for="__tabbed_25_3">Non-Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_False_8.png" /></p>
+</div>
+</div>
+</details>
+<details class="details"><summary>Temporal Dims: 9</summary><div class="tabbed-set" data-tabs="26:3"><input checked="checked" id="__tabbed_26_1" name="__tabbed_26" type="radio" /><label for="__tabbed_26_1">Both</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_both_9.png" /></p>
+</div>
+<input id="__tabbed_26_2" name="__tabbed_26" type="radio" /><label for="__tabbed_26_2">Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_True_9.png" /></p>
+</div>
+<input id="__tabbed_26_3" name="__tabbed_26" type="radio" /><label for="__tabbed_26_3">Non-Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_False_9.png" /></p>
+</div>
+</div>
+</details>
+<details class="details"><summary>Temporal Dims: 10</summary><div class="tabbed-set" data-tabs="27:3"><input checked="checked" id="__tabbed_27_1" name="__tabbed_27" type="radio" /><label for="__tabbed_27_1">Both</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_both_10.png" /></p>
+</div>
+<input id="__tabbed_27_2" name="__tabbed_27" type="radio" /><label for="__tabbed_27_2">Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_True_10.png" /></p>
+</div>
+<input id="__tabbed_27_3" name="__tabbed_27" type="radio" /><label for="__tabbed_27_3">Non-Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_False_10.png" /></p>
+</div>
+</div>
+</details>
+<details class="details"><summary>Temporal Dims: 11</summary><div class="tabbed-set" data-tabs="28:3"><input checked="checked" id="__tabbed_28_1" name="__tabbed_28" type="radio" /><label for="__tabbed_28_1">Both</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_both_11.png" /></p>
+</div>
+<input id="__tabbed_28_2" name="__tabbed_28" type="radio" /><label for="__tabbed_28_2">Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_True_11.png" /></p>
+</div>
+<input id="__tabbed_28_3" name="__tabbed_28" type="radio" /><label for="__tabbed_28_3">Non-Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_False_11.png" /></p>
+</div>
+</div>
+</details>
+<details class="details"><summary>Temporal Dims: 12</summary><div class="tabbed-set" data-tabs="29:3"><input checked="checked" id="__tabbed_29_1" name="__tabbed_29" type="radio" /><label for="__tabbed_29_1">Both</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_both_12.png" /></p>
+</div>
+<input id="__tabbed_29_2" name="__tabbed_29" type="radio" /><label for="__tabbed_29_2">Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_True_12.png" /></p>
+</div>
+<input id="__tabbed_29_3" name="__tabbed_29" type="radio" /><label for="__tabbed_29_3">Non-Drought</label><div class="tabbed-content">
+<p><img alt="png" src="../../pics/droughts/taylor/vod_False_12.png" /></p>
+</div>
+</div>
+</details>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid" aria-label="Footer">
+        
+          <a href="../../notes/todo/" title="TODO" class="md-footer-nav__link md-footer-nav__link--prev" rel="prev">
+            <div class="md-footer-nav__button md-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+            </div>
+            <div class="md-footer-nav__title">
+              <div class="md-ellipsis">
+                <span class="md-footer-nav__direction">
+                  Previous
+                </span>
+                TODO
+              </div>
+            </div>
+          </a>
+        
+        
+      </nav>
+    </div>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+          <div class="md-footer-copyright__highlight">
+            Copyright &copy; 2020 J. Emmanuel Johnson
+          </div>
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+      </div>
+      
+  <div class="md-footer-social">
+    
+      
+      
+      <a href="https://github.com/jejjohnson" target="_blank" rel="noopener" title="github.com" class="md-footer-social__link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"/></svg>
+      </a>
+    
+      
+      
+      <a href="https://twitter.com/jejjohnson" target="_blank" rel="noopener" title="twitter.com" class="md-footer-social__link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg>
+      </a>
+    
+      
+      
+      <a href="https://linkedin.com/in/jejjohnson" target="_blank" rel="noopener" title="linkedin.com" class="md-footer-social__link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M416 32H31.9C14.3 32 0 46.5 0 64.3v383.4C0 465.5 14.3 480 31.9 480H416c17.6 0 32-14.5 32-32.3V64.3c0-17.8-14.4-32.3-32-32.3zM135.4 416H69V202.2h66.5V416zm-33.2-243c-21.3 0-38.5-17.3-38.5-38.5S80.9 96 102.2 96c21.2 0 38.5 17.3 38.5 38.5 0 21.3-17.2 38.5-38.5 38.5zm282.1 243h-66.4V312c0-24.8-.5-56.7-34.5-56.7-34.6 0-39.9 27-39.9 54.9V416h-66.4V202.2h63.7v29.2h.9c8.9-16.8 30.6-34.5 62.9-34.5 67.2 0 79.7 44.3 79.7 101.9V416z"/></svg>
+      </a>
+    
+      
+      
+      <a href="https://jejjohnson.netlify.com" target="_blank" rel="noopener" title="jejjohnson.netlify.com" class="md-footer-social__link">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><path d="M336.5 160C322 70.7 287.8 8 248 8s-74 62.7-88.5 152h177zM152 256c0 22.2 1.2 43.5 3.3 64h185.3c2.1-20.5 3.3-41.8 3.3-64s-1.2-43.5-3.3-64H155.3c-2.1 20.5-3.3 41.8-3.3 64zm324.7-96c-28.6-67.9-86.5-120.4-158-141.6 24.4 33.8 41.2 84.7 50 141.6h108zM177.2 18.4C105.8 39.6 47.8 92.1 19.3 160h108c8.7-56.9 25.5-107.8 49.9-141.6zM487.4 192H372.7c2.1 21 3.3 42.5 3.3 64s-1.2 43-3.3 64h114.6c5.5-20.5 8.6-41.8 8.6-64s-3.1-43.5-8.5-64zM120 256c0-21.5 1.2-43 3.3-64H8.6C3.2 212.5 0 233.8 0 256s3.2 43.5 8.6 64h114.6c-2-21-3.2-42.5-3.2-64zm39.5 96c14.5 89.3 48.7 152 88.5 152s74-62.7 88.5-152h-177zm159.3 141.6c71.4-21.2 129.4-73.7 158-141.6h-108c-8.8 56.9-25.6 107.8-50 141.6zM19.3 352c28.6 67.9 86.5 120.4 158 141.6-24.4-33.8-41.2-84.7-50-141.6h-108z"/></svg>
+      </a>
+    
+  </div>
+
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    
+      <script src="../../assets/javascripts/vendor.83fe6e3c.min.js"></script>
+      <script src="../../assets/javascripts/bundle.7e1cb91c.min.js"></script><script id="__lang" type="application/json">{"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents"}</script>
+      
+      <script>
+        app = initialize({
+          base: "../..",
+          features: [],
+          search: Object.assign({
+            worker: "../../assets/javascripts/worker/search.37585f48.min.js"
+          }, typeof search !== "undefined" && search)
+        })
+      </script>
+      
+        <script src="../../javascripts/extra.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+      
+    
+  </body>
+</html>
