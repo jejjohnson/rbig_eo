@@ -130,27 +130,49 @@
 
 ## Entropy
 
-* Period - 2002
 * Measures
   * Entropy
 
-=== "GPP"
-    **Gross Primary Productivity**
+??? details "Period: 2002"
+    === "GPP"
+        **Gross Primary Productivity**
 
-    ![png](../../pics/infoearth/spain/H_spain_gpp_2010.png)
+        ![png](../../pics/infoearth/spain/H_spain_gpp_2010.png)
 
-=== "LST"
-    **Land Surface Temperature**
-    ![png](../../pics/infoearth/spain/H_spain_lst_2010.png)
+    === "LST"
+        **Land Surface Temperature**
+        ![png](../../pics/infoearth/spain/H_spain_lst_2010.png)
 
-=== "Precip"
-    **Precipitation**
-    ![png](../../pics/infoearth/spain/H_spain_precip_2010.png)
+    === "Precip"
+        **Precipitation**
+        ![png](../../pics/infoearth/spain/H_spain_precip_2010.png)
 
-=== "RM"
-    **Root Moisture**
-    ![png](../../pics/infoearth/spain/H_spain_rm_2010.png)
+    === "RM"
+        **Root Moisture**
+        ![png](../../pics/infoearth/spain/H_spain_rm_2010.png)
 
-=== "SM"
-    **Soil Moisture**
-    ![png](../../pics/infoearth/spain/H_spain_sm_2010.png)
+    === "SM"
+        **Soil Moisture**
+        ![png](../../pics/infoearth/spain/H_spain_sm_2010.png)
+
+??? details "Period: 2002-2010"
+    === "GPP"
+        **Gross Primary Productivity**
+
+        ![png](../../pics/infoearth/spain/H_spain_gpp_2002_2010.png)
+
+    === "LST"
+        **Land Surface Temperature**
+        ![png](../../pics/infoearth/spain/H_spain_lst_2002_2010.png)
+
+    === "Precip"
+        **Precipitation**
+        ![png](../../pics/infoearth/spain/H_spain_precip_2002_2010.png)
+
+    === "RM"
+        **Root Moisture**
+        ![png](../../pics/infoearth/spain/H_spain_rm_2002_2010.png)
+
+    === "SM"
+        **Soil Moisture**
+        ![png](../../pics/infoearth/spain/H_spain_sm_2002_2010.png)
