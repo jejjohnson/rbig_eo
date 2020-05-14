@@ -132,3 +132,5 @@ venv.bak/
 # Mac OS-specific storage files
 .DS_Store
 
+dask-worker-space/
+*.dirlock
