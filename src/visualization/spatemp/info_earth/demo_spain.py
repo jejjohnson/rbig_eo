@@ -1,6 +1,7 @@
 import sys, os
 from pyprojroot import here
 from typing import Optional
+import argparse
 
 root = here(project_files=[".here"])
 sys.path.append(str(here()))
@@ -37,9 +38,7 @@ pd.set_option("display.max_columns", 120)
 
 
 RES_PATH = pathlib.Path(str(root)).joinpath("data/spa_temp/info_earth")
-FIG_PATH = pathlib.Path(str(root)).joinpath(
-    "reports/figures/spa_temp/demos/infoearth/spain"
-)
+FIG_PATH = pathlib.Path(str(root)).joinpath("reports/figures/spa_temp/demos/infoearth/")
 
 
 def plot_map(xr_data, measure: str, save_name: Optional[str] = None):
@@ -67,7 +66,12 @@ def plot_map(xr_data, measure: str, save_name: Optional[str] = None):
     ax.set(xlabel="Longitude", ylabel="Latitude")
     plt.tight_layout()
     if save_name:
-        fig.savefig(FIG_PATH.joinpath(f"{measure}_maps_{save_name}.png"))
+        fig.savefig(
+            FIG_PATH.joinpath(
+                f"{save_name.split('_')[0]}/{measure}_maps_{save_name}.png"
+            )
+        )
+    plt.close()
 
 
 def plot_ts(xr_data, measure: str, save_name: Optional[str] = None):
@@ -91,7 +95,10 @@ def plot_ts(xr_data, measure: str, save_name: Optional[str] = None):
     ax.legend(["Mean Predictions"])
     plt.tight_layout()
     if save_name:
-        fig.savefig(FIG_PATH.joinpath(f"{measure}_ts_{save_name}.png"))
+        fig.savefig(
+            FIG_PATH.joinpath(f"{save_name.split('_')[0]}/{measure}_ts_{save_name}.png")
+        )
+    plt.close()
 
 
 def plot_ts_error(xr_data, measure: str, save_name: Optional[str] = None):
@@ -122,7 +129,12 @@ def plot_ts_error(xr_data, measure: str, save_name: Optional[str] = None):
     ax.legend(["Mean_predictions"])
     plt.tight_layout()
     if save_name:
-        fig.savefig(FIG_PATH.joinpath(f"{measure}_ts_err_{save_name}.png"))
+        fig.savefig(
+            FIG_PATH.joinpath(
+                f"{save_name.split('_')[0]}/{measure}_ts_err_{save_name}.png"
+            )
+        )
+    plt.close()
 
 
 def plot_monthly_map(xr_data, measure: str, save_name: Optional[str] = None):
@@ -130,19 +142,20 @@ def plot_monthly_map(xr_data, measure: str, save_name: Optional[str] = None):
     xr_data.probs.groupby("time.month").mean().plot.pcolormesh(
         x="lon", y="lat", col="month", col_wrap=3, vmin=0, robust=True, cmap="Reds"
     )
-    plt.savefig(FIG_PATH.joinpath(f"{measure}_monthly_{save_name}.png"))
+    plt.savefig(
+        FIG_PATH.joinpath(
+            f"{save_name.split('_')[0]}/{measure}_monthly_{save_name}.png"
+        )
+    )
+    plt.close()
 
 
-if __name__ == "__main__":
+def main(args):
 
-    region = "spain"
     dimensions = ["111", "116", "331", "333"]
     for idimension in dimensions:
-        period = "2002_2010"
-        samples = "200000"
 
-        variable = "gpp"
-        filename = f"{region}_{variable}_{period}_v0_s{samples}_d{idimension}"
+        filename = f"{args.region}_{args.variable}_{args.period}_v0_s{args.samples}_d{idimension}"
 
         # read csv file
         probs_df = pd.read_csv(str(RES_PATH.joinpath(f"probs/{filename}" + ".csv")))
@@ -177,3 +190,12 @@ if __name__ == "__main__":
 
         plot_ts_error(probs_cubes, "probs", f"{filename}")
         plot_ts_error(probs_cubes, "info", f"{filename}")
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Arguments for GP experiment.")
+    parser.add_argument("-s", "--samples", default=200000, type=int, help="Samples")
+    parser.add_argument("-v", "--variable", default=str, type=str, help="Variable")
+    parser.add_argument("-r", "--region", default="spain", type=str, help="Region")
+    parser.add_argument("-p", "--period", default="2010", type=str, help="Period")
+    main(parser.parse_args())

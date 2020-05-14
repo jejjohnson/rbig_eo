@@ -10,6 +10,7 @@ def get_rbig_model(
     params: Optional[Dict] = None,
     subsample: Optional[int] = 100_000,
     random_state: int = 123,
+    verbose: bool=False,
 ) -> None:
 
     X = subset_indices(X, subsample, random_state)
@@ -26,6 +27,7 @@ def get_rbig_model(
         random_state=random_state,
         pdf_extension=pdf_extension,
         zero_tolerance=zero_tolerance,
+        verbose=verbose
     )
 
     rbig_model.fit(X)

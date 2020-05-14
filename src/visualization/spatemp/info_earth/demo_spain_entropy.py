@@ -1,6 +1,7 @@
 import sys, os
 from pyprojroot import here
 from typing import Optional
+import argparse
 
 root = here(project_files=[".here"])
 sys.path.append(str(here()))
@@ -63,15 +64,14 @@ def plot_entropies(df, save_name: Optional[str] = None):
     plt.tight_layout()
     if save_name:
         fig.savefig(FIG_PATH.joinpath(f"H_{save_name}.png"))
+    plt.close()
 
 
-def main():
+def main(args):
 
-    region = "spain"
-    period = "2010"
     variables = ["gpp", "rm", "precip", "lst", "sm"]
     for ivariable in variables:
-        save_name = f"{region}_{ivariable}_{period}"
+        save_name = f"{args.region}_{ivariable}_{args.period}"
 
         # read csv file
         results_df = pd.read_csv(str(RES_PATH.joinpath(f"v0_{save_name}.csv")))
@@ -94,4 +94,7 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Arguments for GP experiment.")
+    parser.add_argument("-r", "--region", default="spain", type=str, help="Region")
+    parser.add_argument("-p", "--period", default="2010", type=str, help="Period")
+    main(parser.parse_args())

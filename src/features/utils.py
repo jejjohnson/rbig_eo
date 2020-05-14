@@ -1,3 +1,6 @@
+from typing import Tuple, Optional
+from sklearn.utils import check_random_state
+import numpy as np
 import pandas as pd
 
 
@@ -9,3 +12,24 @@ def move_variables(df: pd.DataFrame, variable: str) -> pd.DataFrame:
     ].values
 
     return df
+
+
+def subset_data(
+    X: np.ndarray, subsample: Optional[int] = None, random_state: int = 123,
+) -> Tuple[np.ndarray, np.ndarray]:
+    
+    idx = subset_indices(X, subsample, random_state)
+
+    return X[subset_indices, :]
+
+def subset_indices(
+    X: np.ndarray, subsample: Optional[int] = None, random_state: int = 123,
+) -> Tuple[np.ndarray, np.ndarray]:
+
+    if subsample is not None and subsample < X.shape[0]:
+        rng = check_random_state(random_state)
+        indices = np.arange(X.shape[0])
+        subset_indices = rng.permutation(indices)[:subsample]
+        return subset_indices
+    else:
+        return None
