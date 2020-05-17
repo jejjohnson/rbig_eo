@@ -14,12 +14,20 @@ from tqdm import tqdm
 import numpy as np
 import time
 import joblib
+import xarray as xr
 
 # Experiment Functions
 from src.data.esdc import get_dataset
 from src.features.temporal import select_period, TimePeriod
-from src.features.spatial import select_region, get_spain, get_europe
+from src.features.spatial import (
+    select_region,
+    get_spain,
+    get_europe,
+    get_northern_hemisphere,
+    get_southern_hemisphere,
+)
 from sklearn.preprocessing import StandardScaler
+from src.features.temporal import remove_climatology
 from src.models.density import get_rbig_model
 from src.experiments.utils import dict_product, run_parallel_step
 from src.features.density import get_density_cubes
@@ -56,24 +64,24 @@ def get_parameters(args) -> Dict:
         parameters["variable"] = ["gross_primary_productivity"]
     elif args.variable == "rm":
         parameters["variable"] = ["root_moisture"]
-    elif args.variable == "sm":
-        parameters["variable"] = ["soil_moisture"]
     elif args.variable == "lst":
         parameters["variable"] = ["land_surface_temperature"]
+    elif args.variable == "lai":
+        parameters["variable"] = ["leaf_area_index"]
     elif args.variable == "precip":
         parameters["variable"] = ["precipitation"]
-    elif args.variable == "wv":
-        parameters["variable"] = ["water_vapour"]
     else:
         raise ValueError("Unrecognized variable")
 
     # ======================
     # Region
     # ======================
-    if args.region == "spain":
-        parameters["region"] = [get_spain()]
-    elif args.region == "europe":
-        parameters["region"] = [get_europe()]
+    if args.region == "north":
+        parameters["region"] = [get_northern_hemisphere()]
+    elif args.region == "south":
+        parameters["region"] = [get_southern_hemisphere()]
+    elif args.region == "world":
+        parameters["region"] = ["world"]
     else:
         raise ValueError("Unrecognized region")
 
@@ -188,12 +196,28 @@ def experiment_step(
     datacube = get_dataset([params["variable"]])
 
     # subset datacube (spatially)
-    datacube = select_region(xr_data=datacube, bbox=params["region"])[
-        params["variable"]
-    ]
+    if params["region"] not in ["world"]:
+        region_name = params["region"].name
+        datacube = select_region(xr_data=datacube, bbox=params["region"])[
+            params["variable"]
+        ]
+    else:
+        region_name = "world"
+
+    # remove climatology
+    # print(type(datacube))
+    datacube, _ = remove_climatology(datacube)
+    # print(type(datacube))
+    #
+    if isinstance(datacube, xr.Dataset):
+        # print(type(datacube))
+        datacube = datacube[params["variable"]]
+        # print(type(datacube))
 
     # subset datacube (temporally)
-    datacube = select_period(xr_data=datacube, period=params["period"]).compute()
+    # print(type(datacube))
+    # print(datacube)
+    datacube = select_period(xr_data=datacube, period=params["period"])
 
     # get density cubes
     density_cube_df = get_density_cubes(
@@ -203,7 +227,7 @@ def experiment_step(
     )
 
     if smoke_test:
-        density_cube_df = density_cube_df.iloc[:1_000]
+        density_cube_df = density_cube_df.iloc[:10_000]
         logging.info(f"Total data (smoke-test): {density_cube_df.shape}")
 
     # # standardize data
@@ -229,7 +253,7 @@ def experiment_step(
     # Save Results
     results_df = pd.DataFrame(
         {
-            "region": params["region"].name,
+            "region": region_name,
             "period": params["period"].name,
             "variable": params["variable"],
             "spatial": params["dimensions"].spatial,
@@ -248,7 +272,9 @@ def main(args):
 
     parameters = get_parameters(args)
 
-    save_name = f"{args.save}_" f"{args.region}_" f"{args.variable}_" f"{args.period}"
+    save_name = (
+        f"{args.save}_" + f"{args.region}_" + f"{args.variable}_" + f"{args.period}"
+    )
     header = True
     mode = "w"
     if args.smoke_test:
@@ -265,8 +291,8 @@ def main(args):
             for iparam in pbar:
 
                 pbar.set_description(
-                    f"V: {args.variable}, T: {iparam['period'].name}, "
-                    f"R: {iparam['region'].name}, "
+                    f"V: {args.variable}, T: {args.period}, "
+                    f"R: {args.region}, "
                     f"Spa-Temp: {iparam['dimensions'].temporal}-{iparam['dimensions'].spatial}"
                 )
 
@@ -301,7 +327,7 @@ if __name__ == "__main__":
         "--njobs", type=int, default=-1, help="number of processes in parallel",
     )
     parser.add_argument(
-        "--subsample", type=int, default=10_000, help="subset points to take"
+        "--subsample", type=int, default=200_000, help="subset points to take"
     )
     parser.add_argument(
         "--region", type=str, default="spain", help="Region to be Gaussianized"

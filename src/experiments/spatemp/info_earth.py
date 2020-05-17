@@ -4,9 +4,8 @@ from pyprojroot import here
 root = here(project_files=[".here"])
 sys.path.append(str(here()))
 
-from typing import Dict, Tuple, Optional, Union, Any
+from typing import Dict, Optional, Union, Any
 from collections import namedtuple
-
 import pathlib
 import argparse
 import pandas as pd
@@ -14,14 +13,20 @@ from tqdm import tqdm
 import numpy as np
 import time
 import joblib
+import xarray as xr
+import logging
 
 # Experiment Functions
 from src.data.esdc import get_dataset
-from src.features.temporal import select_period, TimePeriod
-from src.features.spatial import select_region, get_spain, get_europe
+from src.features.temporal import select_period, TimePeriod, remove_climatology
+from src.features.spatial import (
+    select_region,
+    get_northern_hemisphere,
+    get_southern_hemisphere,
+)
 from sklearn.preprocessing import StandardScaler
 from src.models.density import get_rbig_model
-from src.experiments.utils import dict_product, run_parallel_step
+from src.models.utils import parallel_predictions
 from src.features.density import get_density_cubes
 from src.features.preprocessing import (
     standardizer_data,
@@ -30,7 +35,6 @@ from src.features.preprocessing import (
 )
 from sklearn.utils import check_random_state
 
-import logging
 
 logging.basicConfig(
     level=logging.INFO,
@@ -43,7 +47,7 @@ logger = logging.getLogger()
 
 SPATEMP = namedtuple("SPATEMP", ["spatial", "temporal", "dimensions"])
 RNG = check_random_state(123)
-RES_PATH = pathlib.Path(str(root)).joinpath("data/spa_temp/info_earth")
+RES_PATH = pathlib.Path(str(root)).joinpath("data/spa_temp/info_earth/world")
 
 
 def get_parameters(args) -> Dict:
@@ -53,27 +57,27 @@ def get_parameters(args) -> Dict:
     # Variable
     # ======================
     if args.variable == "gpp":
-        parameters["variable"] = "gross_primary_productivity"
+        parameters["variable"] = ["gross_primary_productivity"]
     elif args.variable == "rm":
-        parameters["variable"] = "root_moisture"
-    elif args.variable == "sm":
-        parameters["variable"] = "soil_moisture"
+        parameters["variable"] = ["root_moisture"]
     elif args.variable == "lst":
-        parameters["variable"] = "land_surface_temperature"
+        parameters["variable"] = ["land_surface_temperature"]
+    elif args.variable == "lai":
+        parameters["variable"] = ["leaf_area_index"]
     elif args.variable == "precip":
-        parameters["variable"] = "precipitation"
-    elif args.variable == "wv":
-        parameters["variable"] = "water_vapour"
+        parameters["variable"] = ["precipitation"]
     else:
         raise ValueError("Unrecognized variable")
 
     # ======================
     # Region
     # ======================
-    if args.region == "spain":
-        parameters["region"] = get_spain()
-    elif args.region == "europe":
-        parameters["region"] = get_europe()
+    if args.region == "north":
+        parameters["region"] = get_northern_hemisphere()
+    elif args.region == "south":
+        parameters["region"] = get_southern_hemisphere()
+    elif args.region == "world":
+        parameters["region"] = ["world"]
     else:
         raise ValueError("Unrecognized region")
 
@@ -106,22 +110,33 @@ def experiment_step(
     # ======================
     # Get DataCube
     logging.info(f"Loading '{params['variable']}' variable")
-    datacube = get_dataset([params["variable"]])
+    datacube = get_dataset(params["variable"])
 
     # subset datacube (spatially)
-    logging.info(f"Selecting region '{params['region'].name}'")
-    datacube = select_region(xr_data=datacube, bbox=params["region"])[
-        params["variable"]
-    ]
+    try:
+        logging.info(f"Selecting region '{params['region'].name}'")
+        datacube = select_region(xr_data=datacube, bbox=params["region"])[
+            params["variable"]
+        ]
+    except:
+        logging.info(f"Selecting region 'world'")
+
+    #
+    logging.info("Removing climatology...")
+    datacube, _ = remove_climatology(datacube)
 
     # subset datacube (temporally)
     logging.info(f"Selecting temporal period: '{params['period'].name}'")
-    datacube = select_period(xr_data=datacube, period=params["period"]).compute()
+    datacube = select_period(xr_data=datacube, period=params["period"])
 
     # get density cubes
     logging.info(
         f"Getting density cubes: S: {params['spatial']}, T: {params['temporal']}"
     )
+    if isinstance(datacube, xr.Dataset):
+        # print(type(datacube))
+        datacube = datacube[params["variable"][0]]
+
     density_cube_df = get_density_cubes(
         data=datacube, spatial=params["spatial"], temporal=params["temporal"],
     )
@@ -154,22 +169,30 @@ def experiment_step(
     t1 = time.time() - t0
     logging.info(f"Time Taken: {t1:.2f} secs")
 
+    # get the probability estimates
+    logging.info(f"Getting probability estimates...")
+    t0 = time.time()
     # add noise
 
     prob_inputs = density_cube_df_norm.values + 1e-1 * RNG.rand(
         *density_cube_df_norm.values.shape
     )
-
-    # get the probability estimates
-    logging.info(f"Getting probability estimates...")
-    t0 = time.time()
-    X_prob = rbig_model.predict_proba(
-        prob_inputs, n_trials=1, chunksize=100_000, domain="input"
+    logging.info(f"Parallel predictions...")
+    X_prob = parallel_predictions(
+        X=prob_inputs,
+        func=rbig_model.predict_proba,
+        batchsize=10_000,
+        n_jobs=-1,
+        verbose=1,
     )
+
     t1 = time.time() - t0
     logging.info(f"Time Taken: {t1:.2f} secs")
 
     X_prob = pd.DataFrame(data=X_prob, index=density_cube_df_norm.index,)
+
+    logging.info(f"Computing Mean...")
+    X_prob = X_prob.groupby(level=["lat", "lon"]).mean()
     return rbig_model, x_transformer, X_prob, density_cube_df
 
 
@@ -180,10 +203,10 @@ def main(args):
 
     logging.info("Getting save path...")
     save_name = (
+        f"{args.save}_"
         f"{args.region}_"
         f"{args.variable}_"
         f"{args.period}_"
-        f"{args.save}_"
         f"s{args.subsample}_"
         f"d{args.spatial}{args.spatial}{args.temporal}"
     )
@@ -201,10 +224,10 @@ def main(args):
     # ======================
     # SAVING
     # ======================
-    # Model + Transform
-    logging.info(f"Saving rbig model and transformer...")
-    model = {"rbig": rbig_model, "x_transform": x_transformer}
-    joblib.dump(model, RES_PATH.joinpath(f"models/{save_name}.joblib"))
+    # # Model + Transform
+    # logging.info(f"Saving rbig model and transformer...")
+    # model = {"rbig": rbig_model, "x_transform": x_transformer, "parameters": parameters}
+    # joblib.dump(model, RES_PATH.joinpath(f"models/{save_name}.joblib"))
 
     # Data
     logging.info(f"Saving data...")
@@ -248,6 +271,9 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--period", type=str, default="2010", help="Period to do the Gaussianization"
+    )
+    parser.add_argument(
+        "--hemisphere", type=str, default="top", help="Hemisphere for data"
     )
     parser.add_argument("-sm", "--smoke_test", action="store_true")
 

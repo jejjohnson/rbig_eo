@@ -12,7 +12,8 @@ from sklearn.preprocessing import KernelCenterer
 from sklearn.gaussian_process.kernels import RBF
 import time
 from src.models.utils import subset_indices
-from rbig.rbig import RBIGMI, RBIG
+from rbig.rbig import RBIGMI, RBIG as oldRBIG
+from rbig.model import RBIG
 
 
 def univariate_stats(X: np.ndarray, Y: np.ndarray) -> Dict[str, float]:
@@ -204,14 +205,14 @@ def variation_of_info(H_X, H_Y, I_XY):
     return I_XY / np.sqrt(H_X) / np.sqrt(H_Y)
 
 
-def rbig_h_measures(
+def rbig_h_measures_old(
     X: np.ndarray, subsample: Optional[int] = 100_000, random_state: int = 123,
 ) -> Dict:
     n_layers = 10000
     rotation_type = "PCA"
     random_state = 0
     zero_tolerance = 60
-    pdf_extension = 10
+    pdf_extension = 20
 
     X = subset_indices(X, subsample=subsample, random_state=random_state)
     t0 = time.time()
@@ -222,7 +223,57 @@ def rbig_h_measures(
         random_state=random_state,
         pdf_extension=pdf_extension,
         zero_tolerance=zero_tolerance,
+        verbose=0,
     )
 
     # fit model to the data
     return H_rbig_model.fit(X).entropy(correction=True)
+
+
+def rbig_h_measures(
+    X: np.ndarray,
+    subsample: Optional[int] = 100_000,
+    random_state: int = 123,
+    method: str = "old",
+) -> Dict:
+
+    if method == "old":
+        n_layers = 10_000
+        rotation_type = "PCA"
+        random_state = 0
+        zero_tolerance = 60
+        pdf_extension = 10
+        pdf_resolution = None
+        tolerance = None
+        method = "kdefft"
+        n_quantiles = 50
+        # Initialize RBIG class
+        rbig_model = RBIG(
+            n_layers=n_layers,
+            rotation_type=rotation_type,
+            random_state=random_state,
+            zero_tolerance=zero_tolerance,
+            tolerance=tolerance,
+            pdf_extension=pdf_extension,
+            verbose=1,
+            method=method,
+            n_quantiles=n_quantiles,
+        )
+    else:
+        n_layers = 10000
+        rotation_type = "PCA"
+        random_state = 0
+        zero_tolerance = 60
+        pdf_extension = 20
+        rbig_model = RBIG(
+            n_layers=n_layers,
+            rotation_type=rotation_type,
+            random_state=random_state,
+            pdf_extension=pdf_extension,
+            zero_tolerance=zero_tolerance,
+            verbose=0,
+        )
+
+    # Initialize RBIG class
+    # fit model to the data
+    return rbig_model.fit(X).entropy(correction=True)

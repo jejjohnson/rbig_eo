@@ -212,3 +212,25 @@ def buff(df: pd.DataFrame, window: int = 5) -> pd.DataFrame:
     data.index = index
     data.columns = columns[::1]
     return data
+
+
+def get_information_cubes(df: pd.DataFrame) -> xr.Dataset:
+    """Converts dataframe with probabilities to information"""
+    # create dataframe in the format for xarray
+    # check
+    set1 = set(["lat", "lon"])
+    set2 = set(df.index.names)
+
+    if not set1.issubset(set2):
+        try:
+            df = df.set_index(["lat", "lon"])  # .rename(columns={"0": "probability"})
+        except:
+            raise ValueError(f"index doesn't contain lat lon")
+    # create xarray cubes
+    info_cubes = xr.Dataset.from_dataframe(df)
+
+    # shannon info
+    info_cubes["shannon_info"] = np.log(1 / info_cubes["probability"])
+
+    # return cubes with probabilities
+    return info_cubes
