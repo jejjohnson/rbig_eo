@@ -62,8 +62,6 @@ def rv_coefficient(
 ) -> Dict:
     """simple function to calculate the rv coefficient"""
     t0 = time.time()
-    X = subset_indices(X, subsample=subsample, random_state=random_state)
-    Y = subset_indices(Y, subsample=subsample, random_state=random_state)
 
     # calculate the kernel matrices
     X_gram = linear_kernel(X)
@@ -104,17 +102,8 @@ def estimate_sigma(X: np.ndarray, percent: int = 50, heuristic: bool = False,) -
     return sigma
 
 
-def cka_coefficient(
-    X: np.ndarray,
-    Y: np.ndarray,
-    subsample: Optional[int] = 10_000,
-    random_state: int = 123,
-) -> Dict:
+def cka_coefficient(X: np.ndarray, Y: np.ndarray, random_state: int = 123,) -> Dict:
     """simple function to calculate the rv coefficient"""
-
-    X = subset_indices(X, subsample=subsample, random_state=random_state)
-    Y = subset_indices(Y, subsample=subsample, random_state=random_state)
-
     # estimate sigmas
     sigma_X = estimate_sigma(X, percent=50)
     sigma_Y = estimate_sigma(Y, percent=50)
@@ -145,29 +134,26 @@ def cka_coefficient(
 
 
 def rbig_it_measures(
-    X: np.ndarray,
-    Y: np.ndarray,
-    subsample: Optional[int] = 100_000,
-    random_state: int = 123,
+    X: np.ndarray, Y: np.ndarray, random_state: int = 123, verbose: int = 0
 ) -> Dict:
-    X = subset_indices(X, subsample=subsample, random_state=random_state)
-    Y = subset_indices(Y, subsample=subsample, random_state=random_state)
+
     n_layers = 10000
     rotation_type = "PCA"
     random_state = 0
     zero_tolerance = 60
-    pdf_extension = 10
+    pdf_extension = 20
 
     rbig_results = {}
 
     t0 = time.time()
     # Initialize RBIG class
-    H_rbig_model = RBIG(
+    H_rbig_model = oldRBIG(
         n_layers=n_layers,
         rotation_type=rotation_type,
         random_state=random_state,
         pdf_extension=pdf_extension,
         zero_tolerance=zero_tolerance,
+        verbose=verbose,
     )
 
     # fit model to the data
@@ -205,19 +191,16 @@ def variation_of_info(H_X, H_Y, I_XY):
     return I_XY / np.sqrt(H_X) / np.sqrt(H_Y)
 
 
-def rbig_h_measures_old(
-    X: np.ndarray, subsample: Optional[int] = 100_000, random_state: int = 123,
-) -> Dict:
+def rbig_h_measures_old(X: np.ndarray, random_state: int = 123,) -> Dict:
     n_layers = 10000
     rotation_type = "PCA"
     random_state = 0
     zero_tolerance = 60
     pdf_extension = 20
 
-    X = subset_indices(X, subsample=subsample, random_state=random_state)
     t0 = time.time()
     # Initialize RBIG class
-    H_rbig_model = RBIG(
+    H_rbig_model = oldRBIG(
         n_layers=n_layers,
         rotation_type=rotation_type,
         random_state=random_state,
@@ -231,10 +214,7 @@ def rbig_h_measures_old(
 
 
 def rbig_h_measures(
-    X: np.ndarray,
-    subsample: Optional[int] = 100_000,
-    random_state: int = 123,
-    method: str = "old",
+    X: np.ndarray, random_state: int = 123, method: str = "old",
 ) -> Dict:
 
     if method == "old":
@@ -242,22 +222,15 @@ def rbig_h_measures(
         rotation_type = "PCA"
         random_state = 0
         zero_tolerance = 60
-        pdf_extension = 10
-        pdf_resolution = None
-        tolerance = None
-        method = "kdefft"
-        n_quantiles = 50
+        pdf_extension = 20
         # Initialize RBIG class
-        rbig_model = RBIG(
+        rbig_model = oldRBIG(
             n_layers=n_layers,
             rotation_type=rotation_type,
             random_state=random_state,
-            zero_tolerance=zero_tolerance,
-            tolerance=tolerance,
             pdf_extension=pdf_extension,
-            verbose=1,
-            method=method,
-            n_quantiles=n_quantiles,
+            zero_tolerance=zero_tolerance,
+            verbose=0,
         )
     else:
         n_layers = 10000

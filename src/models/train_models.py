@@ -11,23 +11,17 @@ from sklearn.utils import check_random_state
 
 
 def get_similarity_scores(
-    X_ref: pd.DataFrame,
-    Y_compare: pd.DataFrame,
-    smoke_test: bool = False,
-    subsample: Optional[int] = 10_000,
+    X_ref: pd.DataFrame, Y_compare: pd.DataFrame, verbose: int = 0
 ) -> Dict:
 
-    if smoke_test is True:
-        subsample = 100
-
     # RV Coefficient
-    rv_results = rv_coefficient(X_ref, Y_compare, subsample=subsample)
+    rv_results = rv_coefficient(X_ref, Y_compare)
 
     # CKA Coefficient
-    cka_results = cka_coefficient(X_ref, Y_compare, subsample=subsample)
+    cka_results = cka_coefficient(X_ref, Y_compare)
 
     # RBIG Coefficient
-    rbig_results = rbig_it_measures(X_ref, Y_compare, subsample=subsample * 10)
+    rbig_results = rbig_it_measures(X_ref, Y_compare, verbose=verbose)
 
     results = {
         **rv_results,
