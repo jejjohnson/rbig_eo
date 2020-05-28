@@ -115,6 +115,21 @@ logger = logging.getLogger()
 
 </div>
 
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>The autoreload extension is already loaded. To reload it, use:
+  %reload_ext autoreload
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
 </div>
 <div class="cell border-box-sizing text_cell rendered" markdown="1">
 <div class="inner_cell" markdown="1">
@@ -156,48 +171,8 @@ esdc-8d-0.25deg-1x720x1440-2.0.0.zarr
 <div class="input">
 
 ```python
-# Datapath
-DATA_PATH = pathlib.Path("/media/disk/databases/ESDC/")
-
-# get filename
-filename = DATA_PATH.joinpath("esdc-8d-0.25deg-1x720x1440-2.0.0.zarr")
-```
-
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered" markdown="1">
-<div class="input">
-
-```python
-
-```
-
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered" markdown="1">
-<div class="input">
-
-```python
-from typing import List
-import xarray as xr
-
-def get_dataset(variable: str)-> xr.Dataset:
-    return xr.open_zarr(str(filename))[[variable]]
-```
-
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered" markdown="1">
-<div class="input">
-
-```python
-variable = 'soil_moisture'
-
-datacube = get_dataset(variable)
-datacube
+esdc = get_dataset(['gross_primary_productivity'])
+esdc
 ```
 
 </div>
@@ -543,12 +518,12 @@ dl.xr-attrs {
   stroke: currentColor;
   fill: currentColor;
 }
-</style><div class='xr-wrap'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-9d9397d9-4fef-4fcb-84ed-85a78daf17dc' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-9d9397d9-4fef-4fcb-84ed-85a78daf17dc' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>lat</span>: 720</li><li><span class='xr-has-index'>lon</span>: 1440</li><li><span class='xr-has-index'>time</span>: 1702</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-b61d12d4-f1f2-46f8-8013-4b9dc57fe547' class='xr-section-summary-in' type='checkbox'  checked><label for='section-b61d12d4-f1f2-46f8-8013-4b9dc57fe547' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>lon</span></div><div class='xr-var-dims'>(lon)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>-179.875 -179.625 ... 179.875</div><input id='attrs-e01f0a15-afba-4778-a735-3cf7064b1340' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-e01f0a15-afba-4778-a735-3cf7064b1340' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-340c0580-11ef-40af-acbd-74682ef8bbca' class='xr-var-data-in' type='checkbox'><label for='data-340c0580-11ef-40af-acbd-74682ef8bbca' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><pre class='xr-var-data'>array([-179.875, -179.625, -179.375, ...,  179.375,  179.625,  179.875],
-      dtype=float32)</pre></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>datetime64[ns]</div><div class='xr-var-preview xr-preview'>1980-01-05 ... 2016-12-30</div><input id='attrs-259cc9c3-0f03-40ae-8478-417c8f703113' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-259cc9c3-0f03-40ae-8478-417c8f703113' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-77bf20a6-a0cb-476d-b36b-f84bc862ee1c' class='xr-var-data-in' type='checkbox'><label for='data-77bf20a6-a0cb-476d-b36b-f84bc862ee1c' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>bounds :</span></dt><dd>time_bnds</dd><dt><span>long_name :</span></dt><dd>time</dd><dt><span>standard_name :</span></dt><dd>time</dd></dl></div><pre class='xr-var-data'>array([&#x27;1980-01-05T00:00:00.000000000&#x27;, &#x27;1980-01-13T00:00:00.000000000&#x27;,
+</style><div class='xr-wrap'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-d933ab0e-93ae-4cc7-b3ea-1d09bb065718' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-d933ab0e-93ae-4cc7-b3ea-1d09bb065718' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>lat</span>: 720</li><li><span class='xr-has-index'>lon</span>: 1440</li><li><span class='xr-has-index'>time</span>: 1702</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-188774e0-ae13-411d-88a9-1fdbf26d3ae1' class='xr-section-summary-in' type='checkbox'  checked><label for='section-188774e0-ae13-411d-88a9-1fdbf26d3ae1' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>lon</span></div><div class='xr-var-dims'>(lon)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>-179.875 -179.625 ... 179.875</div><input id='attrs-76eae8b4-da7f-4d4a-875d-87dfb1221617' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-76eae8b4-da7f-4d4a-875d-87dfb1221617' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-883e4bcb-ff88-43d8-8f99-1dd4da457464' class='xr-var-data-in' type='checkbox'><label for='data-883e4bcb-ff88-43d8-8f99-1dd4da457464' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><pre class='xr-var-data'>array([-179.875, -179.625, -179.375, ...,  179.375,  179.625,  179.875],
+      dtype=float32)</pre></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>lat</span></div><div class='xr-var-dims'>(lat)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>89.875 89.625 ... -89.625 -89.875</div><input id='attrs-4944290f-3b80-4d04-8104-afee6e2be090' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-4944290f-3b80-4d04-8104-afee6e2be090' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-8ac3c34a-c1ee-49c0-9627-1398834a5b7f' class='xr-var-data-in' type='checkbox'><label for='data-8ac3c34a-c1ee-49c0-9627-1398834a5b7f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><pre class='xr-var-data'>array([ 89.875,  89.625,  89.375, ..., -89.375, -89.625, -89.875],
+      dtype=float32)</pre></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>datetime64[ns]</div><div class='xr-var-preview xr-preview'>1980-01-05 ... 2016-12-30</div><input id='attrs-37655485-c1b3-4c92-9373-0921cd276a14' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-37655485-c1b3-4c92-9373-0921cd276a14' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-aadd005d-676a-450a-95bc-3c84942d2b66' class='xr-var-data-in' type='checkbox'><label for='data-aadd005d-676a-450a-95bc-3c84942d2b66' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>bounds :</span></dt><dd>time_bnds</dd><dt><span>long_name :</span></dt><dd>time</dd><dt><span>standard_name :</span></dt><dd>time</dd></dl></div><pre class='xr-var-data'>array([&#x27;1980-01-05T00:00:00.000000000&#x27;, &#x27;1980-01-13T00:00:00.000000000&#x27;,
        &#x27;1980-01-21T00:00:00.000000000&#x27;, ..., &#x27;2016-12-14T00:00:00.000000000&#x27;,
        &#x27;2016-12-22T00:00:00.000000000&#x27;, &#x27;2016-12-30T00:00:00.000000000&#x27;],
-      dtype=&#x27;datetime64[ns]&#x27;)</pre></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>lat</span></div><div class='xr-var-dims'>(lat)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>89.875 89.625 ... -89.625 -89.875</div><input id='attrs-5454ae9c-d7a7-4215-a5d2-d6b2fa5f44c0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-5454ae9c-d7a7-4215-a5d2-d6b2fa5f44c0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-95467e60-c064-4fc4-aead-8cadf552a847' class='xr-var-data-in' type='checkbox'><label for='data-95467e60-c064-4fc4-aead-8cadf552a847' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><pre class='xr-var-data'>array([ 89.875,  89.625,  89.375, ..., -89.375, -89.625, -89.875],
-      dtype=float32)</pre></li></ul></div></li><li class='xr-section-item'><input id='section-158be6d5-28a6-4170-866b-09cba7f6bd8f' class='xr-section-summary-in' type='checkbox'  checked><label for='section-158be6d5-28a6-4170-866b-09cba7f6bd8f' class='xr-section-summary' >Data variables: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>soil_moisture</span></div><div class='xr-var-dims'>(time, lat, lon)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>dask.array&lt;chunksize=(1, 720, 1440), meta=np.ndarray&gt;</div><input id='attrs-470c3c7b-5114-4e6d-98ca-e7565391524c' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-470c3c7b-5114-4e6d-98ca-e7565391524c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-75913e46-b019-4012-ab0b-da2842516f7b' class='xr-var-data-in' type='checkbox'><label for='data-75913e46-b019-4012-ab0b-da2842516f7b' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>ID :</span></dt><dd>78</dd><dt><span>esa_cci_path :</span></dt><dd>/neodc/esacci/soil_moisture/data/daily_files/COMBINED/v04.2/</dd><dt><span>long_name :</span></dt><dd>Soil Moisture</dd><dt><span>orig_attrs :</span></dt><dd>{&#x27;comment&#x27;: &#x27;Soil moisture based on the SOilmoisture CCI project&#x27;, &#x27;long_name&#x27;: &#x27;Soil Moisture&#x27;, &#x27;project_name&#x27;: &#x27;SoilMoisture CCI&#x27;, &#x27;references&#x27;: &#x27;Liu, Y.Y., Parinussa, R.M., Dorigo, W.A., De Jeu, R.A.M., Wagner, W., McCabe, M.F., Evans, J.P., and van Dijk, A.I.J.M. (2012): Trend-preserving blending of passive and active microwave soil moisture retrievals; Liu, Y.Y., Parinussa, R.M., Dorigo, W.A., De Jeu, R.A.M., Wagner, W., van Dijk, A.I.J.M., McCabe, M.F., &amp; Evans, J.P. (2011): Developing an improved soil moisture dataset by blending passive and active microwave satellite based retrievals. Hydrology and Earth System Sciences, 15, 425-436.&#x27;, &#x27;source_name&#x27;: &#x27;SoilMoisture&#x27;, &#x27;standard_name&#x27;: &#x27;soil_moisture_content&#x27;, &#x27;units&#x27;: &#x27;m3&#x27;, &#x27;url&#x27;: &#x27;http://www.esa-soilmoisture-cci.org&#x27;}</dd><dt><span>orig_version :</span></dt><dd>v04.2</dd><dt><span>project_name :</span></dt><dd>SoilMoisture CCI</dd><dt><span>time_coverage_end :</span></dt><dd>2014-01-29</dd><dt><span>time_coverage_resolution :</span></dt><dd>P8D</dd><dt><span>time_coverage_start :</span></dt><dd>1980-01-05</dd><dt><span>url :</span></dt><dd>http://www.esa-soilmoisture-cci.org</dd></dl></div><pre class='xr-var-data'><table>
+      dtype=&#x27;datetime64[ns]&#x27;)</pre></li></ul></div></li><li class='xr-section-item'><input id='section-290ed463-70a0-4a75-b3c6-0edc9459511c' class='xr-section-summary-in' type='checkbox'  checked><label for='section-290ed463-70a0-4a75-b3c6-0edc9459511c' class='xr-section-summary' >Data variables: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>gross_primary_productivity</span></div><div class='xr-var-dims'>(time, lat, lon)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>dask.array&lt;chunksize=(1, 720, 1440), meta=np.ndarray&gt;</div><input id='attrs-b90d73ce-1b45-489f-aad8-19576bc9ca28' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-b90d73ce-1b45-489f-aad8-19576bc9ca28' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-5e0a6a24-c48f-4ea3-8ad1-198a710b5256' class='xr-var-data-in' type='checkbox'><label for='data-5e0a6a24-c48f-4ea3-8ad1-198a710b5256' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>ID :</span></dt><dd>47</dd><dt><span>esa_cci_path :</span></dt><dd>nan</dd><dt><span>long_name :</span></dt><dd>Gross Primary Productivity</dd><dt><span>orig_attrs :</span></dt><dd>{&#x27;comment&#x27;: &#x27;Gross Carbon uptake of of the ecosystem through photosynthesis&#x27;, &#x27;long_name&#x27;: &#x27;Gross Primary Productivity&#x27;, &#x27;orig_attrs&#x27;: {}, &#x27;project_name&#x27;: &#x27;FLUXCOM&#x27;, &#x27;references&#x27;: &#x27;Tramontana, Gianluca, et al. &quot;Predicting carbon dioxide and energy fluxes across global FLUXNET sites with regression algorithms.&quot; (2016).&#x27;, &#x27;source_name&#x27;: &#x27;GPPall&#x27;, &#x27;standard_name&#x27;: &#x27;gross_primary_productivity_of_carbon&#x27;, &#x27;units&#x27;: &#x27;gC m-2 day-1&#x27;, &#x27;url&#x27;: &#x27;http://www.fluxcom.org/&#x27;}</dd><dt><span>orig_version :</span></dt><dd>v1</dd><dt><span>project_name :</span></dt><dd>FLUXCOM</dd><dt><span>time_coverage_end :</span></dt><dd>2015-12-31</dd><dt><span>time_coverage_resolution :</span></dt><dd>P8D</dd><dt><span>time_coverage_start :</span></dt><dd>2001-01-05</dd><dt><span>url :</span></dt><dd>http://www.fluxcom.org/</dd></dl></div><pre class='xr-var-data'><table>
 <tr>
 <td>
 <table>
@@ -4008,7 +3983,7 @@ dl.xr-attrs {
 </svg>
 </td>
 </tr>
-</table></pre></li></ul></div></li><li class='xr-section-item'><input id='section-bd294a6c-2b0a-4c2b-8298-47e8e9a685a3' class='xr-section-summary-in' type='checkbox'  ><label for='section-bd294a6c-2b0a-4c2b-8298-47e8e9a685a3' class='xr-section-summary' >Attributes: <span>(35)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>Metadata_conventions  :</span></dt><dd>Unidata Dataset Discovery v1.0</dd><dt><span>acknowledgment :</span></dt><dd>The ESDL team acknowledges all data providers! </dd><dt><span>chunking :</span></dt><dd>1x720x1440</dd><dt><span>comment :</span></dt><dd>none. </dd><dt><span>contributor_name :</span></dt><dd>Max Planck Institute for Biogeochemistry</dd><dt><span>contributor_role :</span></dt><dd>ESDL Science Lead </dd><dt><span>creator_email :</span></dt><dd>info@earthsystemdatalab.net</dd><dt><span>creator_name :</span></dt><dd>Brockmann Consult GmbH </dd><dt><span>creator_url :</span></dt><dd>www.earthsystemdatalab.net</dd><dt><span>date_created :</span></dt><dd>17.12.2018</dd><dt><span>date_issued :</span></dt><dd>19.12.2018</dd><dt><span>date_modified :</span></dt><dd>17.12.2018</dd><dt><span>geospatial_lat_max :</span></dt><dd>89.75</dd><dt><span>geospatial_lat_min :</span></dt><dd>-89.75</dd><dt><span>geospatial_lon_max :</span></dt><dd>179.75</dd><dt><span>geospatial_lon_min :</span></dt><dd>-179.75</dd><dt><span>geospatial_resolution :</span></dt><dd>1/4deg</dd><dt><span>history :</span></dt><dd>- processing with esdl cube v0.1  (https://github.com/esa-esdl/esdl-core/)</dd><dt><span>id :</span></dt><dd>v2.0.0</dd><dt><span>institution :</span></dt><dd>Brockmann Consult GmbH </dd><dt><span>keywords :</span></dt><dd>Earth Science, Geophysical Variables</dd><dt><span>license :</span></dt><dd>Please refer to individual variables</dd><dt><span>naming_authority :</span></dt><dd>Earth System Data Lab team</dd><dt><span>processing_level :</span></dt><dd>Level 4</dd><dt><span>project :</span></dt><dd>ESA Earth System Data Lab </dd><dt><span>publisher_email :</span></dt><dd>info@earthsystemdatalab.net</dd><dt><span>publisher_name :</span></dt><dd>Brockmann Consult GmbH &amp; Max Planck Institute for Biogechemistry </dd><dt><span>publisher_url :</span></dt><dd>www.brockmann-consult.de</dd><dt><span>standard_name_vocabulary :</span></dt><dd>CF-1.7</dd><dt><span>summary :</span></dt><dd>This data set contains a data cube of Earth System variables created by the ESA project Earth System Data Lab. </dd><dt><span>time_coverage_duration :</span></dt><dd>P37Y</dd><dt><span>time_coverage_end :</span></dt><dd>30.12.2016</dd><dt><span>time_coverage_resolution :</span></dt><dd>P8D</dd><dt><span>time_coverage_start :</span></dt><dd>05.01.1980</dd><dt><span>title :</span></dt><dd>Earth System Data Cube</dd></dl></div></li></ul></div></div>
+</table></pre></li></ul></div></li><li class='xr-section-item'><input id='section-ac92386f-5480-4c17-a9e9-3fa9a19c9872' class='xr-section-summary-in' type='checkbox'  ><label for='section-ac92386f-5480-4c17-a9e9-3fa9a19c9872' class='xr-section-summary' >Attributes: <span>(35)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>Metadata_conventions  :</span></dt><dd>Unidata Dataset Discovery v1.0</dd><dt><span>acknowledgment :</span></dt><dd>The ESDL team acknowledges all data providers! </dd><dt><span>chunking :</span></dt><dd>1x720x1440</dd><dt><span>comment :</span></dt><dd>none. </dd><dt><span>contributor_name :</span></dt><dd>Max Planck Institute for Biogeochemistry</dd><dt><span>contributor_role :</span></dt><dd>ESDL Science Lead </dd><dt><span>creator_email :</span></dt><dd>info@earthsystemdatalab.net</dd><dt><span>creator_name :</span></dt><dd>Brockmann Consult GmbH </dd><dt><span>creator_url :</span></dt><dd>www.earthsystemdatalab.net</dd><dt><span>date_created :</span></dt><dd>17.12.2018</dd><dt><span>date_issued :</span></dt><dd>19.12.2018</dd><dt><span>date_modified :</span></dt><dd>17.12.2018</dd><dt><span>geospatial_lat_max :</span></dt><dd>89.75</dd><dt><span>geospatial_lat_min :</span></dt><dd>-89.75</dd><dt><span>geospatial_lon_max :</span></dt><dd>179.75</dd><dt><span>geospatial_lon_min :</span></dt><dd>-179.75</dd><dt><span>geospatial_resolution :</span></dt><dd>1/4deg</dd><dt><span>history :</span></dt><dd>- processing with esdl cube v0.1  (https://github.com/esa-esdl/esdl-core/)</dd><dt><span>id :</span></dt><dd>v2.0.0</dd><dt><span>institution :</span></dt><dd>Brockmann Consult GmbH </dd><dt><span>keywords :</span></dt><dd>Earth Science, Geophysical Variables</dd><dt><span>license :</span></dt><dd>Please refer to individual variables</dd><dt><span>naming_authority :</span></dt><dd>Earth System Data Lab team</dd><dt><span>processing_level :</span></dt><dd>Level 4</dd><dt><span>project :</span></dt><dd>ESA Earth System Data Lab </dd><dt><span>publisher_email :</span></dt><dd>info@earthsystemdatalab.net</dd><dt><span>publisher_name :</span></dt><dd>Brockmann Consult GmbH &amp; Max Planck Institute for Biogechemistry </dd><dt><span>publisher_url :</span></dt><dd>www.brockmann-consult.de</dd><dt><span>standard_name_vocabulary :</span></dt><dd>CF-1.7</dd><dt><span>summary :</span></dt><dd>This data set contains a data cube of Earth System variables created by the ESA project Earth System Data Lab. </dd><dt><span>time_coverage_duration :</span></dt><dd>P37Y</dd><dt><span>time_coverage_end :</span></dt><dd>30.12.2016</dd><dt><span>time_coverage_resolution :</span></dt><dd>P8D</dd><dt><span>time_coverage_start :</span></dt><dd>05.01.1980</dd><dt><span>title :</span></dt><dd>Earth System Data Cube</dd></dl></div></li></ul></div></div>
 </div>
 
 </div>
@@ -4021,8 +3996,6 @@ dl.xr-attrs {
 <div class="inner_cell" markdown="1">
 <div class="text_cell_render border-box-sizing rendered_html" markdown="1">
 ## 2. Select Region
-
-For this task, we are going to do something simple: work with only Europe and a segment of Eurasia. I have outlined a region described the latitude and longitude coordintes. With these coordinates, we can subset a section of the cube and continue working with that region only.
 </div>
 </div>
 </div>
@@ -4030,28 +4003,48 @@ For this task, we are going to do something simple: work with only Europe and a 
 <div class="input">
 
 ```python
-from src.features.temporal import select_period
-from src.features.spatial import select_region
+from src.features.spatial import get_europe, get_spain, select_region
+# from src.features.spatial import 
+# subset with bounding box
+datacube = select_region(esdc, bbox=get_europe())
 ```
 
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+## 2. Remove Climatology
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered" markdown="1">
 <div class="input">
 
 ```python
-# get european bounding box
-europe_bbox = get_europe()
-time_period = ('July-2010', 'July-2010')
+from src.features.temporal import remove_climatology
 
-# subset region
-europe_datacube = subset_cube(datacube, europe_bbox)
+# remove the climatology
+datacube_ = remove_climatology(datacube)
+```
 
-# subset region
-europe_datacube_201007 = select_period(europe_datacube, time_period)
+</div>
 
-europe_datacube_201007
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+## 3. Resample - Mean Values per Month
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+datacube__ = datacube.resample(time='1MS').mean()
+datacube__
 ```
 
 </div>
@@ -4397,8 +4390,10 @@ dl.xr-attrs {
   stroke: currentColor;
   fill: currentColor;
 }
-</style><div class='xr-wrap'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-ff380eaf-71f5-41f5-b27c-1aef86aac6c9' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-ff380eaf-71f5-41f5-b27c-1aef86aac6c9' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>lat</span>: 144</li><li><span class='xr-has-index'>lon</span>: 312</li><li><span class='xr-has-index'>time</span>: 3</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-969e6213-c60f-434d-a7aa-ae642dc07a69' class='xr-section-summary-in' type='checkbox'  checked><label for='section-969e6213-c60f-434d-a7aa-ae642dc07a69' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>lon</span></div><div class='xr-var-dims'>(lon)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>-17.875 -17.625 ... 59.625 59.875</div><input id='attrs-7fc29876-be6c-44d9-b3af-8ce200d071d5' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-7fc29876-be6c-44d9-b3af-8ce200d071d5' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2c9647f2-c112-4dbf-b611-7525dfe93679' class='xr-var-data-in' type='checkbox'><label for='data-2c9647f2-c112-4dbf-b611-7525dfe93679' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><pre class='xr-var-data'>array([-17.875, -17.625, -17.375, ...,  59.375,  59.625,  59.875],
-      dtype=float32)</pre></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>lat</span></div><div class='xr-var-dims'>(lat)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>71.625 71.375 ... 36.125 35.875</div><input id='attrs-fe70d70b-c65d-4b16-b1dc-a39a02a78ad0' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-fe70d70b-c65d-4b16-b1dc-a39a02a78ad0' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-b66acb81-1bfd-432e-b2ff-ad14074152c5' class='xr-var-data-in' type='checkbox'><label for='data-b66acb81-1bfd-432e-b2ff-ad14074152c5' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><pre class='xr-var-data'>array([71.625, 71.375, 71.125, 70.875, 70.625, 70.375, 70.125, 69.875, 69.625,
+</style><div class='xr-wrap'><div class='xr-header'><div class='xr-obj-type'>xarray.Dataset</div></div><ul class='xr-sections'><li class='xr-section-item'><input id='section-ec37c587-8b81-455a-b367-0458b6b044f8' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-ec37c587-8b81-455a-b367-0458b6b044f8' class='xr-section-summary'  title='Expand/collapse section'>Dimensions:</label><div class='xr-section-inline-details'><ul class='xr-dim-list'><li><span class='xr-has-index'>lat</span>: 144</li><li><span class='xr-has-index'>lon</span>: 232</li><li><span class='xr-has-index'>time</span>: 444</li></ul></div><div class='xr-section-details'></div></li><li class='xr-section-item'><input id='section-df1a8515-dbdc-48dd-9fec-b19a0d566153' class='xr-section-summary-in' type='checkbox'  checked><label for='section-df1a8515-dbdc-48dd-9fec-b19a0d566153' class='xr-section-summary' >Coordinates: <span>(3)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>datetime64[ns]</div><div class='xr-var-preview xr-preview'>1980-01-01 ... 2016-12-01</div><input id='attrs-2559749e-c180-4016-be32-ae3031d9838f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-2559749e-c180-4016-be32-ae3031d9838f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-e202cae6-b179-418a-aff0-db78262a23db' class='xr-var-data-in' type='checkbox'><label for='data-e202cae6-b179-418a-aff0-db78262a23db' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><pre class='xr-var-data'>array([&#x27;1980-01-01T00:00:00.000000000&#x27;, &#x27;1980-02-01T00:00:00.000000000&#x27;,
+       &#x27;1980-03-01T00:00:00.000000000&#x27;, ..., &#x27;2016-10-01T00:00:00.000000000&#x27;,
+       &#x27;2016-11-01T00:00:00.000000000&#x27;, &#x27;2016-12-01T00:00:00.000000000&#x27;],
+      dtype=&#x27;datetime64[ns]&#x27;)</pre></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>lat</span></div><div class='xr-var-dims'>(lat)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>71.625 71.375 ... 36.125 35.875</div><input id='attrs-375c111a-7e56-4b29-b8fa-b1d11fcc5e53' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-375c111a-7e56-4b29-b8fa-b1d11fcc5e53' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-2d38d360-ab68-45d0-adcc-5b218f290acf' class='xr-var-data-in' type='checkbox'><label for='data-2d38d360-ab68-45d0-adcc-5b218f290acf' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><pre class='xr-var-data'>array([71.625, 71.375, 71.125, 70.875, 70.625, 70.375, 70.125, 69.875, 69.625,
        69.375, 69.125, 68.875, 68.625, 68.375, 68.125, 67.875, 67.625, 67.375,
        67.125, 66.875, 66.625, 66.375, 66.125, 65.875, 65.625, 65.375, 65.125,
        64.875, 64.625, 64.375, 64.125, 63.875, 63.625, 63.375, 63.125, 62.875,
@@ -4414,8 +4409,8 @@ dl.xr-attrs {
        42.375, 42.125, 41.875, 41.625, 41.375, 41.125, 40.875, 40.625, 40.375,
        40.125, 39.875, 39.625, 39.375, 39.125, 38.875, 38.625, 38.375, 38.125,
        37.875, 37.625, 37.375, 37.125, 36.875, 36.625, 36.375, 36.125, 35.875],
-      dtype=float32)</pre></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>time</span></div><div class='xr-var-dims'>(time)</div><div class='xr-var-dtype'>datetime64[ns]</div><div class='xr-var-preview xr-preview'>2010-07-08 2010-07-16 2010-07-24</div><input id='attrs-8b475fa3-1c1c-4b28-ad26-165329b5594b' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-8b475fa3-1c1c-4b28-ad26-165329b5594b' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-bd824093-4489-455e-94c0-86b6bafdf832' class='xr-var-data-in' type='checkbox'><label for='data-bd824093-4489-455e-94c0-86b6bafdf832' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>bounds :</span></dt><dd>time_bnds</dd><dt><span>long_name :</span></dt><dd>time</dd><dt><span>standard_name :</span></dt><dd>time</dd></dl></div><pre class='xr-var-data'>array([&#x27;2010-07-08T00:00:00.000000000&#x27;, &#x27;2010-07-16T00:00:00.000000000&#x27;,
-       &#x27;2010-07-24T00:00:00.000000000&#x27;], dtype=&#x27;datetime64[ns]&#x27;)</pre></li></ul></div></li><li class='xr-section-item'><input id='section-b342c89d-4c9d-4908-b91e-eb2e34d912bf' class='xr-section-summary-in' type='checkbox'  checked><label for='section-b342c89d-4c9d-4908-b91e-eb2e34d912bf' class='xr-section-summary' >Data variables: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>gross_primary_productivity</span></div><div class='xr-var-dims'>(time, lat, lon)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>dask.array&lt;chunksize=(1, 144, 312), meta=np.ndarray&gt;</div><input id='attrs-92d8fc2c-7e05-4c0e-906e-f36f21623183' class='xr-var-attrs-in' type='checkbox' ><label for='attrs-92d8fc2c-7e05-4c0e-906e-f36f21623183' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-7f06a138-29f8-4967-916b-7d63d71d9b6f' class='xr-var-data-in' type='checkbox'><label for='data-7f06a138-29f8-4967-916b-7d63d71d9b6f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'><dt><span>ID :</span></dt><dd>47</dd><dt><span>esa_cci_path :</span></dt><dd>nan</dd><dt><span>long_name :</span></dt><dd>Gross Primary Productivity</dd><dt><span>orig_attrs :</span></dt><dd>{&#x27;comment&#x27;: &#x27;Gross Carbon uptake of of the ecosystem through photosynthesis&#x27;, &#x27;long_name&#x27;: &#x27;Gross Primary Productivity&#x27;, &#x27;orig_attrs&#x27;: {}, &#x27;project_name&#x27;: &#x27;FLUXCOM&#x27;, &#x27;references&#x27;: &#x27;Tramontana, Gianluca, et al. &quot;Predicting carbon dioxide and energy fluxes across global FLUXNET sites with regression algorithms.&quot; (2016).&#x27;, &#x27;source_name&#x27;: &#x27;GPPall&#x27;, &#x27;standard_name&#x27;: &#x27;gross_primary_productivity_of_carbon&#x27;, &#x27;units&#x27;: &#x27;gC m-2 day-1&#x27;, &#x27;url&#x27;: &#x27;http://www.fluxcom.org/&#x27;}</dd><dt><span>orig_version :</span></dt><dd>v1</dd><dt><span>project_name :</span></dt><dd>FLUXCOM</dd><dt><span>time_coverage_end :</span></dt><dd>2015-12-31</dd><dt><span>time_coverage_resolution :</span></dt><dd>P8D</dd><dt><span>time_coverage_start :</span></dt><dd>2001-01-05</dd><dt><span>url :</span></dt><dd>http://www.fluxcom.org/</dd></dl></div><pre class='xr-var-data'><table>
+      dtype=float32)</pre></li><li class='xr-var-item'><div class='xr-var-name'><span class='xr-has-index'>lon</span></div><div class='xr-var-dims'>(lon)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>-17.875 -17.625 ... 39.625 39.875</div><input id='attrs-9d7ad303-d844-434e-9a77-b05908a17c1f' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-9d7ad303-d844-434e-9a77-b05908a17c1f' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-36555478-5594-4040-bed6-10092180957f' class='xr-var-data-in' type='checkbox'><label for='data-36555478-5594-4040-bed6-10092180957f' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><pre class='xr-var-data'>array([-17.875, -17.625, -17.375, ...,  39.375,  39.625,  39.875],
+      dtype=float32)</pre></li></ul></div></li><li class='xr-section-item'><input id='section-20e1c7c3-f71f-4d8b-b0e1-25a6715e0526' class='xr-section-summary-in' type='checkbox'  checked><label for='section-20e1c7c3-f71f-4d8b-b0e1-25a6715e0526' class='xr-section-summary' >Data variables: <span>(1)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><ul class='xr-var-list'><li class='xr-var-item'><div class='xr-var-name'><span>gross_primary_productivity</span></div><div class='xr-var-dims'>(time, lat, lon)</div><div class='xr-var-dtype'>float32</div><div class='xr-var-preview xr-preview'>dask.array&lt;chunksize=(1, 144, 232), meta=np.ndarray&gt;</div><input id='attrs-b39ccc51-e3ca-4275-b0f9-0c647ffcef7c' class='xr-var-attrs-in' type='checkbox' disabled><label for='attrs-b39ccc51-e3ca-4275-b0f9-0c647ffcef7c' title='Show/Hide attributes'><svg class='icon xr-icon-file-text2'><use xlink:href='#icon-file-text2'></use></svg></label><input id='data-af0e5d65-a3b0-40a7-9935-fdcea9dde148' class='xr-var-data-in' type='checkbox'><label for='data-af0e5d65-a3b0-40a7-9935-fdcea9dde148' title='Show/Hide data repr'><svg class='icon xr-icon-database'><use xlink:href='#icon-database'></use></svg></label><div class='xr-var-attrs'><dl class='xr-attrs'></dl></div><pre class='xr-var-data'><table>
 <tr>
 <td>
 <table>
@@ -4423,63 +4418,1008 @@ dl.xr-attrs {
     <tr><td> </td><th> Array </th><th> Chunk </th></tr>
   </thead>
   <tbody>
-    <tr><th> Bytes </th><td> 539.14 kB </td> <td> 179.71 kB </td></tr>
-    <tr><th> Shape </th><td> (3, 144, 312) </td> <td> (1, 144, 312) </td></tr>
-    <tr><th> Count </th><td> 3408 Tasks </td><td> 3 Chunks </td></tr>
+    <tr><th> Bytes </th><td> 59.33 MB </td> <td> 133.63 kB </td></tr>
+    <tr><th> Shape </th><td> (444, 144, 232) </td> <td> (1, 144, 232) </td></tr>
+    <tr><th> Count </th><td> 8141 Tasks </td><td> 444 Chunks </td></tr>
     <tr><th> Type </th><td> float32 </td><td> numpy.ndarray </td></tr>
   </tbody>
 </table>
 </td>
 <td>
-<svg width="194" height="120" style="stroke:rgb(0,0,0);stroke-width:1" >
+<svg width="193" height="164" style="stroke:rgb(0,0,0);stroke-width:1" >
 
   <!-- Horizontal lines -->
-  <line x1="10" y1="0" x2="24" y2="14" style="stroke-width:2" />
-  <line x1="10" y1="55" x2="24" y2="70" style="stroke-width:2" />
+  <line x1="10" y1="0" x2="80" y2="70" style="stroke-width:2" />
+  <line x1="10" y1="43" x2="80" y2="114" style="stroke-width:2" />
 
   <!-- Vertical lines -->
-  <line x1="10" y1="0" x2="10" y2="55" style="stroke-width:2" />
-  <line x1="14" y1="4" x2="14" y2="60" />
-  <line x1="19" y1="9" x2="19" y2="65" />
-  <line x1="24" y1="14" x2="24" y2="70" style="stroke-width:2" />
+  <line x1="10" y1="0" x2="10" y2="43" style="stroke-width:2" />
+  <line x1="10" y1="0" x2="10" y2="43" />
+  <line x1="10" y1="0" x2="10" y2="44" />
+  <line x1="10" y1="0" x2="10" y2="44" />
+  <line x1="10" y1="0" x2="10" y2="44" />
+  <line x1="10" y1="0" x2="10" y2="44" />
+  <line x1="10" y1="0" x2="10" y2="44" />
+  <line x1="11" y1="1" x2="11" y2="44" />
+  <line x1="11" y1="1" x2="11" y2="45" />
+  <line x1="11" y1="1" x2="11" y2="45" />
+  <line x1="11" y1="1" x2="11" y2="45" />
+  <line x1="11" y1="1" x2="11" y2="45" />
+  <line x1="11" y1="1" x2="11" y2="45" />
+  <line x1="12" y1="2" x2="12" y2="45" />
+  <line x1="12" y1="2" x2="12" y2="46" />
+  <line x1="12" y1="2" x2="12" y2="46" />
+  <line x1="12" y1="2" x2="12" y2="46" />
+  <line x1="12" y1="2" x2="12" y2="46" />
+  <line x1="12" y1="2" x2="12" y2="46" />
+  <line x1="13" y1="3" x2="13" y2="46" />
+  <line x1="13" y1="3" x2="13" y2="46" />
+  <line x1="13" y1="3" x2="13" y2="47" />
+  <line x1="13" y1="3" x2="13" y2="47" />
+  <line x1="13" y1="3" x2="13" y2="47" />
+  <line x1="13" y1="3" x2="13" y2="47" />
+  <line x1="13" y1="3" x2="13" y2="47" />
+  <line x1="14" y1="4" x2="14" y2="47" />
+  <line x1="14" y1="4" x2="14" y2="48" />
+  <line x1="14" y1="4" x2="14" y2="48" />
+  <line x1="14" y1="4" x2="14" y2="48" />
+  <line x1="14" y1="4" x2="14" y2="48" />
+  <line x1="14" y1="4" x2="14" y2="48" />
+  <line x1="15" y1="5" x2="15" y2="48" />
+  <line x1="15" y1="5" x2="15" y2="49" />
+  <line x1="15" y1="5" x2="15" y2="49" />
+  <line x1="15" y1="5" x2="15" y2="49" />
+  <line x1="15" y1="5" x2="15" y2="49" />
+  <line x1="15" y1="5" x2="15" y2="49" />
+  <line x1="16" y1="6" x2="16" y2="49" />
+  <line x1="16" y1="6" x2="16" y2="49" />
+  <line x1="16" y1="6" x2="16" y2="50" />
+  <line x1="16" y1="6" x2="16" y2="50" />
+  <line x1="16" y1="6" x2="16" y2="50" />
+  <line x1="16" y1="6" x2="16" y2="50" />
+  <line x1="16" y1="6" x2="16" y2="50" />
+  <line x1="17" y1="7" x2="17" y2="50" />
+  <line x1="17" y1="7" x2="17" y2="51" />
+  <line x1="17" y1="7" x2="17" y2="51" />
+  <line x1="17" y1="7" x2="17" y2="51" />
+  <line x1="17" y1="7" x2="17" y2="51" />
+  <line x1="17" y1="7" x2="17" y2="51" />
+  <line x1="18" y1="8" x2="18" y2="51" />
+  <line x1="18" y1="8" x2="18" y2="52" />
+  <line x1="18" y1="8" x2="18" y2="52" />
+  <line x1="18" y1="8" x2="18" y2="52" />
+  <line x1="18" y1="8" x2="18" y2="52" />
+  <line x1="18" y1="8" x2="18" y2="52" />
+  <line x1="19" y1="9" x2="19" y2="52" />
+  <line x1="19" y1="9" x2="19" y2="53" />
+  <line x1="19" y1="9" x2="19" y2="53" />
+  <line x1="19" y1="9" x2="19" y2="53" />
+  <line x1="19" y1="9" x2="19" y2="53" />
+  <line x1="19" y1="9" x2="19" y2="53" />
+  <line x1="20" y1="10" x2="20" y2="53" />
+  <line x1="20" y1="10" x2="20" y2="53" />
+  <line x1="20" y1="10" x2="20" y2="54" />
+  <line x1="20" y1="10" x2="20" y2="54" />
+  <line x1="20" y1="10" x2="20" y2="54" />
+  <line x1="20" y1="10" x2="20" y2="54" />
+  <line x1="20" y1="10" x2="20" y2="54" />
+  <line x1="21" y1="11" x2="21" y2="54" />
+  <line x1="21" y1="11" x2="21" y2="55" />
+  <line x1="21" y1="11" x2="21" y2="55" />
+  <line x1="21" y1="11" x2="21" y2="55" />
+  <line x1="21" y1="11" x2="21" y2="55" />
+  <line x1="21" y1="11" x2="21" y2="55" />
+  <line x1="22" y1="12" x2="22" y2="55" />
+  <line x1="22" y1="12" x2="22" y2="56" />
+  <line x1="22" y1="12" x2="22" y2="56" />
+  <line x1="22" y1="12" x2="22" y2="56" />
+  <line x1="22" y1="12" x2="22" y2="56" />
+  <line x1="22" y1="12" x2="22" y2="56" />
+  <line x1="23" y1="13" x2="23" y2="56" />
+  <line x1="23" y1="13" x2="23" y2="56" />
+  <line x1="23" y1="13" x2="23" y2="57" />
+  <line x1="23" y1="13" x2="23" y2="57" />
+  <line x1="23" y1="13" x2="23" y2="57" />
+  <line x1="23" y1="13" x2="23" y2="57" />
+  <line x1="23" y1="13" x2="23" y2="57" />
+  <line x1="24" y1="14" x2="24" y2="57" />
+  <line x1="24" y1="14" x2="24" y2="58" />
+  <line x1="24" y1="14" x2="24" y2="58" />
+  <line x1="24" y1="14" x2="24" y2="58" />
+  <line x1="24" y1="14" x2="24" y2="58" />
+  <line x1="24" y1="14" x2="24" y2="58" />
+  <line x1="25" y1="15" x2="25" y2="58" />
+  <line x1="25" y1="15" x2="25" y2="59" />
+  <line x1="25" y1="15" x2="25" y2="59" />
+  <line x1="25" y1="15" x2="25" y2="59" />
+  <line x1="25" y1="15" x2="25" y2="59" />
+  <line x1="25" y1="15" x2="25" y2="59" />
+  <line x1="26" y1="16" x2="26" y2="59" />
+  <line x1="26" y1="16" x2="26" y2="60" />
+  <line x1="26" y1="16" x2="26" y2="60" />
+  <line x1="26" y1="16" x2="26" y2="60" />
+  <line x1="26" y1="16" x2="26" y2="60" />
+  <line x1="26" y1="16" x2="26" y2="60" />
+  <line x1="27" y1="17" x2="27" y2="60" />
+  <line x1="27" y1="17" x2="27" y2="60" />
+  <line x1="27" y1="17" x2="27" y2="61" />
+  <line x1="27" y1="17" x2="27" y2="61" />
+  <line x1="27" y1="17" x2="27" y2="61" />
+  <line x1="27" y1="17" x2="27" y2="61" />
+  <line x1="27" y1="17" x2="27" y2="61" />
+  <line x1="28" y1="18" x2="28" y2="61" />
+  <line x1="28" y1="18" x2="28" y2="62" />
+  <line x1="28" y1="18" x2="28" y2="62" />
+  <line x1="28" y1="18" x2="28" y2="62" />
+  <line x1="28" y1="18" x2="28" y2="62" />
+  <line x1="28" y1="18" x2="28" y2="62" />
+  <line x1="29" y1="19" x2="29" y2="62" />
+  <line x1="29" y1="19" x2="29" y2="63" />
+  <line x1="29" y1="19" x2="29" y2="63" />
+  <line x1="29" y1="19" x2="29" y2="63" />
+  <line x1="29" y1="19" x2="29" y2="63" />
+  <line x1="29" y1="19" x2="29" y2="63" />
+  <line x1="30" y1="20" x2="30" y2="63" />
+  <line x1="30" y1="20" x2="30" y2="63" />
+  <line x1="30" y1="20" x2="30" y2="64" />
+  <line x1="30" y1="20" x2="30" y2="64" />
+  <line x1="30" y1="20" x2="30" y2="64" />
+  <line x1="30" y1="20" x2="30" y2="64" />
+  <line x1="30" y1="20" x2="30" y2="64" />
+  <line x1="31" y1="21" x2="31" y2="64" />
+  <line x1="31" y1="21" x2="31" y2="65" />
+  <line x1="31" y1="21" x2="31" y2="65" />
+  <line x1="31" y1="21" x2="31" y2="65" />
+  <line x1="31" y1="21" x2="31" y2="65" />
+  <line x1="31" y1="21" x2="31" y2="65" />
+  <line x1="32" y1="22" x2="32" y2="65" />
+  <line x1="32" y1="22" x2="32" y2="66" />
+  <line x1="32" y1="22" x2="32" y2="66" />
+  <line x1="32" y1="22" x2="32" y2="66" />
+  <line x1="32" y1="22" x2="32" y2="66" />
+  <line x1="32" y1="22" x2="32" y2="66" />
+  <line x1="33" y1="23" x2="33" y2="66" />
+  <line x1="33" y1="23" x2="33" y2="67" />
+  <line x1="33" y1="23" x2="33" y2="67" />
+  <line x1="33" y1="23" x2="33" y2="67" />
+  <line x1="33" y1="23" x2="33" y2="67" />
+  <line x1="33" y1="23" x2="33" y2="67" />
+  <line x1="34" y1="24" x2="34" y2="67" />
+  <line x1="34" y1="24" x2="34" y2="67" />
+  <line x1="34" y1="24" x2="34" y2="68" />
+  <line x1="34" y1="24" x2="34" y2="68" />
+  <line x1="34" y1="24" x2="34" y2="68" />
+  <line x1="34" y1="24" x2="34" y2="68" />
+  <line x1="34" y1="24" x2="34" y2="68" />
+  <line x1="35" y1="25" x2="35" y2="68" />
+  <line x1="35" y1="25" x2="35" y2="69" />
+  <line x1="35" y1="25" x2="35" y2="69" />
+  <line x1="35" y1="25" x2="35" y2="69" />
+  <line x1="35" y1="25" x2="35" y2="69" />
+  <line x1="35" y1="25" x2="35" y2="69" />
+  <line x1="36" y1="26" x2="36" y2="69" />
+  <line x1="36" y1="26" x2="36" y2="70" />
+  <line x1="36" y1="26" x2="36" y2="70" />
+  <line x1="36" y1="26" x2="36" y2="70" />
+  <line x1="36" y1="26" x2="36" y2="70" />
+  <line x1="36" y1="26" x2="36" y2="70" />
+  <line x1="37" y1="27" x2="37" y2="70" />
+  <line x1="37" y1="27" x2="37" y2="70" />
+  <line x1="37" y1="27" x2="37" y2="71" />
+  <line x1="37" y1="27" x2="37" y2="71" />
+  <line x1="37" y1="27" x2="37" y2="71" />
+  <line x1="37" y1="27" x2="37" y2="71" />
+  <line x1="37" y1="27" x2="37" y2="71" />
+  <line x1="38" y1="28" x2="38" y2="71" />
+  <line x1="38" y1="28" x2="38" y2="72" />
+  <line x1="38" y1="28" x2="38" y2="72" />
+  <line x1="38" y1="28" x2="38" y2="72" />
+  <line x1="38" y1="28" x2="38" y2="72" />
+  <line x1="38" y1="28" x2="38" y2="72" />
+  <line x1="39" y1="29" x2="39" y2="72" />
+  <line x1="39" y1="29" x2="39" y2="73" />
+  <line x1="39" y1="29" x2="39" y2="73" />
+  <line x1="39" y1="29" x2="39" y2="73" />
+  <line x1="39" y1="29" x2="39" y2="73" />
+  <line x1="39" y1="29" x2="39" y2="73" />
+  <line x1="40" y1="30" x2="40" y2="73" />
+  <line x1="40" y1="30" x2="40" y2="74" />
+  <line x1="40" y1="30" x2="40" y2="74" />
+  <line x1="40" y1="30" x2="40" y2="74" />
+  <line x1="40" y1="30" x2="40" y2="74" />
+  <line x1="40" y1="30" x2="40" y2="74" />
+  <line x1="41" y1="31" x2="41" y2="74" />
+  <line x1="41" y1="31" x2="41" y2="74" />
+  <line x1="41" y1="31" x2="41" y2="75" />
+  <line x1="41" y1="31" x2="41" y2="75" />
+  <line x1="41" y1="31" x2="41" y2="75" />
+  <line x1="41" y1="31" x2="41" y2="75" />
+  <line x1="41" y1="31" x2="41" y2="75" />
+  <line x1="42" y1="32" x2="42" y2="75" />
+  <line x1="42" y1="32" x2="42" y2="76" />
+  <line x1="42" y1="32" x2="42" y2="76" />
+  <line x1="42" y1="32" x2="42" y2="76" />
+  <line x1="42" y1="32" x2="42" y2="76" />
+  <line x1="42" y1="32" x2="42" y2="76" />
+  <line x1="43" y1="33" x2="43" y2="76" />
+  <line x1="43" y1="33" x2="43" y2="77" />
+  <line x1="43" y1="33" x2="43" y2="77" />
+  <line x1="43" y1="33" x2="43" y2="77" />
+  <line x1="43" y1="33" x2="43" y2="77" />
+  <line x1="43" y1="33" x2="43" y2="77" />
+  <line x1="44" y1="34" x2="44" y2="77" />
+  <line x1="44" y1="34" x2="44" y2="77" />
+  <line x1="44" y1="34" x2="44" y2="78" />
+  <line x1="44" y1="34" x2="44" y2="78" />
+  <line x1="44" y1="34" x2="44" y2="78" />
+  <line x1="44" y1="34" x2="44" y2="78" />
+  <line x1="44" y1="34" x2="44" y2="78" />
+  <line x1="45" y1="35" x2="45" y2="78" />
+  <line x1="45" y1="35" x2="45" y2="79" />
+  <line x1="45" y1="35" x2="45" y2="79" />
+  <line x1="45" y1="35" x2="45" y2="79" />
+  <line x1="45" y1="35" x2="45" y2="79" />
+  <line x1="45" y1="35" x2="45" y2="79" />
+  <line x1="46" y1="36" x2="46" y2="79" />
+  <line x1="46" y1="36" x2="46" y2="80" />
+  <line x1="46" y1="36" x2="46" y2="80" />
+  <line x1="46" y1="36" x2="46" y2="80" />
+  <line x1="46" y1="36" x2="46" y2="80" />
+  <line x1="46" y1="36" x2="46" y2="80" />
+  <line x1="47" y1="37" x2="47" y2="80" />
+  <line x1="47" y1="37" x2="47" y2="81" />
+  <line x1="47" y1="37" x2="47" y2="81" />
+  <line x1="47" y1="37" x2="47" y2="81" />
+  <line x1="47" y1="37" x2="47" y2="81" />
+  <line x1="47" y1="37" x2="47" y2="81" />
+  <line x1="47" y1="37" x2="47" y2="81" />
+  <line x1="48" y1="38" x2="48" y2="81" />
+  <line x1="48" y1="38" x2="48" y2="82" />
+  <line x1="48" y1="38" x2="48" y2="82" />
+  <line x1="48" y1="38" x2="48" y2="82" />
+  <line x1="48" y1="38" x2="48" y2="82" />
+  <line x1="48" y1="38" x2="48" y2="82" />
+  <line x1="49" y1="39" x2="49" y2="82" />
+  <line x1="49" y1="39" x2="49" y2="83" />
+  <line x1="49" y1="39" x2="49" y2="83" />
+  <line x1="49" y1="39" x2="49" y2="83" />
+  <line x1="49" y1="39" x2="49" y2="83" />
+  <line x1="49" y1="39" x2="49" y2="83" />
+  <line x1="50" y1="40" x2="50" y2="83" />
+  <line x1="50" y1="40" x2="50" y2="84" />
+  <line x1="50" y1="40" x2="50" y2="84" />
+  <line x1="50" y1="40" x2="50" y2="84" />
+  <line x1="50" y1="40" x2="50" y2="84" />
+  <line x1="50" y1="40" x2="50" y2="84" />
+  <line x1="51" y1="41" x2="51" y2="84" />
+  <line x1="51" y1="41" x2="51" y2="84" />
+  <line x1="51" y1="41" x2="51" y2="85" />
+  <line x1="51" y1="41" x2="51" y2="85" />
+  <line x1="51" y1="41" x2="51" y2="85" />
+  <line x1="51" y1="41" x2="51" y2="85" />
+  <line x1="51" y1="41" x2="51" y2="85" />
+  <line x1="52" y1="42" x2="52" y2="85" />
+  <line x1="52" y1="42" x2="52" y2="86" />
+  <line x1="52" y1="42" x2="52" y2="86" />
+  <line x1="52" y1="42" x2="52" y2="86" />
+  <line x1="52" y1="42" x2="52" y2="86" />
+  <line x1="52" y1="42" x2="52" y2="86" />
+  <line x1="53" y1="43" x2="53" y2="86" />
+  <line x1="53" y1="43" x2="53" y2="87" />
+  <line x1="53" y1="43" x2="53" y2="87" />
+  <line x1="53" y1="43" x2="53" y2="87" />
+  <line x1="53" y1="43" x2="53" y2="87" />
+  <line x1="53" y1="43" x2="53" y2="87" />
+  <line x1="54" y1="44" x2="54" y2="87" />
+  <line x1="54" y1="44" x2="54" y2="87" />
+  <line x1="54" y1="44" x2="54" y2="88" />
+  <line x1="54" y1="44" x2="54" y2="88" />
+  <line x1="54" y1="44" x2="54" y2="88" />
+  <line x1="54" y1="44" x2="54" y2="88" />
+  <line x1="54" y1="44" x2="54" y2="88" />
+  <line x1="55" y1="45" x2="55" y2="88" />
+  <line x1="55" y1="45" x2="55" y2="89" />
+  <line x1="55" y1="45" x2="55" y2="89" />
+  <line x1="55" y1="45" x2="55" y2="89" />
+  <line x1="55" y1="45" x2="55" y2="89" />
+  <line x1="55" y1="45" x2="55" y2="89" />
+  <line x1="56" y1="46" x2="56" y2="89" />
+  <line x1="56" y1="46" x2="56" y2="90" />
+  <line x1="56" y1="46" x2="56" y2="90" />
+  <line x1="56" y1="46" x2="56" y2="90" />
+  <line x1="56" y1="46" x2="56" y2="90" />
+  <line x1="56" y1="46" x2="56" y2="90" />
+  <line x1="57" y1="47" x2="57" y2="90" />
+  <line x1="57" y1="47" x2="57" y2="91" />
+  <line x1="57" y1="47" x2="57" y2="91" />
+  <line x1="57" y1="47" x2="57" y2="91" />
+  <line x1="57" y1="47" x2="57" y2="91" />
+  <line x1="57" y1="47" x2="57" y2="91" />
+  <line x1="58" y1="48" x2="58" y2="91" />
+  <line x1="58" y1="48" x2="58" y2="91" />
+  <line x1="58" y1="48" x2="58" y2="92" />
+  <line x1="58" y1="48" x2="58" y2="92" />
+  <line x1="58" y1="48" x2="58" y2="92" />
+  <line x1="58" y1="48" x2="58" y2="92" />
+  <line x1="58" y1="48" x2="58" y2="92" />
+  <line x1="59" y1="49" x2="59" y2="92" />
+  <line x1="59" y1="49" x2="59" y2="93" />
+  <line x1="59" y1="49" x2="59" y2="93" />
+  <line x1="59" y1="49" x2="59" y2="93" />
+  <line x1="59" y1="49" x2="59" y2="93" />
+  <line x1="59" y1="49" x2="59" y2="93" />
+  <line x1="60" y1="50" x2="60" y2="93" />
+  <line x1="60" y1="50" x2="60" y2="94" />
+  <line x1="60" y1="50" x2="60" y2="94" />
+  <line x1="60" y1="50" x2="60" y2="94" />
+  <line x1="60" y1="50" x2="60" y2="94" />
+  <line x1="60" y1="50" x2="60" y2="94" />
+  <line x1="61" y1="51" x2="61" y2="94" />
+  <line x1="61" y1="51" x2="61" y2="94" />
+  <line x1="61" y1="51" x2="61" y2="95" />
+  <line x1="61" y1="51" x2="61" y2="95" />
+  <line x1="61" y1="51" x2="61" y2="95" />
+  <line x1="61" y1="51" x2="61" y2="95" />
+  <line x1="61" y1="51" x2="61" y2="95" />
+  <line x1="62" y1="52" x2="62" y2="95" />
+  <line x1="62" y1="52" x2="62" y2="96" />
+  <line x1="62" y1="52" x2="62" y2="96" />
+  <line x1="62" y1="52" x2="62" y2="96" />
+  <line x1="62" y1="52" x2="62" y2="96" />
+  <line x1="62" y1="52" x2="62" y2="96" />
+  <line x1="63" y1="53" x2="63" y2="96" />
+  <line x1="63" y1="53" x2="63" y2="97" />
+  <line x1="63" y1="53" x2="63" y2="97" />
+  <line x1="63" y1="53" x2="63" y2="97" />
+  <line x1="63" y1="53" x2="63" y2="97" />
+  <line x1="63" y1="53" x2="63" y2="97" />
+  <line x1="64" y1="54" x2="64" y2="97" />
+  <line x1="64" y1="54" x2="64" y2="98" />
+  <line x1="64" y1="54" x2="64" y2="98" />
+  <line x1="64" y1="54" x2="64" y2="98" />
+  <line x1="64" y1="54" x2="64" y2="98" />
+  <line x1="64" y1="54" x2="64" y2="98" />
+  <line x1="65" y1="55" x2="65" y2="98" />
+  <line x1="65" y1="55" x2="65" y2="98" />
+  <line x1="65" y1="55" x2="65" y2="99" />
+  <line x1="65" y1="55" x2="65" y2="99" />
+  <line x1="65" y1="55" x2="65" y2="99" />
+  <line x1="65" y1="55" x2="65" y2="99" />
+  <line x1="65" y1="55" x2="65" y2="99" />
+  <line x1="66" y1="56" x2="66" y2="99" />
+  <line x1="66" y1="56" x2="66" y2="100" />
+  <line x1="66" y1="56" x2="66" y2="100" />
+  <line x1="66" y1="56" x2="66" y2="100" />
+  <line x1="66" y1="56" x2="66" y2="100" />
+  <line x1="66" y1="56" x2="66" y2="100" />
+  <line x1="67" y1="57" x2="67" y2="100" />
+  <line x1="67" y1="57" x2="67" y2="101" />
+  <line x1="67" y1="57" x2="67" y2="101" />
+  <line x1="67" y1="57" x2="67" y2="101" />
+  <line x1="67" y1="57" x2="67" y2="101" />
+  <line x1="67" y1="57" x2="67" y2="101" />
+  <line x1="68" y1="58" x2="68" y2="101" />
+  <line x1="68" y1="58" x2="68" y2="101" />
+  <line x1="68" y1="58" x2="68" y2="102" />
+  <line x1="68" y1="58" x2="68" y2="102" />
+  <line x1="68" y1="58" x2="68" y2="102" />
+  <line x1="68" y1="58" x2="68" y2="102" />
+  <line x1="68" y1="58" x2="68" y2="102" />
+  <line x1="69" y1="59" x2="69" y2="102" />
+  <line x1="69" y1="59" x2="69" y2="103" />
+  <line x1="69" y1="59" x2="69" y2="103" />
+  <line x1="69" y1="59" x2="69" y2="103" />
+  <line x1="69" y1="59" x2="69" y2="103" />
+  <line x1="69" y1="59" x2="69" y2="103" />
+  <line x1="70" y1="60" x2="70" y2="103" />
+  <line x1="70" y1="60" x2="70" y2="104" />
+  <line x1="70" y1="60" x2="70" y2="104" />
+  <line x1="70" y1="60" x2="70" y2="104" />
+  <line x1="70" y1="60" x2="70" y2="104" />
+  <line x1="70" y1="60" x2="70" y2="104" />
+  <line x1="71" y1="61" x2="71" y2="104" />
+  <line x1="71" y1="61" x2="71" y2="105" />
+  <line x1="71" y1="61" x2="71" y2="105" />
+  <line x1="71" y1="61" x2="71" y2="105" />
+  <line x1="71" y1="61" x2="71" y2="105" />
+  <line x1="71" y1="61" x2="71" y2="105" />
+  <line x1="72" y1="62" x2="72" y2="105" />
+  <line x1="72" y1="62" x2="72" y2="105" />
+  <line x1="72" y1="62" x2="72" y2="106" />
+  <line x1="72" y1="62" x2="72" y2="106" />
+  <line x1="72" y1="62" x2="72" y2="106" />
+  <line x1="72" y1="62" x2="72" y2="106" />
+  <line x1="72" y1="62" x2="72" y2="106" />
+  <line x1="73" y1="63" x2="73" y2="106" />
+  <line x1="73" y1="63" x2="73" y2="107" />
+  <line x1="73" y1="63" x2="73" y2="107" />
+  <line x1="73" y1="63" x2="73" y2="107" />
+  <line x1="73" y1="63" x2="73" y2="107" />
+  <line x1="73" y1="63" x2="73" y2="107" />
+  <line x1="74" y1="64" x2="74" y2="107" />
+  <line x1="74" y1="64" x2="74" y2="108" />
+  <line x1="74" y1="64" x2="74" y2="108" />
+  <line x1="74" y1="64" x2="74" y2="108" />
+  <line x1="74" y1="64" x2="74" y2="108" />
+  <line x1="74" y1="64" x2="74" y2="108" />
+  <line x1="75" y1="65" x2="75" y2="108" />
+  <line x1="75" y1="65" x2="75" y2="108" />
+  <line x1="75" y1="65" x2="75" y2="109" />
+  <line x1="75" y1="65" x2="75" y2="109" />
+  <line x1="75" y1="65" x2="75" y2="109" />
+  <line x1="75" y1="65" x2="75" y2="109" />
+  <line x1="75" y1="65" x2="75" y2="109" />
+  <line x1="76" y1="66" x2="76" y2="109" />
+  <line x1="76" y1="66" x2="76" y2="110" />
+  <line x1="76" y1="66" x2="76" y2="110" />
+  <line x1="76" y1="66" x2="76" y2="110" />
+  <line x1="76" y1="66" x2="76" y2="110" />
+  <line x1="76" y1="66" x2="76" y2="110" />
+  <line x1="77" y1="67" x2="77" y2="110" />
+  <line x1="77" y1="67" x2="77" y2="111" />
+  <line x1="77" y1="67" x2="77" y2="111" />
+  <line x1="77" y1="67" x2="77" y2="111" />
+  <line x1="77" y1="67" x2="77" y2="111" />
+  <line x1="77" y1="67" x2="77" y2="111" />
+  <line x1="78" y1="68" x2="78" y2="111" />
+  <line x1="78" y1="68" x2="78" y2="112" />
+  <line x1="78" y1="68" x2="78" y2="112" />
+  <line x1="78" y1="68" x2="78" y2="112" />
+  <line x1="78" y1="68" x2="78" y2="112" />
+  <line x1="78" y1="68" x2="78" y2="112" />
+  <line x1="78" y1="68" x2="78" y2="112" />
+  <line x1="79" y1="69" x2="79" y2="112" />
+  <line x1="79" y1="69" x2="79" y2="113" />
+  <line x1="79" y1="69" x2="79" y2="113" />
+  <line x1="79" y1="69" x2="79" y2="113" />
+  <line x1="79" y1="69" x2="79" y2="113" />
+  <line x1="79" y1="69" x2="79" y2="113" />
+  <line x1="80" y1="70" x2="80" y2="113" />
+  <line x1="80" y1="70" x2="80" y2="114" />
+  <line x1="80" y1="70" x2="80" y2="114" />
+  <line x1="80" y1="70" x2="80" y2="114" style="stroke-width:2" />
 
   <!-- Colored Rectangle -->
-  <polygon points="10.000000,0.000000 24.948598,14.948598 24.948598,70.333213 10.000000,55.384615" style="fill:#ECB172A0;stroke-width:0"/>
+  <polygon points="10.000000,0.000000 80.588235,70.588235 80.588235,114.387625 10.000000,43.799390" style="fill:#ECB172A0;stroke-width:0"/>
 
   <!-- Horizontal lines -->
-  <line x1="10" y1="0" x2="130" y2="0" style="stroke-width:2" />
-  <line x1="14" y1="4" x2="134" y2="4" />
-  <line x1="19" y1="9" x2="139" y2="9" />
-  <line x1="24" y1="14" x2="144" y2="14" style="stroke-width:2" />
+  <line x1="10" y1="0" x2="72" y2="0" style="stroke-width:2" />
+  <line x1="10" y1="0" x2="72" y2="0" />
+  <line x1="10" y1="0" x2="73" y2="0" />
+  <line x1="10" y1="0" x2="73" y2="0" />
+  <line x1="10" y1="0" x2="73" y2="0" />
+  <line x1="10" y1="0" x2="73" y2="0" />
+  <line x1="10" y1="0" x2="73" y2="0" />
+  <line x1="11" y1="1" x2="73" y2="1" />
+  <line x1="11" y1="1" x2="73" y2="1" />
+  <line x1="11" y1="1" x2="74" y2="1" />
+  <line x1="11" y1="1" x2="74" y2="1" />
+  <line x1="11" y1="1" x2="74" y2="1" />
+  <line x1="11" y1="1" x2="74" y2="1" />
+  <line x1="12" y1="2" x2="74" y2="2" />
+  <line x1="12" y1="2" x2="74" y2="2" />
+  <line x1="12" y1="2" x2="75" y2="2" />
+  <line x1="12" y1="2" x2="75" y2="2" />
+  <line x1="12" y1="2" x2="75" y2="2" />
+  <line x1="12" y1="2" x2="75" y2="2" />
+  <line x1="13" y1="3" x2="75" y2="3" />
+  <line x1="13" y1="3" x2="75" y2="3" />
+  <line x1="13" y1="3" x2="76" y2="3" />
+  <line x1="13" y1="3" x2="76" y2="3" />
+  <line x1="13" y1="3" x2="76" y2="3" />
+  <line x1="13" y1="3" x2="76" y2="3" />
+  <line x1="13" y1="3" x2="76" y2="3" />
+  <line x1="14" y1="4" x2="76" y2="4" />
+  <line x1="14" y1="4" x2="76" y2="4" />
+  <line x1="14" y1="4" x2="77" y2="4" />
+  <line x1="14" y1="4" x2="77" y2="4" />
+  <line x1="14" y1="4" x2="77" y2="4" />
+  <line x1="14" y1="4" x2="77" y2="4" />
+  <line x1="15" y1="5" x2="77" y2="5" />
+  <line x1="15" y1="5" x2="77" y2="5" />
+  <line x1="15" y1="5" x2="78" y2="5" />
+  <line x1="15" y1="5" x2="78" y2="5" />
+  <line x1="15" y1="5" x2="78" y2="5" />
+  <line x1="15" y1="5" x2="78" y2="5" />
+  <line x1="16" y1="6" x2="78" y2="6" />
+  <line x1="16" y1="6" x2="78" y2="6" />
+  <line x1="16" y1="6" x2="79" y2="6" />
+  <line x1="16" y1="6" x2="79" y2="6" />
+  <line x1="16" y1="6" x2="79" y2="6" />
+  <line x1="16" y1="6" x2="79" y2="6" />
+  <line x1="16" y1="6" x2="79" y2="6" />
+  <line x1="17" y1="7" x2="79" y2="7" />
+  <line x1="17" y1="7" x2="80" y2="7" />
+  <line x1="17" y1="7" x2="80" y2="7" />
+  <line x1="17" y1="7" x2="80" y2="7" />
+  <line x1="17" y1="7" x2="80" y2="7" />
+  <line x1="17" y1="7" x2="80" y2="7" />
+  <line x1="18" y1="8" x2="80" y2="8" />
+  <line x1="18" y1="8" x2="80" y2="8" />
+  <line x1="18" y1="8" x2="81" y2="8" />
+  <line x1="18" y1="8" x2="81" y2="8" />
+  <line x1="18" y1="8" x2="81" y2="8" />
+  <line x1="18" y1="8" x2="81" y2="8" />
+  <line x1="19" y1="9" x2="81" y2="9" />
+  <line x1="19" y1="9" x2="81" y2="9" />
+  <line x1="19" y1="9" x2="82" y2="9" />
+  <line x1="19" y1="9" x2="82" y2="9" />
+  <line x1="19" y1="9" x2="82" y2="9" />
+  <line x1="19" y1="9" x2="82" y2="9" />
+  <line x1="20" y1="10" x2="82" y2="10" />
+  <line x1="20" y1="10" x2="82" y2="10" />
+  <line x1="20" y1="10" x2="83" y2="10" />
+  <line x1="20" y1="10" x2="83" y2="10" />
+  <line x1="20" y1="10" x2="83" y2="10" />
+  <line x1="20" y1="10" x2="83" y2="10" />
+  <line x1="20" y1="10" x2="83" y2="10" />
+  <line x1="21" y1="11" x2="83" y2="11" />
+  <line x1="21" y1="11" x2="83" y2="11" />
+  <line x1="21" y1="11" x2="84" y2="11" />
+  <line x1="21" y1="11" x2="84" y2="11" />
+  <line x1="21" y1="11" x2="84" y2="11" />
+  <line x1="21" y1="11" x2="84" y2="11" />
+  <line x1="22" y1="12" x2="84" y2="12" />
+  <line x1="22" y1="12" x2="84" y2="12" />
+  <line x1="22" y1="12" x2="85" y2="12" />
+  <line x1="22" y1="12" x2="85" y2="12" />
+  <line x1="22" y1="12" x2="85" y2="12" />
+  <line x1="22" y1="12" x2="85" y2="12" />
+  <line x1="23" y1="13" x2="85" y2="13" />
+  <line x1="23" y1="13" x2="85" y2="13" />
+  <line x1="23" y1="13" x2="86" y2="13" />
+  <line x1="23" y1="13" x2="86" y2="13" />
+  <line x1="23" y1="13" x2="86" y2="13" />
+  <line x1="23" y1="13" x2="86" y2="13" />
+  <line x1="23" y1="13" x2="86" y2="13" />
+  <line x1="24" y1="14" x2="86" y2="14" />
+  <line x1="24" y1="14" x2="87" y2="14" />
+  <line x1="24" y1="14" x2="87" y2="14" />
+  <line x1="24" y1="14" x2="87" y2="14" />
+  <line x1="24" y1="14" x2="87" y2="14" />
+  <line x1="24" y1="14" x2="87" y2="14" />
+  <line x1="25" y1="15" x2="87" y2="15" />
+  <line x1="25" y1="15" x2="87" y2="15" />
+  <line x1="25" y1="15" x2="88" y2="15" />
+  <line x1="25" y1="15" x2="88" y2="15" />
+  <line x1="25" y1="15" x2="88" y2="15" />
+  <line x1="25" y1="15" x2="88" y2="15" />
+  <line x1="26" y1="16" x2="88" y2="16" />
+  <line x1="26" y1="16" x2="88" y2="16" />
+  <line x1="26" y1="16" x2="89" y2="16" />
+  <line x1="26" y1="16" x2="89" y2="16" />
+  <line x1="26" y1="16" x2="89" y2="16" />
+  <line x1="26" y1="16" x2="89" y2="16" />
+  <line x1="27" y1="17" x2="89" y2="17" />
+  <line x1="27" y1="17" x2="89" y2="17" />
+  <line x1="27" y1="17" x2="90" y2="17" />
+  <line x1="27" y1="17" x2="90" y2="17" />
+  <line x1="27" y1="17" x2="90" y2="17" />
+  <line x1="27" y1="17" x2="90" y2="17" />
+  <line x1="27" y1="17" x2="90" y2="17" />
+  <line x1="28" y1="18" x2="90" y2="18" />
+  <line x1="28" y1="18" x2="90" y2="18" />
+  <line x1="28" y1="18" x2="91" y2="18" />
+  <line x1="28" y1="18" x2="91" y2="18" />
+  <line x1="28" y1="18" x2="91" y2="18" />
+  <line x1="28" y1="18" x2="91" y2="18" />
+  <line x1="29" y1="19" x2="91" y2="19" />
+  <line x1="29" y1="19" x2="91" y2="19" />
+  <line x1="29" y1="19" x2="92" y2="19" />
+  <line x1="29" y1="19" x2="92" y2="19" />
+  <line x1="29" y1="19" x2="92" y2="19" />
+  <line x1="29" y1="19" x2="92" y2="19" />
+  <line x1="30" y1="20" x2="92" y2="20" />
+  <line x1="30" y1="20" x2="92" y2="20" />
+  <line x1="30" y1="20" x2="93" y2="20" />
+  <line x1="30" y1="20" x2="93" y2="20" />
+  <line x1="30" y1="20" x2="93" y2="20" />
+  <line x1="30" y1="20" x2="93" y2="20" />
+  <line x1="30" y1="20" x2="93" y2="20" />
+  <line x1="31" y1="21" x2="93" y2="21" />
+  <line x1="31" y1="21" x2="94" y2="21" />
+  <line x1="31" y1="21" x2="94" y2="21" />
+  <line x1="31" y1="21" x2="94" y2="21" />
+  <line x1="31" y1="21" x2="94" y2="21" />
+  <line x1="31" y1="21" x2="94" y2="21" />
+  <line x1="32" y1="22" x2="94" y2="22" />
+  <line x1="32" y1="22" x2="94" y2="22" />
+  <line x1="32" y1="22" x2="95" y2="22" />
+  <line x1="32" y1="22" x2="95" y2="22" />
+  <line x1="32" y1="22" x2="95" y2="22" />
+  <line x1="32" y1="22" x2="95" y2="22" />
+  <line x1="33" y1="23" x2="95" y2="23" />
+  <line x1="33" y1="23" x2="95" y2="23" />
+  <line x1="33" y1="23" x2="96" y2="23" />
+  <line x1="33" y1="23" x2="96" y2="23" />
+  <line x1="33" y1="23" x2="96" y2="23" />
+  <line x1="33" y1="23" x2="96" y2="23" />
+  <line x1="34" y1="24" x2="96" y2="24" />
+  <line x1="34" y1="24" x2="96" y2="24" />
+  <line x1="34" y1="24" x2="97" y2="24" />
+  <line x1="34" y1="24" x2="97" y2="24" />
+  <line x1="34" y1="24" x2="97" y2="24" />
+  <line x1="34" y1="24" x2="97" y2="24" />
+  <line x1="34" y1="24" x2="97" y2="24" />
+  <line x1="35" y1="25" x2="97" y2="25" />
+  <line x1="35" y1="25" x2="97" y2="25" />
+  <line x1="35" y1="25" x2="98" y2="25" />
+  <line x1="35" y1="25" x2="98" y2="25" />
+  <line x1="35" y1="25" x2="98" y2="25" />
+  <line x1="35" y1="25" x2="98" y2="25" />
+  <line x1="36" y1="26" x2="98" y2="26" />
+  <line x1="36" y1="26" x2="98" y2="26" />
+  <line x1="36" y1="26" x2="99" y2="26" />
+  <line x1="36" y1="26" x2="99" y2="26" />
+  <line x1="36" y1="26" x2="99" y2="26" />
+  <line x1="36" y1="26" x2="99" y2="26" />
+  <line x1="37" y1="27" x2="99" y2="27" />
+  <line x1="37" y1="27" x2="99" y2="27" />
+  <line x1="37" y1="27" x2="100" y2="27" />
+  <line x1="37" y1="27" x2="100" y2="27" />
+  <line x1="37" y1="27" x2="100" y2="27" />
+  <line x1="37" y1="27" x2="100" y2="27" />
+  <line x1="37" y1="27" x2="100" y2="27" />
+  <line x1="38" y1="28" x2="100" y2="28" />
+  <line x1="38" y1="28" x2="101" y2="28" />
+  <line x1="38" y1="28" x2="101" y2="28" />
+  <line x1="38" y1="28" x2="101" y2="28" />
+  <line x1="38" y1="28" x2="101" y2="28" />
+  <line x1="38" y1="28" x2="101" y2="28" />
+  <line x1="39" y1="29" x2="101" y2="29" />
+  <line x1="39" y1="29" x2="101" y2="29" />
+  <line x1="39" y1="29" x2="102" y2="29" />
+  <line x1="39" y1="29" x2="102" y2="29" />
+  <line x1="39" y1="29" x2="102" y2="29" />
+  <line x1="39" y1="29" x2="102" y2="29" />
+  <line x1="40" y1="30" x2="102" y2="30" />
+  <line x1="40" y1="30" x2="102" y2="30" />
+  <line x1="40" y1="30" x2="103" y2="30" />
+  <line x1="40" y1="30" x2="103" y2="30" />
+  <line x1="40" y1="30" x2="103" y2="30" />
+  <line x1="40" y1="30" x2="103" y2="30" />
+  <line x1="41" y1="31" x2="103" y2="31" />
+  <line x1="41" y1="31" x2="103" y2="31" />
+  <line x1="41" y1="31" x2="104" y2="31" />
+  <line x1="41" y1="31" x2="104" y2="31" />
+  <line x1="41" y1="31" x2="104" y2="31" />
+  <line x1="41" y1="31" x2="104" y2="31" />
+  <line x1="41" y1="31" x2="104" y2="31" />
+  <line x1="42" y1="32" x2="104" y2="32" />
+  <line x1="42" y1="32" x2="104" y2="32" />
+  <line x1="42" y1="32" x2="105" y2="32" />
+  <line x1="42" y1="32" x2="105" y2="32" />
+  <line x1="42" y1="32" x2="105" y2="32" />
+  <line x1="42" y1="32" x2="105" y2="32" />
+  <line x1="43" y1="33" x2="105" y2="33" />
+  <line x1="43" y1="33" x2="105" y2="33" />
+  <line x1="43" y1="33" x2="106" y2="33" />
+  <line x1="43" y1="33" x2="106" y2="33" />
+  <line x1="43" y1="33" x2="106" y2="33" />
+  <line x1="43" y1="33" x2="106" y2="33" />
+  <line x1="44" y1="34" x2="106" y2="34" />
+  <line x1="44" y1="34" x2="106" y2="34" />
+  <line x1="44" y1="34" x2="107" y2="34" />
+  <line x1="44" y1="34" x2="107" y2="34" />
+  <line x1="44" y1="34" x2="107" y2="34" />
+  <line x1="44" y1="34" x2="107" y2="34" />
+  <line x1="44" y1="34" x2="107" y2="34" />
+  <line x1="45" y1="35" x2="107" y2="35" />
+  <line x1="45" y1="35" x2="107" y2="35" />
+  <line x1="45" y1="35" x2="108" y2="35" />
+  <line x1="45" y1="35" x2="108" y2="35" />
+  <line x1="45" y1="35" x2="108" y2="35" />
+  <line x1="45" y1="35" x2="108" y2="35" />
+  <line x1="46" y1="36" x2="108" y2="36" />
+  <line x1="46" y1="36" x2="108" y2="36" />
+  <line x1="46" y1="36" x2="109" y2="36" />
+  <line x1="46" y1="36" x2="109" y2="36" />
+  <line x1="46" y1="36" x2="109" y2="36" />
+  <line x1="46" y1="36" x2="109" y2="36" />
+  <line x1="47" y1="37" x2="109" y2="37" />
+  <line x1="47" y1="37" x2="109" y2="37" />
+  <line x1="47" y1="37" x2="110" y2="37" />
+  <line x1="47" y1="37" x2="110" y2="37" />
+  <line x1="47" y1="37" x2="110" y2="37" />
+  <line x1="47" y1="37" x2="110" y2="37" />
+  <line x1="47" y1="37" x2="110" y2="37" />
+  <line x1="48" y1="38" x2="110" y2="38" />
+  <line x1="48" y1="38" x2="111" y2="38" />
+  <line x1="48" y1="38" x2="111" y2="38" />
+  <line x1="48" y1="38" x2="111" y2="38" />
+  <line x1="48" y1="38" x2="111" y2="38" />
+  <line x1="48" y1="38" x2="111" y2="38" />
+  <line x1="49" y1="39" x2="111" y2="39" />
+  <line x1="49" y1="39" x2="111" y2="39" />
+  <line x1="49" y1="39" x2="112" y2="39" />
+  <line x1="49" y1="39" x2="112" y2="39" />
+  <line x1="49" y1="39" x2="112" y2="39" />
+  <line x1="49" y1="39" x2="112" y2="39" />
+  <line x1="50" y1="40" x2="112" y2="40" />
+  <line x1="50" y1="40" x2="112" y2="40" />
+  <line x1="50" y1="40" x2="113" y2="40" />
+  <line x1="50" y1="40" x2="113" y2="40" />
+  <line x1="50" y1="40" x2="113" y2="40" />
+  <line x1="50" y1="40" x2="113" y2="40" />
+  <line x1="51" y1="41" x2="113" y2="41" />
+  <line x1="51" y1="41" x2="113" y2="41" />
+  <line x1="51" y1="41" x2="114" y2="41" />
+  <line x1="51" y1="41" x2="114" y2="41" />
+  <line x1="51" y1="41" x2="114" y2="41" />
+  <line x1="51" y1="41" x2="114" y2="41" />
+  <line x1="51" y1="41" x2="114" y2="41" />
+  <line x1="52" y1="42" x2="114" y2="42" />
+  <line x1="52" y1="42" x2="114" y2="42" />
+  <line x1="52" y1="42" x2="115" y2="42" />
+  <line x1="52" y1="42" x2="115" y2="42" />
+  <line x1="52" y1="42" x2="115" y2="42" />
+  <line x1="52" y1="42" x2="115" y2="42" />
+  <line x1="53" y1="43" x2="115" y2="43" />
+  <line x1="53" y1="43" x2="115" y2="43" />
+  <line x1="53" y1="43" x2="116" y2="43" />
+  <line x1="53" y1="43" x2="116" y2="43" />
+  <line x1="53" y1="43" x2="116" y2="43" />
+  <line x1="53" y1="43" x2="116" y2="43" />
+  <line x1="54" y1="44" x2="116" y2="44" />
+  <line x1="54" y1="44" x2="116" y2="44" />
+  <line x1="54" y1="44" x2="117" y2="44" />
+  <line x1="54" y1="44" x2="117" y2="44" />
+  <line x1="54" y1="44" x2="117" y2="44" />
+  <line x1="54" y1="44" x2="117" y2="44" />
+  <line x1="54" y1="44" x2="117" y2="44" />
+  <line x1="55" y1="45" x2="117" y2="45" />
+  <line x1="55" y1="45" x2="118" y2="45" />
+  <line x1="55" y1="45" x2="118" y2="45" />
+  <line x1="55" y1="45" x2="118" y2="45" />
+  <line x1="55" y1="45" x2="118" y2="45" />
+  <line x1="55" y1="45" x2="118" y2="45" />
+  <line x1="56" y1="46" x2="118" y2="46" />
+  <line x1="56" y1="46" x2="118" y2="46" />
+  <line x1="56" y1="46" x2="119" y2="46" />
+  <line x1="56" y1="46" x2="119" y2="46" />
+  <line x1="56" y1="46" x2="119" y2="46" />
+  <line x1="56" y1="46" x2="119" y2="46" />
+  <line x1="57" y1="47" x2="119" y2="47" />
+  <line x1="57" y1="47" x2="119" y2="47" />
+  <line x1="57" y1="47" x2="120" y2="47" />
+  <line x1="57" y1="47" x2="120" y2="47" />
+  <line x1="57" y1="47" x2="120" y2="47" />
+  <line x1="57" y1="47" x2="120" y2="47" />
+  <line x1="58" y1="48" x2="120" y2="48" />
+  <line x1="58" y1="48" x2="120" y2="48" />
+  <line x1="58" y1="48" x2="121" y2="48" />
+  <line x1="58" y1="48" x2="121" y2="48" />
+  <line x1="58" y1="48" x2="121" y2="48" />
+  <line x1="58" y1="48" x2="121" y2="48" />
+  <line x1="58" y1="48" x2="121" y2="48" />
+  <line x1="59" y1="49" x2="121" y2="49" />
+  <line x1="59" y1="49" x2="121" y2="49" />
+  <line x1="59" y1="49" x2="122" y2="49" />
+  <line x1="59" y1="49" x2="122" y2="49" />
+  <line x1="59" y1="49" x2="122" y2="49" />
+  <line x1="59" y1="49" x2="122" y2="49" />
+  <line x1="60" y1="50" x2="122" y2="50" />
+  <line x1="60" y1="50" x2="122" y2="50" />
+  <line x1="60" y1="50" x2="123" y2="50" />
+  <line x1="60" y1="50" x2="123" y2="50" />
+  <line x1="60" y1="50" x2="123" y2="50" />
+  <line x1="60" y1="50" x2="123" y2="50" />
+  <line x1="61" y1="51" x2="123" y2="51" />
+  <line x1="61" y1="51" x2="123" y2="51" />
+  <line x1="61" y1="51" x2="124" y2="51" />
+  <line x1="61" y1="51" x2="124" y2="51" />
+  <line x1="61" y1="51" x2="124" y2="51" />
+  <line x1="61" y1="51" x2="124" y2="51" />
+  <line x1="61" y1="51" x2="124" y2="51" />
+  <line x1="62" y1="52" x2="124" y2="52" />
+  <line x1="62" y1="52" x2="125" y2="52" />
+  <line x1="62" y1="52" x2="125" y2="52" />
+  <line x1="62" y1="52" x2="125" y2="52" />
+  <line x1="62" y1="52" x2="125" y2="52" />
+  <line x1="62" y1="52" x2="125" y2="52" />
+  <line x1="63" y1="53" x2="125" y2="53" />
+  <line x1="63" y1="53" x2="125" y2="53" />
+  <line x1="63" y1="53" x2="126" y2="53" />
+  <line x1="63" y1="53" x2="126" y2="53" />
+  <line x1="63" y1="53" x2="126" y2="53" />
+  <line x1="63" y1="53" x2="126" y2="53" />
+  <line x1="64" y1="54" x2="126" y2="54" />
+  <line x1="64" y1="54" x2="126" y2="54" />
+  <line x1="64" y1="54" x2="127" y2="54" />
+  <line x1="64" y1="54" x2="127" y2="54" />
+  <line x1="64" y1="54" x2="127" y2="54" />
+  <line x1="64" y1="54" x2="127" y2="54" />
+  <line x1="65" y1="55" x2="127" y2="55" />
+  <line x1="65" y1="55" x2="127" y2="55" />
+  <line x1="65" y1="55" x2="128" y2="55" />
+  <line x1="65" y1="55" x2="128" y2="55" />
+  <line x1="65" y1="55" x2="128" y2="55" />
+  <line x1="65" y1="55" x2="128" y2="55" />
+  <line x1="65" y1="55" x2="128" y2="55" />
+  <line x1="66" y1="56" x2="128" y2="56" />
+  <line x1="66" y1="56" x2="128" y2="56" />
+  <line x1="66" y1="56" x2="129" y2="56" />
+  <line x1="66" y1="56" x2="129" y2="56" />
+  <line x1="66" y1="56" x2="129" y2="56" />
+  <line x1="66" y1="56" x2="129" y2="56" />
+  <line x1="67" y1="57" x2="129" y2="57" />
+  <line x1="67" y1="57" x2="129" y2="57" />
+  <line x1="67" y1="57" x2="130" y2="57" />
+  <line x1="67" y1="57" x2="130" y2="57" />
+  <line x1="67" y1="57" x2="130" y2="57" />
+  <line x1="67" y1="57" x2="130" y2="57" />
+  <line x1="68" y1="58" x2="130" y2="58" />
+  <line x1="68" y1="58" x2="130" y2="58" />
+  <line x1="68" y1="58" x2="131" y2="58" />
+  <line x1="68" y1="58" x2="131" y2="58" />
+  <line x1="68" y1="58" x2="131" y2="58" />
+  <line x1="68" y1="58" x2="131" y2="58" />
+  <line x1="68" y1="58" x2="131" y2="58" />
+  <line x1="69" y1="59" x2="131" y2="59" />
+  <line x1="69" y1="59" x2="132" y2="59" />
+  <line x1="69" y1="59" x2="132" y2="59" />
+  <line x1="69" y1="59" x2="132" y2="59" />
+  <line x1="69" y1="59" x2="132" y2="59" />
+  <line x1="69" y1="59" x2="132" y2="59" />
+  <line x1="70" y1="60" x2="132" y2="60" />
+  <line x1="70" y1="60" x2="132" y2="60" />
+  <line x1="70" y1="60" x2="133" y2="60" />
+  <line x1="70" y1="60" x2="133" y2="60" />
+  <line x1="70" y1="60" x2="133" y2="60" />
+  <line x1="70" y1="60" x2="133" y2="60" />
+  <line x1="71" y1="61" x2="133" y2="61" />
+  <line x1="71" y1="61" x2="133" y2="61" />
+  <line x1="71" y1="61" x2="134" y2="61" />
+  <line x1="71" y1="61" x2="134" y2="61" />
+  <line x1="71" y1="61" x2="134" y2="61" />
+  <line x1="71" y1="61" x2="134" y2="61" />
+  <line x1="72" y1="62" x2="134" y2="62" />
+  <line x1="72" y1="62" x2="134" y2="62" />
+  <line x1="72" y1="62" x2="135" y2="62" />
+  <line x1="72" y1="62" x2="135" y2="62" />
+  <line x1="72" y1="62" x2="135" y2="62" />
+  <line x1="72" y1="62" x2="135" y2="62" />
+  <line x1="72" y1="62" x2="135" y2="62" />
+  <line x1="73" y1="63" x2="135" y2="63" />
+  <line x1="73" y1="63" x2="135" y2="63" />
+  <line x1="73" y1="63" x2="136" y2="63" />
+  <line x1="73" y1="63" x2="136" y2="63" />
+  <line x1="73" y1="63" x2="136" y2="63" />
+  <line x1="73" y1="63" x2="136" y2="63" />
+  <line x1="74" y1="64" x2="136" y2="64" />
+  <line x1="74" y1="64" x2="136" y2="64" />
+  <line x1="74" y1="64" x2="137" y2="64" />
+  <line x1="74" y1="64" x2="137" y2="64" />
+  <line x1="74" y1="64" x2="137" y2="64" />
+  <line x1="74" y1="64" x2="137" y2="64" />
+  <line x1="75" y1="65" x2="137" y2="65" />
+  <line x1="75" y1="65" x2="137" y2="65" />
+  <line x1="75" y1="65" x2="138" y2="65" />
+  <line x1="75" y1="65" x2="138" y2="65" />
+  <line x1="75" y1="65" x2="138" y2="65" />
+  <line x1="75" y1="65" x2="138" y2="65" />
+  <line x1="75" y1="65" x2="138" y2="65" />
+  <line x1="76" y1="66" x2="138" y2="66" />
+  <line x1="76" y1="66" x2="138" y2="66" />
+  <line x1="76" y1="66" x2="139" y2="66" />
+  <line x1="76" y1="66" x2="139" y2="66" />
+  <line x1="76" y1="66" x2="139" y2="66" />
+  <line x1="76" y1="66" x2="139" y2="66" />
+  <line x1="77" y1="67" x2="139" y2="67" />
+  <line x1="77" y1="67" x2="139" y2="67" />
+  <line x1="77" y1="67" x2="140" y2="67" />
+  <line x1="77" y1="67" x2="140" y2="67" />
+  <line x1="77" y1="67" x2="140" y2="67" />
+  <line x1="77" y1="67" x2="140" y2="67" />
+  <line x1="78" y1="68" x2="140" y2="68" />
+  <line x1="78" y1="68" x2="140" y2="68" />
+  <line x1="78" y1="68" x2="141" y2="68" />
+  <line x1="78" y1="68" x2="141" y2="68" />
+  <line x1="78" y1="68" x2="141" y2="68" />
+  <line x1="78" y1="68" x2="141" y2="68" />
+  <line x1="78" y1="68" x2="141" y2="68" />
+  <line x1="79" y1="69" x2="141" y2="69" />
+  <line x1="79" y1="69" x2="142" y2="69" />
+  <line x1="79" y1="69" x2="142" y2="69" />
+  <line x1="79" y1="69" x2="142" y2="69" />
+  <line x1="79" y1="69" x2="142" y2="69" />
+  <line x1="79" y1="69" x2="142" y2="69" />
+  <line x1="80" y1="70" x2="142" y2="70" />
+  <line x1="80" y1="70" x2="142" y2="70" />
+  <line x1="80" y1="70" x2="143" y2="70" />
+  <line x1="80" y1="70" x2="143" y2="70" style="stroke-width:2" />
 
   <!-- Vertical lines -->
-  <line x1="10" y1="0" x2="24" y2="14" style="stroke-width:2" />
-  <line x1="130" y1="0" x2="144" y2="14" style="stroke-width:2" />
+  <line x1="10" y1="0" x2="80" y2="70" style="stroke-width:2" />
+  <line x1="72" y1="0" x2="143" y2="70" style="stroke-width:2" />
 
   <!-- Colored Rectangle -->
-  <polygon points="10.000000,0.000000 130.000000,0.000000 144.948598,14.948598 24.948598,14.948598" style="fill:#ECB172A0;stroke-width:0"/>
+  <polygon points="10.000000,0.000000 72.702703,0.000000 143.290938,70.588235 80.588235,70.588235" style="fill:#ECB172A0;stroke-width:0"/>
 
   <!-- Horizontal lines -->
-  <line x1="24" y1="14" x2="144" y2="14" style="stroke-width:2" />
-  <line x1="24" y1="70" x2="144" y2="70" style="stroke-width:2" />
+  <line x1="80" y1="70" x2="143" y2="70" style="stroke-width:2" />
+  <line x1="80" y1="114" x2="143" y2="114" style="stroke-width:2" />
 
   <!-- Vertical lines -->
-  <line x1="24" y1="14" x2="24" y2="70" style="stroke-width:2" />
-  <line x1="144" y1="14" x2="144" y2="70" style="stroke-width:2" />
+  <line x1="80" y1="70" x2="80" y2="114" style="stroke-width:2" />
+  <line x1="143" y1="70" x2="143" y2="114" style="stroke-width:2" />
 
   <!-- Colored Rectangle -->
-  <polygon points="24.948598,14.948598 144.948598,14.948598 144.948598,70.333213 24.948598,70.333213" style="fill:#ECB172A0;stroke-width:0"/>
+  <polygon points="80.588235,70.588235 143.290938,70.588235 143.290938,114.387625 80.588235,114.387625" style="fill:#ECB172A0;stroke-width:0"/>
 
   <!-- Text -->
-  <text x="84.948598" y="90.333213" font-size="1.0rem" font-weight="100" text-anchor="middle" >312</text>
-  <text x="164.948598" y="42.640906" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(-90,164.948598,42.640906)">144</text>
-  <text x="7.474299" y="82.858914" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(45,7.474299,82.858914)">3</text>
+  <text x="111.939587" y="134.387625" font-size="1.0rem" font-weight="100" text-anchor="middle" >232</text>
+  <text x="163.290938" y="92.487930" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(-90,163.290938,92.487930)">144</text>
+  <text x="35.294118" y="99.093508" font-size="1.0rem" font-weight="100" text-anchor="middle" transform="rotate(45,35.294118,99.093508)">444</text>
 </svg>
 </td>
 </tr>
-</table></pre></li></ul></div></li><li class='xr-section-item'><input id='section-d37f5686-148e-4403-a63f-5b93b30a2cca' class='xr-section-summary-in' type='checkbox'  ><label for='section-d37f5686-148e-4403-a63f-5b93b30a2cca' class='xr-section-summary' >Attributes: <span>(39)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'><dt><span>Metadata_conventions  :</span></dt><dd>Unidata Dataset Discovery v1.0</dd><dt><span>acknowledgment :</span></dt><dd>The ESDL team acknowledges all data providers! </dd><dt><span>chunking :</span></dt><dd>1x720x1440</dd><dt><span>comment :</span></dt><dd>none. </dd><dt><span>contributor_name :</span></dt><dd>Max Planck Institute for Biogeochemistry</dd><dt><span>contributor_role :</span></dt><dd>ESDL Science Lead </dd><dt><span>creator_email :</span></dt><dd>info@earthsystemdatalab.net</dd><dt><span>creator_name :</span></dt><dd>Brockmann Consult GmbH </dd><dt><span>creator_url :</span></dt><dd>www.earthsystemdatalab.net</dd><dt><span>date_created :</span></dt><dd>17.12.2018</dd><dt><span>date_issued :</span></dt><dd>19.12.2018</dd><dt><span>date_modified :</span></dt><dd>2020-05-01T10:00:44.942841</dd><dt><span>geospatial_lat_max :</span></dt><dd>71.75</dd><dt><span>geospatial_lat_min :</span></dt><dd>35.75</dd><dt><span>geospatial_lon_max :</span></dt><dd>60.0</dd><dt><span>geospatial_lon_min :</span></dt><dd>-18.0</dd><dt><span>geospatial_resolution :</span></dt><dd>1/4deg</dd><dt><span>history :</span></dt><dd>- processing with esdl cube v0.1  (https://github.com/esa-esdl/esdl-core/)</dd><dt><span>id :</span></dt><dd>v2.0.0</dd><dt><span>institution :</span></dt><dd>Brockmann Consult GmbH </dd><dt><span>keywords :</span></dt><dd>Earth Science, Geophysical Variables</dd><dt><span>license :</span></dt><dd>Please refer to individual variables</dd><dt><span>naming_authority :</span></dt><dd>Earth System Data Lab team</dd><dt><span>processing_level :</span></dt><dd>Level 4</dd><dt><span>project :</span></dt><dd>ESA Earth System Data Lab </dd><dt><span>publisher_email :</span></dt><dd>info@earthsystemdatalab.net</dd><dt><span>publisher_name :</span></dt><dd>Brockmann Consult GmbH &amp; Max Planck Institute for Biogechemistry </dd><dt><span>publisher_url :</span></dt><dd>www.brockmann-consult.de</dd><dt><span>standard_name_vocabulary :</span></dt><dd>CF-1.7</dd><dt><span>summary :</span></dt><dd>This data set contains a data cube of Earth System variables created by the ESA project Earth System Data Lab. </dd><dt><span>time_coverage_duration :</span></dt><dd>P37Y</dd><dt><span>time_coverage_end :</span></dt><dd>30.12.2016</dd><dt><span>time_coverage_resolution :</span></dt><dd>P8D</dd><dt><span>time_coverage_start :</span></dt><dd>05.01.1980</dd><dt><span>title :</span></dt><dd>Earth System Data Cube</dd><dt><span>geospatial_lon_units :</span></dt><dd>degrees_east</dd><dt><span>geospatial_lon_resolution :</span></dt><dd>0.25</dd><dt><span>geospatial_lat_units :</span></dt><dd>degrees_north</dd><dt><span>geospatial_lat_resolution :</span></dt><dd>0.25</dd></dl></div></li></ul></div></div>
+</table></pre></li></ul></div></li><li class='xr-section-item'><input id='section-5184fced-2e0f-46b5-a458-aa8f59b4fcc8' class='xr-section-summary-in' type='checkbox' disabled ><label for='section-5184fced-2e0f-46b5-a458-aa8f59b4fcc8' class='xr-section-summary'  title='Expand/collapse section'>Attributes: <span>(0)</span></label><div class='xr-section-inline-details'></div><div class='xr-section-details'><dl class='xr-attrs'></dl></div></li></ul></div></div>
 </div>
 
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered" markdown="1">
+<div class="inner_cell" markdown="1">
+<div class="text_cell_render border-box-sizing rendered_html" markdown="1">
+## 2. Select Region
+
+For this task, we are going to do something simple: work with only Europe and a segment of Eurasia. I have outlined a region described the latitude and longitude coordintes. With these coordinates, we can subset a section of the cube and continue working with that region only.
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+from src.features.temporal import select_period
+from src.features.spatial import select_region
+```
+
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered" markdown="1">
+<div class="input">
+
+```python
+# get european bounding box
+europe_bbox = get_europe()
+time_period = ('July-2010', 'July-2010')
+
+# subset region
+europe_datacube = subset_cube(datacube, europe_bbox)
+
+# subset region
+europe_datacube_201007 = select_period(europe_datacube, time_period)
+
+europe_datacube_201007
+```
+
+</div>
+
+<div class="output_wrapper" markdown="1">
+<div class="output" markdown="1">
+
+
+<div class="output_area" markdown="1">
+<div class="output_subarea output_text output_error">
+<pre>
+<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
+<span class="ansi-red-fg">NameError</span>                                 Traceback (most recent call last)
+<span class="ansi-green-fg">&lt;ipython-input-28-a375d20ecbe5&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span>
+<span class="ansi-green-intense-fg ansi-bold">      4</span> 
+<span class="ansi-green-intense-fg ansi-bold">      5</span> <span class="ansi-red-fg"># subset region</span>
+<span class="ansi-green-fg">----&gt; 6</span><span class="ansi-red-fg"> </span>europe_datacube <span class="ansi-blue-fg">=</span> subset_cube<span class="ansi-blue-fg">(</span>datacube<span class="ansi-blue-fg">,</span> europe_bbox<span class="ansi-blue-fg">)</span>
+<span class="ansi-green-intense-fg ansi-bold">      7</span> 
+<span class="ansi-green-intense-fg ansi-bold">      8</span> <span class="ansi-red-fg"># subset region</span>
+
+<span class="ansi-red-fg">NameError</span>: name &#39;subset_cube&#39; is not defined</pre>
+</div>
 </div>
 
 </div>
@@ -5107,10 +6047,10 @@ gp_model.optimize(
 
 
 
-<div id="0cb908db-5cdb-484e-a8ef-377d375cc514"></div>
+<div id="2cb0eba5-5a22-443e-84ff-a94dc1f2f1cd"></div>
 <div class="output_subarea output_widget_view ">
 <script type="text/javascript">
-var element = $('#0cb908db-5cdb-484e-a8ef-377d375cc514');
+var element = $('#2cb0eba5-5a22-443e-84ff-a94dc1f2f1cd');
 </script>
 <script type="application/vnd.jupyter.widget-view+json">
 {"model_id": "9d0ea3598cb24f87bd592c6260c61c8c", "version_major": 2, "version_minor": 0}

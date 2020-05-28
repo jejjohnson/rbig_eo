@@ -143,10 +143,10 @@ logger = logging.getLogger()
 ```python
 parameters = {}
 parameters['variable'] = [
-    'root_moisture',
-    'land_surface_temperature'
+    'gross_primary_productivity',
+    'leaf_area_index'
 ]
-parameters['region'] = [get_spain()]
+parameters['region'] = ["world"]
 parameters['period'] = [TimePeriod(name="201001_201012", start="Jan-2010", end="Dec-2010")]
 parameters['spatial'] = [1, 2, 3, 4, 5, 6]
 parameters['temporal'] = [1, 2, 3, 4, 5, 6]
@@ -166,7 +166,7 @@ smoke_test = True
 
 <div class="output_area" markdown="1">
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>2
+<pre>72
 </pre>
 </div>
 </div>
