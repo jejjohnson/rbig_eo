@@ -258,7 +258,7 @@ def experiment_step(parameters: Dict, args: argparse.Namespace,) -> pd.DataFrame
     # RESAMPLE
     # ======================
     if args.resample:
-        datacube = datacube.resample(time="1MS").mean()
+        datacube = datacube.resample(time=args.resample).mean()
 
     # ======================
     # SPATIAL SUBSET

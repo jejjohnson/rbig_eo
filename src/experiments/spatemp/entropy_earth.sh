@@ -10,4 +10,4 @@
 module load Anaconda3
 source activate rbig_eo
 
-srun --nodes 1 --ntasks 1 python -u src/experiments/spatemp/entropy_earth_slurm.py --region world --period 2002_2010 --job $SLURM_ARRAY_TASK_ID --save v1 --subsample 200000 -rs 1MS --method old -rc
+srun --nodes 1 --ntasks 1 python -u src/experiments/spatemp/entropy_earth_slurm.py --region world --period 2002_2010 --job $SLURM_ARRAY_TASK_ID --save v2 --subsample 200000 --method old

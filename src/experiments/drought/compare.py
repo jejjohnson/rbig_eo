@@ -199,6 +199,6 @@ if __name__ == "__main__":
     )
     # logistics
     parser.add_argument(
-        "--save", default="drought_v0", type=str, help="Save Name for data results.",
+        "--save", default="v0", type=str, help="Save Name for data results.",
     )
     main(parser.parse_args())

@@ -12,8 +12,8 @@ from sklearn.preprocessing import KernelCenterer
 from sklearn.gaussian_process.kernels import RBF
 import time
 from src.models.utils import subset_indices
-from rbig.rbig import RBIGMI, RBIG as oldRBIG
-from rbig.model import RBIG
+from src.rbig.rbig import RBIGMI, RBIG as oldRBIG
+from src.rbig.rbig.model import RBIG
 
 
 def univariate_stats(X: np.ndarray, Y: np.ndarray) -> Dict[str, float]:
@@ -176,9 +176,9 @@ def rbig_it_measures(
     rbig_results["rbig_I_xy"] = I_rbig_model.fit(X, Y).mutual_information()
     rbig_results["rbig_I_time"] = time.time() - t0
 
-    t0 = time.time()
-    rbig_results["rbig_I_xx"] = I_rbig_model.fit(X, X).mutual_information()
-    rbig_results["rbig_Ixx_time"] = time.time() - t0
+    # t0 = time.time()
+    # rbig_results["rbig_I_xx"] = I_rbig_model.fit(X, X).mutual_information()
+    # rbig_results["rbig_Ixx_time"] = time.time() - t0
 
     # # calculate the variation of information coefficient
     # rbig_results["rbig_vi_coeff"] = variation_of_info(

@@ -33,7 +33,7 @@ from scipy import stats
 from src.experiments.utils import dict_product
 import itertools
 
-RES_PATH = PATH.joinpath("data/drought/results/")
+RES_PATH = PATH.joinpath("data/drought/results/compare")
 
 
 def main(args):
@@ -153,70 +153,72 @@ def main(args):
         )
 
         results_df_single.to_csv(SMOKE_NAME)
+    else:
+        with tqdm(parameters) as params:
+            for iparams in params:
+                # Update progress bar
+                postfix = dict(
+                    Year=f"{iparams['cubes'][0]}",
+                    Temporal=f"{iparams['temporal']}",
+                    Spatial=f"{iparams['spatial']}",
+                )
+                params.set_postfix(postfix)
 
-    with tqdm(parameters) as params:
-        for iparams in params:
-            # Update progress bar
-            postfix = dict(
-                Year=f"{iparams['cubes'][0]}",
-                Temporal=f"{iparams['temporal']}",
-                Spatial=f"{iparams['spatial']}",
-            )
-            params.set_postfix(postfix)
+                # extract density cubes
+                vod_df, lst_df, ndvi_df, sm_df = get_density_cubes(
+                    iparams["cubes"][1], iparams["spatial"], iparams["temporal"]
+                )
 
-            # extract density cubes
-            vod_df, lst_df, ndvi_df, sm_df = get_density_cubes(
-                iparams["cubes"][1], iparams["spatial"], iparams["temporal"]
-            )
+                # get common elements
+                dfs = get_common_elements_many([vod_df, lst_df, ndvi_df, sm_df])
 
-            # get common elements
-            dfs = get_common_elements_many([vod_df, lst_df, ndvi_df, sm_df])
+                variables = {"VOD": dfs[0], "NDVI": dfs[1], "SM": dfs[2], "LST": dfs[3]}
 
-            variables = {"VOD": dfs[0], "NDVI": dfs[1], "SM": dfs[2], "LST": dfs[3]}
+                # get unique permutations
+                var_set1 = pd.concat(
+                    [variables["NDVI"], variables["SM"], variables["LST"]], axis=1
+                )
+                var_set2 = pd.concat(
+                    [
+                        variables["NDVI"],
+                        variables["SM"],
+                        variables["LST"],
+                        variables["VOD"],
+                    ],
+                    axis=1,
+                )
+                # print(var_set1.shape, var_set2.shape)
 
-            # get unique permutations
-            var_set1 = pd.concat(
-                [variables["NDVI"], variables["SM"], variables["LST"]], axis=1
-            )
-            var_set2 = pd.concat(
-                [
-                    variables["NDVI"],
-                    variables["SM"],
-                    variables["LST"],
-                    variables["VOD"],
-                ],
-                axis=1,
-            )
-            # print(var_set1.shape, var_set2.shape)
+                # logger.info(f"Subsetting data")
+                if args.subsample < var_set1.values.shape[0]:
+                    idx = subset_indices(var_set1.values, subsample=args.subsample)
+                    var_set1 = var_set1.iloc[idx, :]
+                    var_set2 = var_set2.iloc[idx, :]
+                # standardize data
+                # logger.info(f"Standardizing Data...")
+                X_norm = StandardScaler().fit_transform(var_set1.values)
+                Y_norm = StandardScaler().fit_transform(var_set2.values)
+                # logger.info(f"Data inputs: {X_norm.shape},{Y_norm.shape}")
 
-            logger.info(f"Subsetting data")
-            idx = subset_indices(var_set1.values, subsample=args.subsample)
+                # entropy, total correlation
+                # logger.info(f"Getting similarity scores...")
+                multivar_stats = get_similarity_scores(X_norm, Y_norm, verbose=0)
 
-            # standardize data
-            logger.info(f"Standardizing Data...")
-            X_norm = StandardScaler().fit_transform(var_set1.iloc[idx, :])
-            Y_norm = StandardScaler().fit_transform(var_set2.iloc[idx, :])
-            logger.info(f"Data inputs: {X_norm.shape},{Y_norm.shape}")
+                # get H and TC
+                results_df_single = results_df_single.append(
+                    {
+                        "year": iparams["cubes"][0],
+                        "drought": drought_years[str(iparams["cubes"][0])],
+                        "samples": X_norm.shape[0],
+                        "temporal": iparams["temporal"],
+                        "variable1": "SMADI",
+                        "variable2": "SMADI+",
+                        **multivar_stats,
+                    },
+                    ignore_index=True,
+                )
 
-            # entropy, total correlation
-            logger.info(f"Getting similarity scores...")
-            multivar_stats = get_similarity_scores(X_norm, Y_norm, verbose=0)
-
-            # get H and TC
-            results_df_single = results_df_single.append(
-                {
-                    "year": iparams["cubes"][0],
-                    "drought": drought_years[str(iparams["cubes"][0])],
-                    "samples": X_norm.shape[0],
-                    "temporal": iparams["temporal"],
-                    "variable1": "SMADI",
-                    "variable2": "SMADI+",
-                    **multivar_stats,
-                },
-                ignore_index=True,
-            )
-
-            results_df_single.to_csv(SAVE_NAME)
+                results_df_single.to_csv(SAVE_NAME)
 
 
 if __name__ == "__main__":
